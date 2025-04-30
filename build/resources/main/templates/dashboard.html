@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Relink Dashboard – Draft Smartlink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+       background-color: #f8f9fc;
+       font-family: 'Segoe UI', sans-serif;
+     }
+     .sidebar {
+       width: 250px;
+       height: 100vh;
+       background-color: #fff;
+       border-right: 1px solid #e2e8f0;
+       display: flex;
+       flex-direction: column;
+       justify-content: space-between;
+       padding: 1.5rem 1rem;
+     }
+     .sidebar .nav-link {
+       border-radius: 12px;
+       padding: 0.85rem 1.2rem;
+       font-weight: 500;
+       font-size: 0.95rem;
+       color: #1e293b;
+     }
+     .sidebar .nav-link.active {
+       background-color: #0f172a;
+       color: #fff;
+     }
+     .sidebar .section-title {
+       font-size: 0.75rem;
+       text-transform: uppercase;
+       color: #94a3b8;
+       margin-top: 2rem;
+       margin-bottom: 0.75rem;
+       padding-left: 0.5rem;
+     }
+     .btn-outline {
+       background-color: #f1f5f9;
+       border: none;
+       font-weight: 600;
+       border-radius: 10px;
+       padding: 0.6rem 1rem;
+     }
+     .user-card {
+       background-color: #fff7ed;
+       border-radius: 12px;
+       padding: 0.5rem 1rem;
+       font-size: 0.9rem;
+       font-weight: 500;
+       color: #d97706;
+     }
+     .main-content {
+       flex-grow: 1;
+       padding: 2rem 3rem;
+     }
+     .config-card {
+       background: #fff;
+       border: 1px solid #e2e8f0;
+       border-radius: 16px;
+       padding: 2.5rem;
+       box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+     }
+     .btn-dark.active {
+       background-color: #0f172a;
+     }
+     .badge-orange {
+       background-color: #f97316;
+       color: #fff;
+       font-size: 0.75rem;
+       padding: 0.3rem 0.5rem;
+       border-radius: 5px;
+     }
+     .smartlink-type button {
+       margin: 0.3rem;
+       border-radius: 10px;
+       padding: 0.45rem 1rem;
+       font-size: 0.9rem;
+     }
+     .form-control {
+       padding: 0.5rem 0.75rem;
+       font-size: 0.95rem;
+       border-radius: 8px;
+     }
+     .form-control:disabled {
+       background-color: #f1f5f9;
+       color: #9ca3af;
+     }
+     .footer-logo {
+       font-size: 1.25rem;
+       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+     }
+     .input-group-text {
+       background-color: #f1f5f9;
+       border: 1px solid #e2e8f0;
+     }
+     .input-group .btn {
+       border-top-left-radius: 0;
+       border-bottom-left-radius: 0;
+     }
+     label.form-label {
+       font-size: 0.9rem;
+       color: #1e293b;
+       margin-bottom: 0.4rem;
+     }
+     small.text-muted {
+       font-size: 0.75rem;
+     }
+     h4.fw-bold.mb-3 {
+       font-size: 1.4rem;
+       margin-bottom: 2rem !important;
+     }
+     h5.fw-semibold {
+       font-size: 1.2rem;
+       margin-bottom: 1.25rem;
+     }
+     .btn-outline-secondary {
+       border-radius: 8px;
+       font-size: 0.9rem;
+       padding: 0.45rem 1rem;
+     }
+     .btn-outline-secondary:disabled {
+       opacity: 0.6;
+       background-color: #f8fafc;
+     }
+     .btn-group .btn {
+       font-weight: 500;
+     }
+     .btn-copy {
+       border: none;
+       background-color: transparent;
+       padding: 0 0.5rem;
+       font-size: 1.1rem;
+       color: #64748b;
+     }
+     .input-wrapper {
+       border: 1px solid #e2e8f0;
+       border-radius: 16px;
+       padding: 0.9rem 1.25rem;
+       background-color: #fff;
+       display: flex;
+       align-items: center;
+       gap: 0.75rem;
+       font-size: 1rem;
+     }
+     .readonly-input {
+       border: none;
+       outline: none;
+       background: transparent;
+       flex-grow: 1;
+       color: #334155;
+       font-weight: 500;
+     }
+     .custom-button {
+       background-color: #f1f5f9;
+       border: none;
+       border-radius: 16px;
+       font-weight: 600;
+       padding: 0.9rem 1.25rem;
+       font-size: 1rem;
+       color: #334155;
+     }
+     .custom-button.disabled, .custom-button:disabled {
+       background-color: #f1f5f9;
+       color: #cbd5e1;
+       opacity: 1;
+     }
+     .note-muted {
+       font-size: 0.9rem;
+       color: #64748b;
+       margin-top: 0.5rem;
+     }
+     .icon-btn {
+       background: none;
+       border: none;
+       font-size: 1.1rem;
+       color: #64748b;
+     }
+     .rounded-pill-input {
+       border: 1px solid #e2e8f0;
+       border-radius: 16px;
+       padding: 0.9rem 1.25rem;
+       font-size: 1rem;
+       color: #64748b;
+       width: 100%;
+     }
+     .toggle-pill {
+       display: flex;
+       background-color: #f8fafc;
+       border-radius: 16px;
+       overflow: hidden;
+     }
+     .toggle-pill button {
+       flex: 1;
+       padding: 0.35rem 1.25rem;
+       border: none;
+       background-color: transparent;
+       font-weight: 600;
+       color: #0f172a;
+       font-size: 1rem;
+     }
+     .toggle-pill .active {
+       background-color: #0f172a;
+       color: #ffffff;
+     }
+     .add-link-btn {
+       background-color: #ff5b00;
+       border-radius: 16px;
+       font-size: 1.1rem;
+       font-weight: 600;
+       color: white;
+       padding: 0.5rem;
+       border: none;
+       width: 100%;
+     }
+     .preview-box {
+       border: 1px solid #d1d5db;
+       border-radius: 20px;
+       background: #fff;
+       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+       padding: 2rem;
+       text-align: center;
+       color: #0f172a;
+     }
+     .preview-box h5 {
+       font-weight: 700;
+     }
+     .preview-box .bi {
+       font-size: 2.5rem;
+       color: #cbd5e1;
+       margin: 1.25rem 0 0.5rem;
+     }
+     .preview-box small {
+       color: #94a3b8;
+       font-weight: 500;
+     }
+
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div>
+            <h5 class="fw-bold ps-2">relink</h5>
+            <div class="section-title">Main</div>
+            <a href="#" class="nav-link"><i class="bi bi-grid"></i> Summary</a>
+            <a href="#" class="nav-link"><i class="bi bi-currency-dollar"></i> Plan</a>
+
+            <div class="section-title">Smartlinks</div>
+            <a href="#" class="nav-link active"><i class="bi bi-file-earmark"></i> Draft Smartlink</a>
+            <a href="#" class="nav-link"><i class="bi bi-file-earmark"></i> Draft Smartlink</a>
+            <a href="#" class="btn btn-outline w-100 mt-2">+ Create New</a>
+        </div>
+        <div>
+            <div class="user-card mb-2">💡 Starter</div>
+            <div class="d-flex align-items-center gap-2">
+                <img src="https://relink.is/_next/image?url=https%3A%2F%2Flh3.googleusercontent.com%2Fa%2FACg8ocIvkQVofCoWmPYxYXl0J3yoJrnO_tjtuQ9Duh4mPtOENb-gTtI%3Ds96-c&w=32&q=75" class="rounded-circle" alt="User">
+                <span class="fw-medium">Sarkhan Rasullu</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content container-fluid">
+        <h4 class="fw-bold mb-3"><i class="bi bi-link-45deg"></i> Draft Smartlink</h4>
+
+        <div class="main-content container">
+            <div class="config-card">
+                <div class="d-flex justify-content-start mb-4 gap-3">
+                    <button class="btn btn-outline-dark">Analytics</button>
+                    <button class="btn btn-dark active">Configuration</button>
+                </div>
+
+                <h5 class="fw-semibold">General configuration</h5>
+                <div class="row mt-3">
+                    <div class="col-md-2 text-center">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?data=relink.is/s6l6wd&size=120x120" class="rounded shadow-sm p-2" alt="QR Code">
+                        <div class="text-muted small mt-2">Click for download</div>
+                    </div>
+                    <div class="col-md-10">
+
+                        <div class="row mb-3">
+                            <div class="container py-4">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="form-section-title">Smartlink Name <i class="bi bi-question-circle"></i></div>
+                                        <div class="input-wrapper">
+                                            <i class="bi bi-bookmark"></i>
+                                            <input type="text" class="readonly-input" value="Draft Smartlink" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-section-title">Open Graph Settings</div>
+                                        <button class="custom-button w-100"><i class="bi bi-window me-2"></i>Open Graph</button>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-section-title">Smartlink URL <i class="bi bi-question-circle"></i></div>
+                                        <div class="input-wrapper">
+                                            <i class="bi bi-link-45deg"></i>
+                                            <span class="readonly-input">relink.is/s6l6wd</span>
+                                            <span class="badge-orange">Professional</span>
+                                            <button class="icon-btn"><i class="bi bi-copy"></i></button>
+                                            <button class="icon-btn"><i class="bi bi-box-arrow-up-right"></i></button>
+                                        </div>
+                                        <div class="note-muted">
+                                            <i class="bi bi-info-circle me-1"></i> Custom URL available on premium plan
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-section-title">UTM Settings</div>
+                                        <button class="custom-button w-100"><i class="bi bi-graph-up-arrow me-2"></i>Generate UTM</button>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-section-title">QR Settings</div>
+                                        <button class="custom-button w-100" disabled><i class="bi bi-qr-code me-2"></i>Edit QR</button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-section-title">Script Injector</div>
+                                        <button class="custom-button w-100" disabled><i class="bi bi-code-slash me-2"></i>Insert Script</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="form-label fw-semibold">Select smartlink type</label>
+                            <div class="smartlink-type">
+                                <button type="tab-button" class="btn btn-dark" for="app-shortener">App shortener</button>
+                                <button type="tab-button" class="btn btn-outline-secondary" for="url-shortener">URL shortener</button>
+                                <button type="tab-button"class="btn btn-outline-secondary" for="link-in-bio">Link-in-Bio</button>
+                                <button type="tab-button"class="btn btn-outline-secondary" for="qr-tag">QR Tag</button>
+                            </div>
+                        </div>
+
+                        <div type="tab" id="app-shortener" class="mt-4">
+                            <label class="form-label fw-semibold">App download links</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">App Store (iOS) app URL <i class="bi bi-question-circle"></i></label>
+                                    <input type="text" class="form-control" placeholder="https://apps.apple.com/en/app/your-app-name/id123456789">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Google Play (Android) app URL <i class="bi bi-question-circle"></i></label>
+                                    <input type="text" class="form-control" placeholder="https://play.google.com/store/apps/details?id=com.example.app">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Windows app URL</label>
+                                    <input type="text" class="form-control" placeholder="https://example.com/windows/9NBLGGH4XXXX">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">MacOS app URL</label>
+                                    <input type="text" class="form-control" placeholder="https://apps.apple.com/us/app/your-macos-app/id123456789">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">iPad version App Store (iOS) app URL</label>
+                                    <input type="text" class="form-control" placeholder="https://apps.apple.com/app/ipad-app/id123456789">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">AppGallery app URL</label>
+                                    <input type="text" class="form-control" placeholder="https://appgallery.huawei.com/app/C123456">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Amazon Appstore app URL</label>
+                                    <input type="text" class="form-control" placeholder="https://www.amazon.com/gp/product/B00EXAMPLE">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div type="tab"  id="url-shortener" class="mt-4 container py-5">
+                            <div class="row g-4 align-items-center">
+                                <div class="col-md-6">
+                                    <label class="form-section-title">URL</label>
+                                    <input type="text" class="rounded-pill-input" placeholder="https://relink.is" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-section-title">Password Protection</label>
+                                    <div class="toggle-pill">
+                                        <button class="active">Off</button>
+                                        <button>On</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div type="tab"  id="link-in-bio">
+                            <div class="container py-5">
+                                <div class="row g-4 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-section-title">Title</label>
+                                        <input type="text" class="form-control pill-input" value="Relink Smartlink">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-section-title">Description</label>
+                                        <input type="text" class="form-control pill-input" value="Relink">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-section-title">Logo</label>
+                                        <input type="file" accept="image/*" class="form-control pill-input">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-section-title">Theme color</label>
+                                        <input type="color" class="form-control form-control-color pill-input" value="#000000">
+                                    </div>
+                                </div>
+
+                                <div class="row g-4 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-section-title">Layout</label>
+                                        <div class="toggle-pill">
+                                            <button class="active">List</button>
+                                            <button>Grid</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-section-title">Theme</label>
+                                        <div class="toggle-pill">
+                                            <button class="active">Light</button>
+                                            <button>Auto</button>
+                                            <button>Dark</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-0">
+                                    <div class="col-md-6 p-4 bg-light">
+                                        <button class="add-link-btn"><i class="bi bi-plus-lg me-2"></i>Add Link</button>
+                                    </div>
+                                    <div class="col-md-6 p-4 bg-white d-flex align-items-center justify-content-center">
+                                        <div class="preview-box">
+                                            <h5 class="mb-3">Relink Smartlink</h5>
+                                            <small>Powered by <strong>relink</strong></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div type="tab"  id="qr-tag">
+                            <div class="container py-5">
+                                <div class="row g-4 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-section-title">Title</label>
+                                        <input type="text" class="form-control pill-input" placeholder="Enter title" value="Relink Smartlink">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-section-title">Description</label>
+                                        <input type="text" class="form-control pill-input" placeholder="Enter description" value="Relink">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-section-title">Picture</label>
+                                        <input type="file" accept="image/*" class="form-control pill-input">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-section-title">Theme color</label>
+                                        <input type="color" class="form-control form-control-color pill-input" value="#000000">
+                                    </div>
+                                </div>
+
+                                <div class="row g-0">
+                                    <div class="col-md-6 bg-light p-4">
+                                        <label class="form-section-title">Select a preset</label>
+                                        <select class="form-select pill-input">
+                                            <option>Select a preset</option>
+                                            <option>Preset 1</option>
+                                            <option>Preset 2</option>
+                                            <option>Preset 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-4">
+                                        <div class="preview-box">
+                                            <h5>Relink Smartlink</h5>
+                                            <i class="bi bi-link-45deg"></i>
+                                            <div class="text-muted fw-semibold">Add link to preview</div>
+                                            <small class="mt-2 d-block">Powered by <strong>relink</strong></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const buttons = document.querySelectorAll('[type="tab-button"]');
+      const tabs = document.querySelectorAll('[type="tab"]');
+
+      function activateTab(id) {
+        tabs.forEach(tab => {
+          tab.style.display = tab.id === id ? 'block' : 'none';
+        });
+
+        buttons.forEach(btn => {
+          if (btn.getAttribute('for') === id) {
+            btn.classList.add('btn-dark');
+            btn.classList.remove('btn-outline-secondary');
+          } else {
+            btn.classList.remove('btn-dark');
+            btn.classList.add('btn-outline-secondary');
+          }
+        });
+      }
+
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          const targetId = button.getAttribute('for');
+          activateTab(targetId);
+        });
+      });
+
+      // Initialize first tab
+      if (tabs.length > 0) {
+        activateTab(tabs[0].id);
+      }
+    });
+</script>
+</body>
+</html>
