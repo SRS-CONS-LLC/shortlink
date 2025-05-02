@@ -1,17 +1,17 @@
-# Use a lightweight JDK base image
+# Use the Eclipse Temurin JDK base image
 FROM eclipse-temurin:21-jdk-alpine
 
-# Set working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy everything
-COPY . .
+# Copy all project files into the container
+COPY . ./
 
-# Give execution permission to gradlew
+# Ensure Gradle wrapper is executable
 RUN chmod +x ./gradlew
 
-# Build the Spring Boot app without running tests
-RUN ./gradlew build -x test
+# Build the application using Gradle (skipping tests)
+RUN ./gradlew clean build -x test
 
-# Run the Spring Boot jar
+# Run the app by dynamically finding the JAR in the build/libs directory
 CMD ["sh", "-c", "java -jar build/libs/*.jar"]
