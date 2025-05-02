@@ -1,0 +1,18 @@
+package com.srscons.shortlink.dto;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+public class SmartLinkRequest {
+     String title;
+     String url;
+     boolean draft;
+     LocalDateTime createdAt;
+}
