@@ -10,6 +10,6 @@
         <module name="shortlink.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="24" />
+    <bytecodeTargetLevel target="21" />
   </component>
 </project>
