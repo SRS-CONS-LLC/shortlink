@@ -14,4 +14,4 @@ RUN chmod +x ./gradlew
 RUN ./gradlew clean build -x test
 
 # Run the app by dynamically finding the JAR in the build/libs directory
-CMD ["sh", "-c", "java -jar build/libs/*.jar"]
+CMD ["java", "-jar", "build/libs/shortlink-0.0.1-SNAPSHOT.jar"]
