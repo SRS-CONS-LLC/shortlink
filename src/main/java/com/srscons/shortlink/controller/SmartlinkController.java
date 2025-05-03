@@ -1,5 +1,7 @@
 package com.srscons.shortlink.controller;
 
+import com.srscons.shortlink.dto.SmartlinkRequestDto;
+import com.srscons.shortlink.dto.SmartlinkResponseDto;
 import com.srscons.shortlink.model.Smartlink;
 import com.srscons.shortlink.service.SmartlinkService;
 import lombok.RequiredArgsConstructor;
@@ -15,18 +17,18 @@ public class SmartlinkController {
     private final SmartlinkService smartlinkService;
 
     @GetMapping
-    public ResponseEntity<List<Smartlink>> getAllSmartlinks() {
+    public ResponseEntity<List<SmartlinkResponseDto>> getAllSmartlinks() {
         return ResponseEntity.ok(smartlinkService.getAllSmartlinks());
     }
 
     @GetMapping("/drafts")
-    public ResponseEntity<List<Smartlink>> getDrafts() {
+    public ResponseEntity<List<SmartlinkResponseDto>> getDrafts() {
         return ResponseEntity.ok(smartlinkService.getDraftSmartlinks());
     }
 
     @PostMapping
-    public ResponseEntity<Smartlink> create(@RequestBody Smartlink smartlink) {
-        return ResponseEntity.ok(smartlinkService.create(smartlink));
+    public ResponseEntity<SmartlinkResponseDto> create(@RequestBody SmartlinkRequestDto smartlinkDto) {
+        return ResponseEntity.ok(smartlinkService.create(smartlinkDto));
     }
 }
 

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class SmartLinkRequest {
+public class SmartlinkRequestDto {
      String title;
      String url;
      boolean draft;
