@@ -1,4 +1,4 @@
-package com.srscons.shortlink;
+package com.srscons.shortlink.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,5 +17,11 @@ public class IndexController {
     public String dashboardPage() {
         return "dashboard";
     }
+
+    @RequestMapping("/test-smartlink")
+    public String testSmartlinkPage() {
+        return "test-smartlink"; // templates/test-smartlink.html faylına yönləndirir
+    }
+
 
 }
