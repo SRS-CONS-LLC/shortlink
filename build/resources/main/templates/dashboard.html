@@ -304,7 +304,10 @@
                                         <div class="form-section-title">Smartlink URL <i class="bi bi-question-circle"></i></div>
                                         <div class="input-wrapper">
                                             <i class="bi bi-link-45deg"></i>
-                                            <span class="readonly-input">relink.is/s6l6wd</span>
+                                            <span class="readonly-input">
+                                                <a th:href="${shortUrl}" th:text="${shortUrl}"></a>
+
+                                            </span>
                                             <span class="badge-orange">Professional</span>
                                             <button class="icon-btn"><i class="bi bi-copy"></i></button>
                                             <button class="icon-btn"><i class="bi bi-box-arrow-up-right"></i></button>

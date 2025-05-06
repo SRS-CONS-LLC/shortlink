@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Redirecting...</title>
+  <script th:inline="javascript">
+    window.onload = async function () {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      const res = await fetch('https://ipapi.co/json/');
+      const geo = await res.json();
+      const country = geo.country_name;
+
+      const params = new URLSearchParams(window.location.search);
+      const utm_source = params.get('utm_source') || 'direct';
+      const utm_medium = params.get('utm_medium') || 'none';
+      const utm_campaign = params.get('utm_campaign') || 'none';
+
+      const shortCode = /*[[${shortCode}]]*/ '';
+      const redirectUrl = /*[[${redirectUrl}]]*/ '';
+
+      // BÜTÜN MƏLUMATLARI QUERY STRING İÇİNƏ YAZ
+      const query = new URLSearchParams({
+        shortCode: shortCode,
+        redirectUrl: redirectUrl,
+        timezone: tz,
+        country: country,
+        utmSource: utm_source,
+        utmMedium: utm_medium,
+        utmCampaign: utm_campaign
+      }).toString();
+
+      // SORĞUNU GÖNDƏR
+      await fetch(`/visit?${query}`, {
+        method: 'POST'
+      });
+
+      // ƏSAS URL-Ə YÖNLƏNDİR
+      window.location.href = redirectUrl;
+    };
+  </script>
+</head>
+<body>
+<p>Redirecting, please wait...</p>
+</body>
+</html>

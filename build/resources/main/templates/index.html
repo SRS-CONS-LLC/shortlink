@@ -94,10 +94,13 @@
     <div class="container">
         <h1 class="display-5 fw-bold">One relink<br>for all app stores and webpages</h1>
         <p class="lead text-muted">Single short link or QR code that directs users to your app or webpage...</p>
-        <div class="input-group w-75 mx-auto my-4">
-            <input type="text" class="form-control shadow-sm" value="relink.is/yourlink">
-            <button class="btn btn-orange">Create now →</button>
-        </div>
+        <form th:action="@{/shorten}" method="post">
+            <div class="input-group w-75 mx-auto my-4">
+                <input type="text" class="form-control shadow-sm"
+                       name="url" placeholder="relink.is/yourlink" required/>
+                <button type="submit" class="btn btn-orange">Create now →</button>
+            </div>
+        </form>
 
         <div class="row text-center mt-5">
             <div class="col-md-3 stat-card">
