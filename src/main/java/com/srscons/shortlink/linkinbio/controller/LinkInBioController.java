@@ -1,12 +1,12 @@
 package com.srscons.shortlink.linkinbio.controller;
 
-
-import com.srscons.shortlink.linkinbio.dto.LinkInBioDto;
+import com.srscons.shortlink.linkinbio.controller.dto.request.LinkInBioRequestDto;
+import com.srscons.shortlink.linkinbio.controller.dto.response.LinkInBioResponseDto;
+import com.srscons.shortlink.linkinbio.controller.mapper.LinkInBioViewMapper;
 import com.srscons.shortlink.linkinbio.service.LinkInBioService;
+import com.srscons.shortlink.linkinbio.service.dto.LinkInBioDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,16 +19,17 @@ public class LinkInBioController {
 
     private final LinkInBioService linkInBioService;
 
-    @GetMapping("/dashboard")
-    public String getDashboard(Model model) {
-        model.addAttribute("link", new LinkInBioDto());
-        return "dashboard";
-    }
+    private final LinkInBioViewMapper linkInBioViewMapper;
 
-    @PostMapping("/linkinbio")
-    public String createLinkInBio(@ModelAttribute LinkInBioDto request, RedirectAttributes redirectAttributes) {
-        LinkInBioDto response = linkInBioService.create(request);
-        redirectAttributes.addFlashAttribute("link", response);
+    @PostMapping("/upload")
+    public String createLinkInBio(@ModelAttribute LinkInBioRequestDto request, RedirectAttributes redirectAttributes) {
+        LinkInBioDto linkInBioDto = linkInBioViewMapper.fromRequestToBusiness(request);
+        LinkInBioDto createdBioDto = linkInBioService.create(linkInBioDto);
+
+        LinkInBioResponseDto responseDto = linkInBioViewMapper.fromBusinessToResponse(createdBioDto);
+        redirectAttributes.addFlashAttribute("link", responseDto);
+
         return "redirect:/dashboard";
     }
+
 }

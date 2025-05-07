@@ -77,6 +77,10 @@
                     </div>
                 </div>
 
+
+            </div>
+
+            <div class="col-md-12">
                 <div class="mt-4">
                     <label class="form-label fw-semibold">Select smartlink type</label>
                     <div class="smartlink-type">
@@ -141,138 +145,8 @@
                 </div>
 
                 <div type="tab"  id="link-in-bio">
-                    <div class="container py-5">
-                        <form th:action="@{/link-in-bio/linkinbio}" method="post" enctype="multipart/form-data" th:object="${link}">
-                            <div class="row g-4 mb-4">
-                                <div class="col-md-6">
-                                    <label class="form-section-title">Title</label>
-                                    <input type="text" th:field="*{title}" class="form-control pill-input" placeholder="Enter title" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-section-title">Description</label>
-                                    <input type="text" th:field="*{description}" class="form-control pill-input" placeholder="Enter description"required>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-section-title">Logo</label>
-                                    <input type="file" th:field="*{logoFile}" accept="image/*" class="form-control pill-input"required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-section-title">Theme</label>
-                                    <select name="themeType" id="themeType" class="form-control pill-input">
-                                        <option value="AUTO">AUTO</option>
-                                        <option value="LIGHT">LIGHT</option>
-                                        <option value="DARK">DARK</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="form-section-title">Links</label>
-                                <div class="mb-3 p-3 rounded border" style="background-color: #f9f9f9;">
-                                    <input type="url" th:field="*{links[0].url}" class="form-control mb-2" placeholder="Your link address" oninput="updatePreview(0)" />
-                                    <input type="text" th:field="*{links[0].title}" class="form-control" placeholder="Title" oninput="updatePreview(0)" />
-                                </div>
-                                <div class="mb-3 rounded border" style="background-color: #f9f9f9;">
-                                    <input type="url" th:field="*{links[1].url}" class="form-control mb-2" placeholder="Your link address" oninput="updatePreview(1)"/>
-                                    <input type="text" th:field="*{links[1].title}" class="form-control" placeholder="Title" oninput="updatePreview(1)"/>
-                                </div>
-                                <div class="mb-3 rounded border" style="background-color: #f9f9f9;">
-                                    <input type="url" th:field="*{links[2].url}" class="form-control mb-2" placeholder="Your link address" oninput="updatePreview(2)"/>
-                                    <input type="text" th:field="*{links[2].title}" class="form-control" placeholder="Title" oninput="updatePreview(2)"/>
-                                </div>
-                                <div class="mb-3 rounded border" style="background-color: #f9f9f9;">
-                                    <input type="url" th:field="*{links[3].url}" class="form-control mb-2" placeholder="Your link address" oninput="updatePreview(3)"/>
-                                    <input type="text" th:field="*{links[3].title}" class="form-control" placeholder="Title" oninput="updatePreview(3)"/>
-                                </div>
-                                <div class="mb-3 rounded border" style="background-color: #f9f9f9;">
-                                    <input type="url" th:field="*{links[4].url}" class="form-control mb-2" placeholder="Your link address" oninput="updatePreview(4)"/>
-                                    <input type="text" th:field="*{links[4].title}" class="form-control" placeholder="Title" oninput="updatePreview(4)"/>
-                                </div>
-                                <div class="mb-3 rounded border" style="background-color: #f9f9f9;">
-                                    <input type="url" th:field="*{links[5].url}" class="form-control mb-2" placeholder="Your link address" oninput="updatePreview(5)"/>
-                                    <input type="text" th:field="*{links[5].title}" class="form-control" placeholder="Title" oninput="updatePreview(5)"/>
-                                </div>
-                                <div class="mb-3 rounded border" style="background-color: #f9f9f9;">
-                                    <input type="url" th:field="*{links[6].url}" class="form-control mb-2" placeholder="Your link address" oninput="updatePreview(6)"/>
-                                    <input type="text" th:field="*{links[6].title}" class="form-control" placeholder="Title" oninput="updatePreview(6)"/>
-                                </div>
-                            </div>
-
-                            <div class="row g-0">
-                                <div class="col-md-6 p-4 bg-light">
-                                    <button type="submit" class="add-link-btn">
-                                        <i class="bi bi-plus-lg me-2"></i>Save Link-in-Bio
-                                    </button>
-                                </div>
-                                <div class="col-md-6 p-4 bg-white d-flex align-items-center justify-content-center">
-                                    <div class="preview-box" id="previewBox">
-                                        <h5 class="mb-3" th:text="*{title} ?: 'Relink Smartlink'" id="preview-title">Relink Smartlink</h5>
-                                        <div id="preview-links"></div>
-                                        <small>Powered by <strong>relink</strong></small>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                    <div th:insert="~{link-in-bio.html}"></div>
                 </div>
-
-                <script>
-                    function updatePreview(index) {
-                        const urlInput = document.querySelector(`input[name='links[${index}].url']`);
-                        const titleInput = document.querySelector(`input[name='links[${index}].title']`);
-
-                        const url = urlInput ? urlInput.value : '';
-                        const title = titleInput ? titleInput.value : '';
-
-                        const previewContainer = document.getElementById("preview-links");
-
-                        let linkDiv = document.getElementById(`preview-link-${index}`);
-                        if (!linkDiv) {
-                            linkDiv = document.createElement("div");
-                            linkDiv.id = `preview-link-${index}`;
-                            linkDiv.className = "mb-2";
-                            previewContainer.appendChild(linkDiv);
-                        }
-
-                        if (!url && !title) {
-                            linkDiv.remove();
-                            return;
-                        }
-
-                        linkDiv.innerHTML = `<a href="${url || '#'}" target="_blank"><strong>${title || 'No Title'}</strong></a>`;
-                    }
-                </script>
-
-                <!-- Script: Enum dəyərinə uyğun rəng dəyişir -->
-                <script>
-                    document.addEventListener("DOMContentLoaded", function () {
-                        const themeSelect = document.getElementById("themeType");
-                        const previewBox = document.getElementById("previewBox");
-
-                        function applyTheme(theme) {
-                            if (theme === "DARK") {
-                                previewBox.style.backgroundColor = "#1f1f1f";
-                                previewBox.style.color = "#ffffff";
-                            } else if (theme === "LIGHT") {
-                                previewBox.style.backgroundColor = "#ffffff";
-                                previewBox.style.color = "#000000";
-                            } else {
-                                previewBox.style.backgroundColor = "#f8f9fa";
-                                previewBox.style.color = "#212529";
-                            }
-                        }
-
-                        if (themeSelect && previewBox) {
-                            themeSelect.addEventListener("change", function () {
-                                applyTheme(this.value);
-                            });
-                            applyTheme(themeSelect.value); // səhifə yüklənəndə də tətbiq et
-                        } else {
-                            console.error("Elementlər tapılmadı.");
-                        }
-                    });
-                </script>
 
                 <div type="tab"  id="qr-tag">
                     <div class="container py-5">

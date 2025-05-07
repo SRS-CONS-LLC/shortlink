@@ -1,14 +1,11 @@
 package com.srscons.shortlink.auth;
 
-import com.google.api.services.youtube.model.Channel;
 import com.srscons.shortlink.auth.entity.UserEntity;
-import com.srscons.shortlink.auth.exception.InvalidTokenException;
 import com.srscons.shortlink.auth.repository.UserRepository;
 import com.srscons.shortlink.auth.service.GoogleAuthService;
 import com.srscons.shortlink.auth.util.CONSTANTS;
 import com.srscons.shortlink.auth.util.CookieUtil;
 import com.srscons.shortlink.auth.util.UrlAntMatcher;
-import com.srscons.shortlink.util.ListUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +29,7 @@ public class PrepareFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    public PrepareFilter(GoogleAuthService googleAuthService,  UserRepository userRepository) {
+    public PrepareFilter(GoogleAuthService googleAuthService, UserRepository userRepository) {
         this.googleAuthService = googleAuthService;
         this.userRepository = userRepository;
     }
@@ -43,13 +40,18 @@ public class PrepareFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)  {
         try {
             boolean isLoggedIn = prepareUser(request, response);
-            if(!isLoggedIn) {
+            if (!isLoggedIn) {
                 if (UrlAntMatcher.of(request.getRequestURI())
                         .notContainsAny("/public/**", "/login/**", "/oauth2/**", "/logout", "/index", "/")) {
                     response.sendRedirect("/");
+                    return;
+                }
+            }else {
+                if (UrlAntMatcher.of(request.getRequestURI()).containsAny("/index", "/")) {
+                    response.sendRedirect("/dashboard");
                     return;
                 }
             }

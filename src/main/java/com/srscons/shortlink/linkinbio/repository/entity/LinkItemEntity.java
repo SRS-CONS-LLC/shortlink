@@ -1,4 +1,4 @@
-package com.srscons.shortlink.linkinbio.entity;
+package com.srscons.shortlink.linkinbio.repository.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,19 +9,20 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "link_item")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
-public class LinkItem {
+public class LinkItemEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(name = "title")
-    String title;
+    private String title;
 
     @Column(name = "url", nullable = false)
-    String url;
+    private String url;
 
     @ManyToOne
     @JoinColumn(name = "link_in_bio_id", nullable = false)
-    LinkInBio linkInBio;
+    private LinkInBioEntity linkInBio;
+
 }

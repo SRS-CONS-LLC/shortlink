@@ -1,4 +1,4 @@
-package com.srscons.shortlink.linkinbio.entity;
+package com.srscons.shortlink.linkinbio.repository.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -6,43 +6,47 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Entity
 @Table(name = "link_in_bio")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
-public class LinkInBio {
+public class LinkInBioEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    @Column(name = "title",nullable = false)
-    String title;
+    @Column(name = "title", nullable = false)
+    private String title;
 
-    @Column(name = "description",nullable = false)
-    String description;
+    @Column(name = "description", nullable = false)
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "theme_type", columnDefinition = "varchar(10) default 'AUTO'")
-    ThemeType themeType;
+    private ThemeType themeType;
 
-    @Column(name = "logo_url")
-    String logoUrl;
+    @Column(name = "logo_file_name")
+    private String logoFileName;
 
     @OneToMany(mappedBy = "linkInBio", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<LinkItem> links = new ArrayList<>();
+    private List<LinkItemEntity> links;
 
     @CreationTimestamp
     @Column(name = "created_at")
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
+
+    public LinkInBioEntity() {
+        this.links = new ArrayList<>();
+    }
 
 }

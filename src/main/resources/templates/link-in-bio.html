@@ -1,0 +1,577 @@
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f7f8fa;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+            padding: 20px;
+            gap: 20px;
+        }
+        .form-section {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .preview-section {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding-top: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .upload-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .upload-icon {
+            margin-right: 8px;
+        }
+        .color-picker {
+            display: flex;
+            align-items: center;
+        }
+        .color-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px 0 0 6px;
+            font-size: 16px;
+        }
+        .color-swatch {
+            width: 40px;
+            height: 38px;
+            background-color: #000000;
+            border: 1px solid #ddd;
+            border-left: none;
+            border-radius: 0 6px 6px 0;
+            cursor: pointer;
+        }
+        .layout-options, .theme-options {
+            display: flex;
+            gap: 10px;
+        }
+        .option-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #101223;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-btn.active {
+            background-color: #101223;
+            color: white;
+        }
+        .option-btn.light-theme {
+            background-color: white;
+            color: #101223;
+            border: 1px solid #ddd;
+        }
+        .option-btn.light-theme.active {
+            border-color: #101223;
+        }
+        .option-btn.dark-theme {
+            background-color: #101223;
+            color: white;
+        }
+        .add-link-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #f06529;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .add-link-btn i {
+            margin-right: 8px;
+        }
+        .link-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+        .drag-handle {
+            color: #999;
+            cursor: grab;
+        }
+        .link-upload {
+            width: 36px;
+            height: 36px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+        .link-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .link-upload img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        .link-inputs {
+            flex: 1;
+        }
+        .link-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .delete-btn {
+            width: 40px;
+            height: 40px;
+            background-color: #f06529;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Preview Styles */
+        .preview-container {
+            width: 450px;
+            height: 350px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .preview-dark {
+            background-color: #101223;
+            color: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .preview-light {
+            background-color: #ffffff;
+            color: #101223;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .preview-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .preview-links {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            gap: 10px;
+        }
+        .preview-link {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .preview-light .preview-link {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .preview-link:hover {
+            background-color: #f06529;
+            color: white;
+        }
+        .preview-link-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .preview-link-icon img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        .preview-footer {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: auto;
+            padding-top: 15px;
+        }
+        .preview-light .preview-footer {
+            color: rgba(0, 0, 0, 0.6);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="form-section">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" class="form-control" value="MyTitle">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" id="description" class="form-control" placeholder="Relink">
+        </div>
+
+        <div class="form-group">
+            <label for="logo">Logo</label>
+            <button class="upload-btn">
+                <span class="upload-icon">↑</span>
+                Upload
+            </button>
+        </div>
+
+        <div class="form-group">
+            <label for="theme-color">Theme color</label>
+            <div class="color-picker">
+                <input type="color" id="theme-color" class="color-input" value="#000000">
+                <div class="color-swatch" id="color-swatch"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Layout</label>
+            <div class="layout-options">
+                <button class="option-btn active" data-layout="list">List</button>
+                <button class="option-btn" data-layout="grid">Grid</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Theme</label>
+            <div class="theme-options">
+                <button class="option-btn light-theme" data-theme="light">Light</button>
+                <button class="option-btn dark-theme active" data-theme="auto">Auto</button>
+                <button class="option-btn dark-theme" data-theme="dark">Dark</button>
+            </div>
+        </div>
+
+        <button class="add-link-btn">
+            <span>+</span>
+            Add Link
+        </button>
+
+        <div class="links-container">
+            <div class="link-item">
+                <div class="drag-handle">☰</div>
+                <div class="link-upload">
+                    <span>↑</span>
+                    <input type="file" accept="image/*" class="link-icon-upload">
+                </div>
+                <div class="link-inputs">
+                    <input type="text" class="link-input" placeholder="Your link address">
+                    <input type="text" class="link-input" placeholder="Title" value="Title">
+                </div>
+                <button class="delete-btn">🗑️</button>
+            </div>
+
+            <div class="link-item">
+                <div class="drag-handle">☰</div>
+                <div class="link-upload">
+                    <span>↑</span>
+                    <input type="file" accept="image/*" class="link-icon-upload">
+                </div>
+                <div class="link-inputs">
+                    <input type="text" class="link-input" placeholder="Your link address">
+                    <input type="text" class="link-input" placeholder="Title" value="Title">
+                </div>
+                <button class="delete-btn">🗑️</button>
+            </div>
+
+            <div class="link-item">
+                <div class="drag-handle">☰</div>
+                <div class="link-upload">
+                    <span>↑</span>
+                    <input type="file" accept="image/*" class="link-icon-upload">
+                </div>
+                <div class="link-inputs">
+                    <input type="text" class="link-input" placeholder="Your link address">
+                    <input type="text" class="link-input" placeholder="Title" value="Title">
+                </div>
+                <button class="delete-btn">🗑️</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="preview-section">
+        <div class="preview-container">
+            <div class="preview-dark" id="preview-content">
+                <div class="preview-title" id="preview-title">MyTitle</div>
+                <div class="preview-links">
+                    <div class="preview-link">
+                        <div class="preview-link-icon"></div>
+                        <span>Title</span>
+                    </div>
+                    <div class="preview-link">
+                        <div class="preview-link-icon"></div>
+                        <span>Title</span>
+                    </div>
+                    <div class="preview-link">
+                        <div class="preview-link-icon"></div>
+                        <span>Title</span>
+                    </div>
+                </div>
+                <div class="preview-footer">Powered by relink</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Elements
+    const titleInput = document.getElementById('title');
+    const themeColorInput = document.getElementById('theme-color');
+    const colorSwatch = document.getElementById('color-swatch');
+    const layoutButtons = document.querySelectorAll('.layout-options .option-btn');
+    const themeButtons = document.querySelectorAll('.theme-options .option-btn');
+    const previewTitle = document.getElementById('preview-title');
+    const previewContent = document.getElementById('preview-content');
+    const addLinkBtn = document.querySelector('.add-link-btn');
+    const linksContainer = document.querySelector('.links-container');
+    const previewLinks = document.querySelector('.preview-links');
+
+    // Update preview title when title input changes
+    titleInput.addEventListener('input', function() {
+        previewTitle.textContent = this.value;
+    });
+
+    // Update color swatch and preview background when theme color input changes
+    themeColorInput.addEventListener('input', function() {
+        const selectedColor = this.value;
+        colorSwatch.style.backgroundColor = selectedColor;
+
+        // Update preview background color
+        if (previewContent.classList.contains('preview-dark')) {
+            previewContent.style.backgroundColor = selectedColor;
+        }
+    });
+
+    // Handle layout button clicks
+    layoutButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            layoutButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Handle theme button clicks
+    themeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            themeButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            const theme = this.getAttribute('data-theme');
+            const currentColor = themeColorInput.value;
+
+            if (theme === 'light') {
+                previewContent.className = 'preview-light';
+                previewContent.style.backgroundColor = ''; // Reset to default light background
+            } else {
+                previewContent.className = 'preview-dark';
+                previewContent.style.backgroundColor = currentColor; // Apply custom color
+            }
+        });
+    });
+
+    // Setup file upload for link icons
+    document.querySelectorAll('.link-icon-upload').forEach((input, index) => {
+        input.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                const uploadContainer = this.closest('.link-upload');
+                const previewLinks = document.querySelectorAll('.preview-link');
+                const previewIcon = previewLinks[index].querySelector('.preview-link-icon');
+
+                reader.onload = function(evt) {
+                    // Update the upload button
+                    const uploadSpan = uploadContainer.querySelector('span');
+                    if (uploadSpan) uploadSpan.remove();
+
+                    let img = uploadContainer.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        uploadContainer.appendChild(img);
+                    }
+                    img.src = evt.target.result;
+
+                    // Update the preview icon
+                    let previewImg = previewIcon.querySelector('img');
+                    if (!previewImg) {
+                        previewImg = document.createElement('img');
+                        previewIcon.appendChild(previewImg);
+                    }
+                    previewImg.src = evt.target.result;
+                };
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    });
+
+    // Add new link
+    addLinkBtn.addEventListener('click', function() {
+        // Create new link item
+        const newLinkItem = document.createElement('div');
+        newLinkItem.className = 'link-item';
+        newLinkItem.innerHTML = `
+                <div class="drag-handle">☰</div>
+                <div class="link-upload">
+                    <span>↑</span>
+                    <input type="file" accept="image/*" class="link-icon-upload">
+                </div>
+                <div class="link-inputs">
+                    <input type="text" class="link-input" placeholder="Your link address">
+                    <input type="text" class="link-input" placeholder="Title" value="New Link">
+                </div>
+                <button class="delete-btn">🗑️</button>
+            `;
+
+        linksContainer.appendChild(newLinkItem);
+
+        // Add new link to preview
+        const newPreviewLink = document.createElement('div');
+        newPreviewLink.className = 'preview-link';
+        newPreviewLink.innerHTML = `
+                <div class="preview-link-icon"></div>
+                <span>New Link</span>
+            `;
+        previewLinks.appendChild(newPreviewLink);
+
+        // Setup icon upload for the new link
+        const newIconUpload = newLinkItem.querySelector('.link-icon-upload');
+        newIconUpload.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                const uploadContainer = this.closest('.link-upload');
+                const previewIcon = newPreviewLink.querySelector('.preview-link-icon');
+
+                reader.onload = function(evt) {
+                    // Update the upload button
+                    const uploadSpan = uploadContainer.querySelector('span');
+                    if (uploadSpan) uploadSpan.remove();
+
+                    let img = uploadContainer.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        uploadContainer.appendChild(img);
+                    }
+                    img.src = evt.target.result;
+
+                    // Update the preview icon
+                    let previewImg = previewIcon.querySelector('img');
+                    if (!previewImg) {
+                        previewImg = document.createElement('img');
+                        previewIcon.appendChild(previewImg);
+                    }
+                    previewImg.src = evt.target.result;
+                };
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Setup delete functionality
+        const deleteBtn = newLinkItem.querySelector('.delete-btn');
+        deleteBtn.addEventListener('click', function() {
+            newLinkItem.remove();
+            newPreviewLink.remove();
+        });
+
+        // Setup title update
+        const titleInput = newLinkItem.querySelector('.link-input:nth-of-type(2)');
+        titleInput.addEventListener('input', function() {
+            newPreviewLink.querySelector('span').textContent = this.value;
+        });
+    });
+
+    // Setup existing delete buttons
+    document.querySelectorAll('.delete-btn').forEach((btn, index) => {
+        btn.addEventListener('click', function() {
+            const linkItem = this.closest('.link-item');
+            linkItem.remove();
+
+            // Remove corresponding preview link
+            const previewLinks = document.querySelectorAll('.preview-link');
+            if (previewLinks[index]) {
+                previewLinks[index].remove();
+            }
+        });
+    });
+
+    // Setup existing title inputs - update the link titles in preview when changed
+    document.querySelectorAll('.link-inputs input:nth-of-type(2)').forEach((input, index) => {
+        input.addEventListener('input', function() {
+            const previewLinks = document.querySelectorAll('.preview-link');
+            if (previewLinks[index]) {
+                previewLinks[index].querySelector('span').textContent = this.value;
+            }
+        });
+    });
+</script>
