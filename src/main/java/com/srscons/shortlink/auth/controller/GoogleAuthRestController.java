@@ -44,7 +44,7 @@ public class GoogleAuthRestController {
         final String accessToken = googleAuthService.getAccessToken(code);
         final GoogleAuthService.GoogleUserInfo googleUserInfo = googleAuthService.getGoogleUserInfo(accessToken);
 
-        final UserEntity user = userRepository.findByEmail(googleUserInfo.getEmail()).orElseGet(()->
+        final UserEntity user = userRepository.findByEmail(googleUserInfo.getEmail()).orElseGet(() ->
                 UserEntity.builder()
                         .name(googleUserInfo.getName())
                         .surname(googleUserInfo.getSurname())
@@ -56,7 +56,7 @@ public class GoogleAuthRestController {
                 .setProviderId(googleUserInfo.getProvider())
                 .setPicture(googleUserInfo.getPicture());
 
-        final List<TokenEntity> tokens = user.getTokens()==null ? new ArrayList<>() : user.getTokens();
+        final List<TokenEntity> tokens = user.getTokens() == null ? new ArrayList<>() : user.getTokens();
         tokens.add(new TokenEntity(accessToken, user));
 
         user.setTokens(tokens);

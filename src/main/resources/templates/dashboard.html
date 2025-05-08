@@ -27,7 +27,7 @@
         <h5 class="fw-semibold">General configuration</h5>
         <div class="row mt-3">
             <div class="col-md-2 text-center">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?data=CTOUT.is/s6l6wd&size=120x120" class="rounded shadow-sm p-2" alt="QR Code">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=CTOUT.me/s6l6wd&size=120x120" class="rounded shadow-sm p-2" alt="QR Code">
                 <div class="text-muted small mt-2">Click for download</div>
             </div>
             <div class="col-md-10">
@@ -51,7 +51,7 @@
                                 <div class="form-section-title">Smartlink URL <i class="bi bi-question-circle"></i></div>
                                 <div class="input-wrapper">
                                     <i class="bi bi-link-45deg"></i>
-                                    <span class="readonly-input">CTOUT.is/s6l6wd</span>
+                                    <span class="readonly-input">CTOUT.me/s6l6wd</span>
                                     <span class="badge-orange">Professional</span>
                                     <button class="icon-btn"><i class="bi bi-copy"></i></button>
                                     <button class="icon-btn"><i class="bi bi-box-arrow-up-right"></i></button>
@@ -77,6 +77,10 @@
                     </div>
                 </div>
 
+
+            </div>
+
+            <div class="col-md-12">
                 <div class="mt-4">
                     <label class="form-label fw-semibold">Select smartlink type</label>
                     <div class="smartlink-type">
@@ -128,7 +132,7 @@
                     <div class="row g-4 align-items-center">
                         <div class="col-md-6">
                             <label class="form-section-title">URL</label>
-                            <input type="text" class="rounded-pill-input" placeholder="https://CTOUT.is" readonly>
+                            <input type="text" class="rounded-pill-input" placeholder="https://CTOUT.me" readonly>
                         </div>
                         <div class="col-md-6">
                             <label class="form-section-title">Password Protection</label>
@@ -141,58 +145,7 @@
                 </div>
 
                 <div type="tab"  id="link-in-bio">
-                    <div class="container py-5">
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-section-title">Title</label>
-                                <input type="text" class="form-control pill-input" value="CTOUT Smartlink">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-section-title">Description</label>
-                                <input type="text" class="form-control pill-input" value="CTOUT">
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-section-title">Logo</label>
-                                <input type="file" accept="image/*" class="form-control pill-input">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-section-title">Theme color</label>
-                                <input type="color" class="form-control form-control-color pill-input" value="#000000">
-                            </div>
-                        </div>
-
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-6">
-                                <label class="form-section-title">Layout</label>
-                                <div class="toggle-pill">
-                                    <button class="active">List</button>
-                                    <button>Grid</button>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-section-title">Theme</label>
-                                <div class="toggle-pill">
-                                    <button class="active">Light</button>
-                                    <button>Auto</button>
-                                    <button>Dark</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row g-0">
-                            <div class="col-md-6 p-4 bg-light">
-                                <button class="add-link-btn"><i class="bi bi-plus-lg me-2"></i>Add Link</button>
-                            </div>
-                            <div class="col-md-6 p-4 bg-white d-flex align-items-center justify-content-center">
-                                <div class="preview-box">
-                                    <h5 class="mb-3">CTOUT Smartlink</h5>
-                                    <small>Powered by <strong>CTOUT</strong></small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                    <div th:insert="~{link-in-bio.html}"></div>
                 </div>
 
                 <div type="tab"  id="qr-tag">
