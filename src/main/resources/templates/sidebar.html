@@ -26,15 +26,15 @@
         try {
             const response = await fetch('/api/v1/link-in-bio');
             const links = await response.json();
-
+            
             const linksContainer = document.getElementById('links-container');
             if (!linksContainer) {
                 console.error('Links container not found');
                 return;
             }
-
+            
             linksContainer.innerHTML = ''; // Clear existing links
-
+            
             links.forEach(link => {
                 const linkElement = document.createElement('a');
                 linkElement.href = '#';
@@ -42,8 +42,8 @@
                 linkElement.innerHTML = `
                     <div class="d-flex align-items-center gap-2">
                         <div class="link-icon" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background: #f8f9fa;">
-                            ${link.logoFileName ?
-                                `<img src="${link.logoFileName}" alt="${link.title}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                            ${link.logoFileName ? 
+                                `<img src="${link.logoFileName}" alt="${link.title}" style="width: 100%; height: 100%; object-fit: cover;">` : 
                                 '<i class="bi bi-link" style="font-size: 16px; color: #6c757d;"></i>'}
                         </div>
                         <div class="link-info">
@@ -52,13 +52,17 @@
                         </div>
                     </div>
                 `;
-
+                
                 // Add click event listener
                 linkElement.addEventListener('click', function(e) {
                     e.preventDefault();
+                    // Remove active-link class from all links
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-link'));
+                    // Add active-link class to clicked link
+                    this.classList.add('active-link');
                     handleLinkClick(link.id);
                 });
-
+                
                 linksContainer.appendChild(linkElement);
             });
         } catch (error) {
@@ -190,4 +194,106 @@
             previewLinks.classList.remove('grid');
         }
     }
+
+    // Create new link
+    const createNewBtn = document.querySelector('.btn-outline');
+    createNewBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        try {
+            // Create empty link in database
+            const formData = new FormData();
+            formData.append('title', 'New Link');
+            formData.append('description', 'CTOUT');
+            formData.append('themeColor', '#000000');
+            formData.append('themeType', 'AUTO');
+            formData.append('layoutType', 'LIST');
+            
+            // Add one empty link
+            const emptyLink = {
+                title: 'New Link',
+                url: ''
+            };
+            
+            // Add each link property separately with index
+            formData.append('links[0].title', emptyLink.title);
+            formData.append('links[0].url', emptyLink.url);
+
+            // Send to API
+            const response = await fetch('/api/v1/link-in-bio', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create new link');
+            }
+
+            const newLink = await response.json();
+            
+            // Update URL with the new ID
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set('tab', 'link-in-bio');
+            newUrl.searchParams.set('id', newLink.id);
+            window.history.pushState({}, '', newUrl);
+            
+            // Reload links list
+            await loadLinks();
+            
+            // Activate the link-in-bio tab
+            const linkInBioTab = document.getElementById('link-in-bio');
+            const linkInBioButton = document.querySelector('.smartlink-type button[for="link-in-bio"]');
+            if (linkInBioTab && linkInBioButton) {
+                // Update button styles
+                document.querySelectorAll('.smartlink-type button').forEach(btn => {
+                    btn.classList.remove('btn-dark');
+                    btn.classList.add('btn-outline-secondary');
+                });
+                linkInBioButton.classList.remove('btn-outline-secondary');
+                linkInBioButton.classList.add('btn-dark');
+                
+                // Show the content
+                document.querySelectorAll('[type="tab"]').forEach(tab => tab.style.display = 'none');
+                linkInBioTab.style.display = 'block';
+                
+                // Load the new link details
+                loadLinkDetails(newLink.id);
+            }
+        } catch (error) {
+            console.error('Error creating new link:', error);
+        }
+    });
 </script>
+
+<style>
+    .sidebar {
+        width: 280px;
+        height: 100vh;
+        background: #fff;
+        border-right: 1px solid #dbe1ea;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 1.5rem;
+    }
+
+    .sidebar .nav-link {
+        color: #6c757d;
+        text-decoration: none;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 0.25rem;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar .nav-link:hover {
+        background: #f8fafd;
+        color: #000;
+    }
+
+    .sidebar .nav-link.active-link {
+        background: #2f2f32;
+        color: #000;
+        font-weight: 500;
+    }
+</style>
