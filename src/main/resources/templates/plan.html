@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CTOUT Dashboard – Draft Smartlink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="/public/css/dashboard.css" rel="stylesheet">
+</head>
+<body>
+<div class="d-flex layout">
+
+<!-- Sidebar -->
+<div th:insert="~{sidebar.html}"></div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <h4 class="fw-bold mb-3"><i class="bi bi-link-45deg"></i> Pricing</h4>
+
+    <div class="config-card">
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Pricing Plan</title>
+            <!-- Bootstrap CSS -->
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                .pricing-header {
+                    font-size: 1.8rem;
+                    font-weight: 600;
+                    margin-bottom: 0;
+                }
+                .pricing-subtext {
+                    color: #6c757d;
+                    margin-bottom: 1rem;
+                }
+                .pricing-amount {
+                    font-size: 1.8rem;
+                    font-weight: 600;
+                }
+                .billing-text {
+                    color: #6c757d;
+                    font-size: 0.9rem;
+                }
+                .btn-get-started {
+                    background-color: #f4733e;
+                    border-color: #f4733e;
+                    color: white;
+                    padding: 0.75rem;
+                    font-weight: 500;
+                }
+                .btn-get-started:hover {
+                    background-color: #e86530;
+                    border-color: #e86530;
+                    color: white;
+                }
+                .free-trial {
+                    color: #6c757d;
+                    font-size: 0.9rem;
+                }
+                .lightning-icon {
+                    color: #f4c33e;
+                    margin-right: 0.25rem;
+                }
+                .toggle-container {
+                    display: flex;
+                    justify-content: center;
+                    margin-bottom: 2rem;
+                }
+                .toggle-btn {
+                    padding: 0.5rem 1rem;
+                    border-radius: 2rem;
+                    background-color: #f8f9fa;
+                    margin: 0 0.25rem;
+                }
+                .toggle-btn.active {
+                    background-color: #f4733e;
+                    color: white;
+                }
+            </style>
+        </head>
+        <body>
+        <div class="container py-5">
+            <h1 class="mb-4">Plan</h1>
+
+
+
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <!-- Starter Plan -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm rounded-4 border-0">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h2 class="pricing-header text-center">Starter</h2>
+                            <p class="pricing-subtext text-center mb-4">For beginners</p>
+
+                            <div class="text-center mb-3">
+                                <h3 class="pricing-amount">$0.99/month</h3>
+                                <p class="billing-text m-0">Billed Monthly</p>
+                            </div>
+
+                            <div class="mt-auto">
+                                <button class="btn btn-get-started w-100 rounded-3 mb-3">Get Started</button>
+                                <p class="free-trial text-center m-0">
+                                    <span class="lightning-icon">⚡</span>
+                                    7-day free trial
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm rounded-4 border-0">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h2 class="pricing-header text-center">Professional</h2>
+                            <p class="pricing-subtext text-center mb-4">For startups</p>
+
+                            <div class="text-center mb-3">
+                                <h3 class="pricing-amount">$9.99/month</h3>
+                                <p class="billing-text m-0">Billed Monthly</p>
+                            </div>
+
+                            <div class="mt-auto">
+                                <button class="btn btn-get-started w-100 rounded-3 mb-3">Get Started</button>
+                                <p class="free-trial text-center m-0">
+                                    <span class="lightning-icon">⚡</span>
+                                    7-day free trial
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm rounded-4 border-0">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h2 class="pricing-header text-center">Enterprise</h2>
+                            <p class="pricing-subtext text-center mb-4">For big bosses</p>
+
+                            <div class="text-center mb-3">
+                                <h3 class="pricing-amount">$79.99/month</h3>
+                                <p class="billing-text m-0">Billed Monthly</p>
+                            </div>
+
+                            <div class="mt-auto">
+                                <button class="btn btn-get-started w-100 rounded-3 mb-3">Get Started</button>
+                                <p class="free-trial text-center m-0">
+                                    <span class="lightning-icon">⚡</span>
+                                    7-day free trial
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bootstrap JS Bundle -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Simple toggle functionality for the monthly/annual buttons
+            document.querySelectorAll('.toggle-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.toggle-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+        </script>
+        </body>
+        </html>
+    </div>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/public/js/dashboard.js"></script>
+
+</body>
+</html>

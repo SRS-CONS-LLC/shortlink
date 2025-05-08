@@ -24,5 +24,10 @@ public class IndexController {
         return "dashboard";
     }
 
+    @RequestMapping("/plan")
+    public String planPage() {
+        return "plan";
+    }
+
 
 }
