@@ -11,30 +11,23 @@
       const country = geo.country_name;
 
       const params = new URLSearchParams(window.location.search);
-      const utm_source = params.get('utm_source') || 'direct';
-      const utm_medium = params.get('utm_medium') || 'none';
-      const utm_campaign = params.get('utm_campaign') || 'none';
+      const utm_source = params.get('utm_source') || 'none';
 
       const shortCode = /*[[${shortCode}]]*/ '';
       const redirectUrl = /*[[${redirectUrl}]]*/ '';
 
-      // BÜTÜN MƏLUMATLARI QUERY STRING İÇİNƏ YAZ
       const query = new URLSearchParams({
         shortCode: shortCode,
         redirectUrl: redirectUrl,
         timezone: tz,
         country: country,
         utmSource: utm_source,
-        utmMedium: utm_medium,
-        utmCampaign: utm_campaign
       }).toString();
 
-      // SORĞUNU GÖNDƏR
       await fetch(`/visit?${query}`, {
         method: 'POST'
       });
 
-      // ƏSAS URL-Ə YÖNLƏNDİR
       window.location.href = redirectUrl;
     };
   </script>
