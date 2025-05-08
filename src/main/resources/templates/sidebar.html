@@ -13,7 +13,7 @@
     <div>
         <div class="user-card mb-2">💡 Starter</div>
         <a href="/account" class="d-flex align-items-center gap-2 px-3 py-2 rounded-pill text-decoration-none" style="background: #f8fafd; border: 1px solid #dbe1ea;">
-            <img th:src="${loggedInUser.picture}" alt="User" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
+            <img th:src="${loggedInUser.picture}" referrerpolicy="no-referrer" alt="User" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
             <span class="fw-bold text-dark" th:text="${loggedInUser.name+' '+loggedInUser.surname}"></span>
         </a>
     </div>
