@@ -1,10 +1,6 @@
 package com.srscons.shortlink;
 
-import com.srscons.shortlink.linkinbio.controller.dto.request.LinkInBioRequestDto;
-import com.srscons.shortlink.linkinbio.repository.entity.ThemeType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -15,5 +11,16 @@ public class IndexController {
     public String indexPage() {
         return "index";
     }
+
+    @RequestMapping("/dashboard")
+    public String dashboardPage() {
+        return "dashboard";
+    }
+
+    @RequestMapping("/plan")
+    public String planPage() {
+        return "plan";
+    }
+
 
 }
