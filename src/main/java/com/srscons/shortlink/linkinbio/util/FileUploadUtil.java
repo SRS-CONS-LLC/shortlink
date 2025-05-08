@@ -13,42 +13,41 @@ import java.util.UUID;
 
 public class FileUploadUtil {
 
-        private static final List<String> ALLOWED_EXTENSIONS = List.of(".jpg", ".jpeg", ".png", ".pdf");
+    private static final List<String> ALLOWED_EXTENSIONS = List.of(".jpg", ".jpeg", ".png");
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-        public static String saveFile(String uploadDir, MultipartFile multipartFile) {
-            String originalFileName = multipartFile.getOriginalFilename();
+    public static String saveFile(String uploadDir, MultipartFile multipartFile) {
+        String originalFileName = multipartFile.getOriginalFilename();
 
-            if (originalFileName == null || !originalFileName.contains(".")) {
-                throw new IllegalArgumentException("Invalid file: no extension found.");
+        if (originalFileName == null || !originalFileName.contains(".")) {
+            throw new IllegalArgumentException("Invalid file: no extension found.");
+        }
+
+        String fileExtension = originalFileName.substring(originalFileName.lastIndexOf(".")).toLowerCase();
+
+        if (!ALLOWED_EXTENSIONS.contains(fileExtension)) {
+            throw new IllegalArgumentException("File type not allowed: " + fileExtension);
+        }
+
+        if (multipartFile.getSize() > MAX_FILE_SIZE) { // 5MB limit
+            throw new IllegalArgumentException("File size exceeds the 5MB limit.");
+        }
+
+        String savedFileName = UUID.randomUUID() + fileExtension;
+
+        try {
+            Path uploadPath = Paths.get(uploadDir);
+
+            try (InputStream inputStream = multipartFile.getInputStream()) {
+                Path filePath = uploadPath.resolve(savedFileName);
+                Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                return savedFileName; // Return only the filename, not the full path
             }
 
-            String fileExtension = originalFileName.substring(originalFileName.lastIndexOf(".")).toLowerCase();
-
-            if (!ALLOWED_EXTENSIONS.contains(fileExtension)) {
-                throw new IllegalArgumentException("File type not allowed: " + fileExtension);
-            }
-
-            if (multipartFile.getSize() > 20 * 1024 * 1024) { // 5MB limit
-                throw new IllegalArgumentException("File size exceeds the 5MB limit.");
-            }
-
-            String savedFileName = UUID.randomUUID() + fileExtension;
-
-            try {
-                Path uploadPath = Paths.get(uploadDir);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                }
-
-                try (InputStream inputStream = multipartFile.getInputStream()) {
-                    Path filePath = uploadPath.resolve(savedFileName);
-                    Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
-                }
-
-                return savedFileName;
-            } catch (IOException e) {
-                throw new RuntimeException("Could not save file: " + originalFileName, e);
-            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not save file: " + originalFileName, e);
         }
     }
+}
 

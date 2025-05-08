@@ -25,7 +25,7 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST)
     public String updateAccount(UserEntity user, Model model, HttpServletRequest request) {
         UserEntity loggedInUser = (UserEntity) request.getAttribute(CONSTANTS.LOGGED_IN_USER);
-        if(user.getFullName() != null && !user.getFullName().isBlank()) {
+        if (user.getFullName() != null && !user.getFullName().isBlank()) {
             loggedInUser.setFullName(user.getFullName());
         }
         loggedInUser.setPhone(user.getPhone());

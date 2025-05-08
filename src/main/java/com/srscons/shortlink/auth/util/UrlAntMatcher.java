@@ -18,16 +18,25 @@ public class UrlAntMatcher {
 
     public boolean notContainsAny(String... patterns) {
         for (String pattern : patterns) {
-            if(ANT_PATH_MATCHER.match(pattern, url)) {
+            if (ANT_PATH_MATCHER.match(pattern, url)) {
                 return false;
             }
         }
         return true;
     }
 
+    public boolean containsAny(String... patterns) {
+        for (String pattern : patterns) {
+            if (ANT_PATH_MATCHER.match(pattern, url)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean containsAll(String... patterns) {
         for (String pattern : patterns) {
-            if(!ANT_PATH_MATCHER.match(pattern, url)) {
+            if (!ANT_PATH_MATCHER.match(pattern, url)) {
                 return false;
             }
         }

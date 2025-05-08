@@ -1,0 +1,1014 @@
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f7f8fa;
+        }
+        .container {
+            display: flex;
+            width: 100%;
+            padding: 20px;
+            gap: 20px;
+        }
+        .form-section {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .preview-section {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding-top: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .upload-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .upload-icon {
+            margin-right: 8px;
+        }
+        .color-picker {
+            display: flex;
+            align-items: center;
+        }
+        .color-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px 0 0 6px;
+            font-size: 16px;
+        }
+        .color-swatch {
+            width: 40px;
+            height: 38px;
+            background-color: #000000;
+            border: 1px solid #ddd;
+            border-left: none;
+            border-radius: 0 6px 6px 0;
+            cursor: pointer;
+        }
+        .layout-options, .theme-options {
+            display: flex;
+            gap: 10px;
+        }
+        .option-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #101223;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-btn.active {
+            background-color: #101223;
+            color: white;
+        }
+        .option-btn.light-theme {
+            background-color: white;
+            color: #101223;
+            border: 1px solid #ddd;
+        }
+        .option-btn.light-theme.active {
+            border-color: #101223;
+        }
+        .option-btn.dark-theme {
+            background-color: #101223;
+            color: white;
+        }
+        .add-link-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #f06529;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .add-link-btn i {
+            margin-right: 8px;
+        }
+        .link-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+        .drag-handle {
+            color: #999;
+            cursor: grab;
+        }
+        .link-upload {
+            width: 36px;
+            height: 36px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+        .link-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .link-upload img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        .link-inputs {
+            flex: 1;
+        }
+        .link-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .delete-btn {
+            width: 40px;
+            height: 40px;
+            background-color: #f06529;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Preview Styles */
+        .preview-container {
+            width: 450px;
+            height: 350px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .preview-dark {
+            background-color: #101223;
+            color: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .preview-light {
+            background-color: #ffffff;
+            color: #101223;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .preview-title {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .preview-description {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .preview-light .preview-description {
+            color: rgba(0, 0, 0, 0.7);
+        }
+        .preview-links {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            gap: 10px;
+        }
+        .preview-links.grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .preview-link {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .preview-light .preview-link {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .preview-link:hover {
+            background-color: #f06529;
+            color: white;
+        }
+        .preview-link-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .preview-link-icon img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        .preview-footer {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: auto;
+            padding-top: 15px;
+        }
+        .preview-light .preview-footer {
+            color: rgba(0, 0, 0, 0.6);
+        }
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .save-btn:hover {
+            background-color: #45a049;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            display: none;
+        }
+        .alert-success {
+            color: #3c763d;
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+        }
+        .alert-danger {
+            color: #a94442;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="form-section">
+        <div class="alert alert-success" id="success-alert">Link in bio saved successfully!</div>
+        <div class="alert alert-danger" id="error-alert"></div>
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" class="form-control" value="MyTitle">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" id="description" class="form-control" placeholder="CTOUT">
+        </div>
+
+        <div class="form-group">
+            <label for="logo">Logo</label>
+            <div class="upload-btn">
+                <span class="upload-icon">↑</span>
+                <span class="upload-text">Upload</span>
+                <input type="file" id="logo" accept="image/*" style="display: none;">
+            </div>
+            <div id="logo-preview" style="margin-top: 10px; display: none;">
+                <img src="" alt="Logo Preview" style="max-width: 100px; max-height: 100px;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="theme-color">Theme color</label>
+            <div class="color-picker">
+                <input type="color" id="theme-color" class="color-input" value="#000000">
+                <div class="color-swatch" id="color-swatch"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Layout</label>
+            <div class="layout-options">
+                <button class="option-btn active" data-layout="list">List</button>
+                <button class="option-btn" data-layout="grid">Grid</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Theme</label>
+            <div class="theme-options">
+                <button class="option-btn light-theme" data-theme="light">Light</button>
+                <button class="option-btn dark-theme active" data-theme="auto">Auto</button>
+                <button class="option-btn dark-theme" data-theme="dark">Dark</button>
+            </div>
+        </div>
+
+        <button class="add-link-btn">
+            <span>+</span>
+            Add Link
+        </button>
+
+        <div class="links-container">
+            <div class="link-item">
+                <div class="drag-handle">☰</div>
+                <div class="link-upload">
+                    <span>↑</span>
+                    <input type="file" accept="image/*" class="link-icon-upload">
+                </div>
+                <div class="link-inputs">
+                    <input type="text" class="link-input" placeholder="Your link address">
+                    <input type="text" class="link-input" placeholder="Title" value="Title">
+                </div>
+                <button class="delete-btn">🗑️</button>
+            </div>
+
+            <div class="link-item">
+                <div class="drag-handle">☰</div>
+                <div class="link-upload">
+                    <span>↑</span>
+                    <input type="file" accept="image/*" class="link-icon-upload">
+                </div>
+                <div class="link-inputs">
+                    <input type="text" class="link-input" placeholder="Your link address">
+                    <input type="text" class="link-input" placeholder="Title" value="Title">
+                </div>
+                <button class="delete-btn">🗑️</button>
+            </div>
+
+            <div class="link-item">
+                <div class="drag-handle">☰</div>
+                <div class="link-upload">
+                    <span>↑</span>
+                    <input type="file" accept="image/*" class="link-icon-upload">
+                </div>
+                <div class="link-inputs">
+                    <input type="text" class="link-input" placeholder="Your link address">
+                    <input type="text" class="link-input" placeholder="Title" value="Title">
+                </div>
+                <button class="delete-btn">🗑️</button>
+            </div>
+        </div>
+        <button class="save-btn" id="save-btn">Save Changes</button>
+    </div>
+
+    <div class="preview-section">
+        <div class="preview-container">
+            <div class="preview-dark" id="preview-content">
+                <div class="preview-title" id="preview-title">MyTitle</div>
+                <div class="preview-description" id="preview-description">CTOUT</div>
+                <div class="preview-links">
+                    <div class="preview-link">
+                        <div class="preview-link-icon"></div>
+                        <span>Title</span>
+                    </div>
+                    <div class="preview-link">
+                        <div class="preview-link-icon"></div>
+                        <span>Title</span>
+                    </div>
+                    <div class="preview-link">
+                        <div class="preview-link-icon"></div>
+                        <span>Title</span>
+                    </div>
+                </div>
+                <div class="preview-footer">Powered by CTOUT</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Elements
+    const titleInput = document.getElementById('title');
+    const themeColorInput = document.getElementById('theme-color');
+    const colorSwatch = document.getElementById('color-swatch');
+    const layoutButtons = document.querySelectorAll('.layout-options .option-btn');
+    const themeButtons = document.querySelectorAll('.theme-options .option-btn');
+    const previewTitle = document.getElementById('preview-title');
+    const previewContent = document.getElementById('preview-content');
+    const addLinkBtn = document.querySelector('.add-link-btn');
+    const linksContainer = document.querySelector('.links-container');
+    const previewLinks = document.querySelector('.preview-links');
+
+    // Update preview title when title input changes
+    titleInput.addEventListener('input', function() {
+        previewTitle.textContent = this.value;
+    });
+
+    // Update color swatch and preview background when theme color input changes
+    themeColorInput.addEventListener('input', function() {
+        const selectedColor = this.value;
+        colorSwatch.style.backgroundColor = selectedColor;
+
+        // Update preview background color if theme is dark or auto
+        const previewContent = document.getElementById('preview-content');
+        const activeTheme = document.querySelector('.theme-options .option-btn.active').getAttribute('data-theme');
+        if (activeTheme === 'dark' || activeTheme === 'auto') {
+            previewContent.style.backgroundColor = selectedColor;
+        }
+    });
+
+    // Handle layout button clicks
+    layoutButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            layoutButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            const layout = this.getAttribute('data-layout');
+            const previewLinks = document.querySelector('.preview-links');
+            
+            if (layout === 'grid') {
+                previewLinks.classList.add('grid');
+            } else {
+                previewLinks.classList.remove('grid');
+            }
+        });
+    });
+
+    // Handle theme button clicks
+    themeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            themeButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            const theme = this.getAttribute('data-theme');
+            const currentColor = themeColorInput.value;
+
+            if (theme === 'light') {
+                previewContent.className = 'preview-light';
+                previewContent.style.backgroundColor = '#FFFFFF'; // Default light background
+            } else {
+                previewContent.className = 'preview-dark';
+                previewContent.style.backgroundColor = currentColor || '#101223'; // Custom color or default dark
+            }
+        });
+    });
+
+    // Setup file upload for link icons
+    document.querySelectorAll('.link-icon-upload').forEach((input, index) => {
+        input.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                const uploadContainer = this.closest('.link-upload');
+                const previewLinks = document.querySelectorAll('.preview-link');
+                const previewIcon = previewLinks[index].querySelector('.preview-link-icon');
+
+                reader.onload = function(evt) {
+                    // Update the upload button
+                    const uploadSpan = uploadContainer.querySelector('span');
+                    if (uploadSpan) uploadSpan.remove();
+
+                    let img = uploadContainer.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        uploadContainer.appendChild(img);
+                    }
+                    img.src = evt.target.result;
+
+                    // Update the preview icon
+                    let previewImg = previewIcon.querySelector('img');
+                    if (!previewImg) {
+                        previewImg = document.createElement('img');
+                        previewIcon.appendChild(previewImg);
+                    }
+                    previewImg.src = evt.target.result;
+                };
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    });
+
+    // Add new link
+    addLinkBtn.addEventListener('click', function() {
+        // Create new link item
+        const newLinkItem = document.createElement('div');
+        newLinkItem.className = 'link-item';
+        newLinkItem.innerHTML = `
+                <div class="drag-handle">☰</div>
+                <div class="link-upload">
+                    <span>↑</span>
+                    <input type="file" accept="image/*" class="link-icon-upload">
+                </div>
+                <div class="link-inputs">
+                    <input type="text" class="link-input" placeholder="Your link address">
+                    <input type="text" class="link-input" placeholder="Title" value="New Link">
+                </div>
+                <button class="delete-btn">🗑️</button>
+            `;
+
+        linksContainer.appendChild(newLinkItem);
+
+        // Add new link to preview
+        const newPreviewLink = document.createElement('div');
+        newPreviewLink.className = 'preview-link';
+        newPreviewLink.innerHTML = `
+                <div class="preview-link-icon"></div>
+                <span>New Link</span>
+            `;
+        previewLinks.appendChild(newPreviewLink);
+
+        // Setup icon upload for the new link
+        const newIconUpload = newLinkItem.querySelector('.link-icon-upload');
+        newIconUpload.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                const uploadContainer = this.closest('.link-upload');
+                const previewIcon = newPreviewLink.querySelector('.preview-link-icon');
+
+                reader.onload = function(evt) {
+                    // Update the upload button
+                    const uploadSpan = uploadContainer.querySelector('span');
+                    if (uploadSpan) uploadSpan.remove();
+
+                    let img = uploadContainer.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        uploadContainer.appendChild(img);
+                    }
+                    img.src = evt.target.result;
+
+                    // Update the preview icon
+                    let previewImg = previewIcon.querySelector('img');
+                    if (!previewImg) {
+                        previewImg = document.createElement('img');
+                        previewIcon.appendChild(previewImg);
+                    }
+                    previewImg.src = evt.target.result;
+                };
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Setup delete functionality
+        const deleteBtn = newLinkItem.querySelector('.delete-btn');
+        deleteBtn.addEventListener('click', function() {
+            newLinkItem.remove();
+            newPreviewLink.remove();
+        });
+
+        // Setup title update
+        const titleInput = newLinkItem.querySelector('.link-input:nth-of-type(2)');
+        titleInput.addEventListener('input', function() {
+            newPreviewLink.querySelector('span').textContent = this.value;
+        });
+    });
+
+    // Setup existing delete buttons
+    document.querySelectorAll('.delete-btn').forEach((btn, index) => {
+        btn.addEventListener('click', function() {
+            const linkItem = this.closest('.link-item');
+            linkItem.remove();
+
+            // Remove corresponding preview link
+            const previewLinks = document.querySelectorAll('.preview-link');
+            if (previewLinks[index]) {
+                previewLinks[index].remove();
+            }
+        });
+    });
+
+    // Setup existing title inputs - update the link titles in preview when changed
+    document.querySelectorAll('.link-inputs input:nth-of-type(2)').forEach((input, index) => {
+        input.addEventListener('input', function() {
+            const previewLinks = document.querySelectorAll('.preview-link');
+            if (previewLinks[index]) {
+                previewLinks[index].querySelector('span').textContent = this.value;
+            }
+        });
+    });
+
+    // Save functionality
+    const saveBtn = document.getElementById('save-btn');
+    const successAlert = document.getElementById('success-alert');
+    const errorAlert = document.getElementById('error-alert');
+
+    saveBtn.addEventListener('click', async function() {
+        try {
+            // Get the link ID from URL if it exists
+            const urlParams = new URLSearchParams(window.location.search);
+            const linkId = urlParams.get('id');
+
+            // Collect form data
+            const formData = new FormData();
+            formData.append('title', titleInput.value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('themeColor', document.getElementById('theme-color').value);
+            
+            // Get logo file if exists
+            const logoFile = document.getElementById('logo').files[0];
+            if (logoFile) {
+                formData.append('logoFile', logoFile);
+            }
+
+            // Get theme type
+            const activeThemeBtn = document.querySelector('.theme-options .option-btn.active');
+            formData.append('themeType', activeThemeBtn.getAttribute('data-theme').toUpperCase());
+
+            // Get layout type
+            const activeLayoutBtn = document.querySelector('.layout-options .option-btn.active');
+            formData.append('layoutType', activeLayoutBtn.getAttribute('data-layout').toUpperCase());
+
+            // Collect links
+            document.querySelectorAll('.link-item').forEach((item, index) => {
+                const urlInput = item.querySelector('.link-input:first-of-type');
+                const titleInput = item.querySelector('.link-input:last-of-type');
+                const iconFile = item.querySelector('.link-icon-upload')?.files[0];
+
+                if (urlInput.value && titleInput.value) {
+                    formData.append(`links[${index}].title`, titleInput.value);
+                    formData.append(`links[${index}].url`, urlInput.value);
+                    
+                    // Add link icon file if exists
+                    if (iconFile) {
+                        formData.append(`links[${index}].logoFile`, iconFile);
+                    }
+                }
+            });
+
+            // Show loading state
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            // Determine if this is an update or create
+            const method = linkId ? 'PUT' : 'POST';
+            const url = linkId ? `/api/v1/link-in-bio/${linkId}` : '/api/v1/link-in-bio';
+
+            // Send to API
+            const response = await fetch(url, {
+                method: method,
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || 'Failed to save link in bio');
+            }
+
+            // Show success message
+            successAlert.style.display = 'block';
+            errorAlert.style.display = 'none';
+            setTimeout(() => {
+                successAlert.style.display = 'none';
+            }, 3000);
+
+            // If this was a new creation, update the URL with the new ID
+            if (!linkId) {
+                const responseData = await response.json();
+                if (responseData.id) {
+                    const newUrl = new URL(window.location.href);
+                    newUrl.searchParams.set('id', responseData.id);
+                    window.history.pushState({}, '', newUrl);
+                }
+            }
+
+            // Reload the links list in the sidebar
+            const loadLinksEvent = new CustomEvent('loadLinks');
+            document.dispatchEvent(loadLinksEvent);
+
+        } catch (error) {
+            // Show error message
+            errorAlert.textContent = error.message;
+            errorAlert.style.display = 'block';
+            successAlert.style.display = 'none';
+        } finally {
+            // Reset button state
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Changes';
+        }
+    });
+
+    // Logo upload functionality
+    const logoUploadBtn = document.querySelector('.upload-btn');
+    const logoInput = document.getElementById('logo');
+    const logoPreview = document.getElementById('logo-preview');
+    const logoPreviewImg = logoPreview.querySelector('img');
+
+    logoUploadBtn.addEventListener('click', function() {
+        logoInput.click();
+    });
+
+    logoInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(evt) {
+                logoPreviewImg.src = evt.target.result;
+                logoPreview.style.display = 'block';
+                
+                // Update preview section logo
+                const previewContent = document.getElementById('preview-content');
+                let previewLogo = document.querySelector('.preview-logo');
+                
+                if (!previewLogo) {
+                    previewLogo = document.createElement('img');
+                    previewLogo.className = 'preview-logo';
+                    previewLogo.style.width = '80px';
+                    previewLogo.style.height = '80px';
+                    previewLogo.style.margin = '0 auto 20px';
+                    previewLogo.style.borderRadius = '50%';
+                    previewLogo.style.objectFit = 'cover';
+                    previewLogo.style.display = 'block';
+                    previewContent.insertBefore(previewLogo, previewContent.firstChild);
+                }
+                
+                previewLogo.src = evt.target.result;
+            };
+
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    // Update preview description when description input changes
+    const descriptionInput = document.getElementById('description');
+    const previewDescription = document.getElementById('preview-description');
+
+    descriptionInput.addEventListener('input', function() {
+        previewDescription.textContent = this.value || 'CTOUT';
+    });
+
+    // Listen for link details loaded event
+    document.addEventListener('linkDetailsLoaded', function(event) {
+        const linkDetails = event.detail;
+        console.log('Link details received:', linkDetails); // Debug log
+        
+        // Update form fields
+        document.getElementById('title').value = linkDetails.title || '';
+        document.getElementById('description').value = linkDetails.description || '';
+        
+        // Update theme color if exists
+        if (linkDetails.themeColor) {
+            const themeColorInput = document.getElementById('theme-color');
+            themeColorInput.value = linkDetails.themeColor;
+            document.getElementById('color-swatch').style.backgroundColor = linkDetails.themeColor;
+        } else {
+            // Set default color based on theme type
+            const defaultColor = linkDetails.themeType === 'LIGHT' ? '#FFFFFF' : '#101223';
+            themeColorInput.value = defaultColor;
+            document.getElementById('color-swatch').style.backgroundColor = defaultColor;
+        }
+        
+        // Update layout type
+        const layoutButtons = document.querySelectorAll('.layout-options .option-btn');
+        layoutButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-layout').toLowerCase() === linkDetails.layoutType.toLowerCase());
+        });
+        
+        // Update theme type
+        const themeButtons = document.querySelectorAll('.theme-options .option-btn');
+        themeButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-theme').toLowerCase() === linkDetails.themeType.toLowerCase());
+        });
+
+        // Update preview theme based on theme type
+        const previewContent = document.getElementById('preview-content');
+        if (linkDetails.themeType === 'LIGHT') {
+            previewContent.className = 'preview-light';
+            previewContent.style.backgroundColor = '#FFFFFF';
+        } else {
+            previewContent.className = 'preview-dark';
+            previewContent.style.backgroundColor = linkDetails.themeColor || '#101223';
+        }
+
+        // Update main logo if exists
+        if (linkDetails.logoFileName) {
+            const logoPreview = document.getElementById('logo-preview');
+            const logoPreviewImg = logoPreview.querySelector('img');
+            logoPreviewImg.src = linkDetails.logoFileName;
+            logoPreview.style.display = 'block';
+
+            // Update preview section logo
+            const previewContent = document.getElementById('preview-content');
+            let previewLogo = document.querySelector('.preview-logo');
+            
+            if (!previewLogo) {
+                previewLogo = document.createElement('img');
+                previewLogo.className = 'preview-logo';
+                previewLogo.style.width = '80px';
+                previewLogo.style.height = '80px';
+                previewLogo.style.margin = '0 auto 20px';
+                previewLogo.style.borderRadius = '50%';
+                previewLogo.style.objectFit = 'cover';
+                previewLogo.style.display = 'block';
+                previewContent.insertBefore(previewLogo, previewContent.firstChild);
+            }
+            
+            previewLogo.src = linkDetails.logoFileName;
+        }
+        
+        // Update links
+        const linksContainer = document.querySelector('.links-container');
+        const previewLinks = document.querySelector('.preview-links');
+        linksContainer.innerHTML = ''; // Clear existing links
+        previewLinks.innerHTML = ''; // Clear existing preview links
+        
+        if (linkDetails.links && linkDetails.links.length > 0) {
+            linkDetails.links.forEach(link => {
+                // Create form link item
+                const linkItem = document.createElement('div');
+                linkItem.className = 'link-item';
+                linkItem.innerHTML = `
+                    <div class="drag-handle">☰</div>
+                    <div class="link-upload">
+                        ${link.logoFileName ? 
+                            `<img src="${link.logoFileName}" alt="${link.title}" style="width: 100%; height: 100%; object-fit: cover;">` : 
+                            '<span>↑</span>'}
+                        <input type="file" accept="image/*" class="link-icon-upload">
+                    </div>
+                    <div class="link-inputs">
+                        <input type="text" class="link-input" placeholder="Your link address" value="${link.url || ''}">
+                        <input type="text" class="link-input" placeholder="Title" value="${link.title || ''}">
+                    </div>
+                    <button class="delete-btn">🗑️</button>
+                `;
+                linksContainer.appendChild(linkItem);
+                
+                // Create preview link
+                const previewLink = document.createElement('div');
+                previewLink.className = 'preview-link';
+                previewLink.innerHTML = `
+                    <div class="preview-link-icon">
+                        ${link.logoFileName ? `<img src="${link.logoFileName}" alt="${link.title}">` : ''}
+                    </div>
+                    <span>${link.title || ''}</span>
+                `;
+                previewLinks.appendChild(previewLink);
+                
+                // Setup icon upload for the new link
+                const iconUpload = linkItem.querySelector('.link-icon-upload');
+                iconUpload.addEventListener('change', function(e) {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        const uploadContainer = this.closest('.link-upload');
+                        const previewIcon = previewLink.querySelector('.preview-link-icon');
+
+                        reader.onload = function(evt) {
+                            // Update the upload button
+                            const uploadSpan = uploadContainer.querySelector('span');
+                            if (uploadSpan) uploadSpan.remove();
+
+                            let img = uploadContainer.querySelector('img');
+                            if (!img) {
+                                img = document.createElement('img');
+                                uploadContainer.appendChild(img);
+                            }
+                            img.src = evt.target.result;
+
+                            // Update the preview icon
+                            let previewImg = previewIcon.querySelector('img');
+                            if (!previewImg) {
+                                previewImg = document.createElement('img');
+                                previewIcon.appendChild(previewImg);
+                            }
+                            previewImg.src = evt.target.result;
+                        };
+
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+                
+                // Setup delete functionality
+                const deleteBtn = linkItem.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', function() {
+                    linkItem.remove();
+                    previewLink.remove();
+                });
+                
+                // Setup title update
+                const titleInput = linkItem.querySelector('.link-input:last-of-type');
+                titleInput.addEventListener('input', function() {
+                    previewLink.querySelector('span').textContent = this.value;
+                });
+            });
+        }
+        
+        // Update preview
+        updatePreview();
+    });
+
+    // Function to update preview
+    function updatePreview() {
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const themeColor = document.getElementById('theme-color').value;
+        const activeTheme = document.querySelector('.theme-options .option-btn.active').getAttribute('data-theme');
+        const activeLayout = document.querySelector('.layout-options .option-btn.active').getAttribute('data-layout');
+        
+        // Update title and description
+        document.getElementById('preview-title').textContent = title;
+        document.getElementById('preview-description').textContent = description;
+        
+        // Update theme
+        const previewContent = document.getElementById('preview-content');
+        if (activeTheme === 'light') {
+            previewContent.className = 'preview-light';
+            previewContent.style.backgroundColor = '';
+        } else {
+            previewContent.className = 'preview-dark';
+            previewContent.style.backgroundColor = themeColor;
+        }
+        
+        // Update layout
+        const previewLinks = document.querySelector('.preview-links');
+        if (activeLayout === 'grid') {
+            previewLinks.classList.add('grid');
+        } else {
+            previewLinks.classList.remove('grid');
+        }
+    }
+
+    // Check URL parameters on page load
+    function checkUrlParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const linkId = urlParams.get('id');
+        
+        if (linkId) {
+            // Load link details
+            fetch(`/api/v1/link-in-bio/${linkId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch link details');
+                    }
+                    return response.json();
+                })
+                .then(linkDetails => {
+                    // Dispatch the linkDetailsLoaded event with the fetched data
+                    const event = new CustomEvent('linkDetailsLoaded', { 
+                        detail: linkDetails,
+                        bubbles: true
+                    });
+                    document.dispatchEvent(event);
+                })
+                .catch(error => {
+                    console.error('Error loading link details:', error);
+                });
+        }
+    }
+
+    // Call checkUrlParameters when the page loads
+    document.addEventListener('DOMContentLoaded', checkUrlParameters);
+</script>

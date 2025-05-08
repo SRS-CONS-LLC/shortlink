@@ -27,9 +27,9 @@ import java.util.Collections;
 @Service
 public class GoogleAuthService {
 
+    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private final GoogleProperties googleProperties;
     private final GoogleClientSecrets googleCredentials;
-    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
     public GoogleAuthService(GoogleProperties googleProperties) throws IOException {
         this.googleProperties = googleProperties;
@@ -41,7 +41,7 @@ public class GoogleAuthService {
                 "?client_id=" + googleCredentials.getDetails().getClientId()
                 + "&redirect_uri=" + googleCredentials.getDetails().getRedirectUris().get(0)
                 + "&response_type=code"
-                + "&scope="+googleProperties.getScope()
+                + "&scope=" + googleProperties.getScope()
                 + "&access_type=online";
     }
 
