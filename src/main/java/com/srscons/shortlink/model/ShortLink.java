@@ -15,8 +15,12 @@ public class ShortLink {
 
     private String code;
 
-    // --- Getter və Setter ---
-    private String originalUrl; // <--- bu olmalıdır!
+    private String originalUrl;         // fallback URL
+    private String youtubeUrl;
+    private String instagramUrl;
+    private String tiktokUrl;
 
+    private String youtubeDeepLink;     // youtube://...
+    private String instagramDeepLink;   // instagram://...
+    private String tiktokDeepLink;      // tiktok://...
 }
-

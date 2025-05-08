@@ -18,10 +18,6 @@ public class IndexController {
         return "dashboard";
     }
 
-    @RequestMapping("/test-smartlink")
-    public String testSmartlinkPage() {
-        return "test-smartlink"; // templates/test-smartlink.html faylına yönləndirir
-    }
 
 
 }
