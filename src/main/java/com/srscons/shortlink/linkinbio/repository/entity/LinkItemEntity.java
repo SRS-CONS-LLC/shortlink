@@ -21,8 +21,10 @@ public class LinkItemEntity {
     @Column(name = "url", nullable = false)
     private String url;
 
+    @Column(name = "logo_file_name")
+    private String logoFileName;
+
     @ManyToOne
     @JoinColumn(name = "link_in_bio_id", nullable = false)
     private LinkInBioEntity linkInBio;
-
 }

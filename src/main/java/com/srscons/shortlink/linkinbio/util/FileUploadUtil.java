@@ -42,7 +42,7 @@ public class FileUploadUtil {
                 Path filePath = uploadPath.resolve(savedFileName);
                 Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
 
-                return filePath.toString();
+                return savedFileName; // Return only the filename, not the full path
             }
 
         } catch (IOException e) {
