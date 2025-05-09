@@ -1,6 +1,15 @@
 package com.srscons.shortlink.linkinbio.repository.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -38,8 +47,8 @@ public class LinkInBioEntity {
     @Column(name = "theme_color")
     private String themeColor;
 
-    @Column(name = "logo_file_name")
-    private String logoFileName;
+    @Column(name = "logo_url")
+    private String logoUrl;
 
     @OneToMany(mappedBy = "linkInBio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LinkItemEntity> links;

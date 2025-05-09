@@ -12,27 +12,26 @@ import java.util.List;
 @Data
 public class LinkInBioRequestDto {
 
+    private Long id;
     private String title;
     private String description;
+
     @JsonIgnore
     private MultipartFile logoFile;
+    private String logoUrl;
     private ThemeType themeType;
     private LayoutType layoutType;
     private String themeColor;
-    private List<LinkItemRequestDto> links;
 
-    public LinkInBioRequestDto() {
-        this.links = new ArrayList<>();
-        this.themeType = ThemeType.AUTO;
-        this.layoutType = LayoutType.LIST;
-    }
+    private List<LinkItemResponseDto> links;
 
     @Data
-    public static class LinkItemRequestDto {
+    public static class LinkItemResponseDto {
         private String title;
         private String url;
         @JsonIgnore
         private MultipartFile logoFile;
+        private String logoUrl;
     }
 
 }
