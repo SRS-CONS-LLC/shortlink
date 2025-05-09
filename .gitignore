@@ -1,3 +1,11 @@
 build
 uploads
 .gradle
+.idea
+.vscode
+# IDE settings
+.idea/
+*.iml
+# Gradle build output
+.gradle/
+build/

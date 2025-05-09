@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class FileUploadUtil {
+public class FileUploadService {
 
     private final Cloudinary cloudinary;
     private static final List<String> ALLOWED_EXTENSIONS = List.of(".jpg", ".jpeg", ".png");
