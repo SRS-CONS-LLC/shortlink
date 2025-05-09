@@ -5,7 +5,7 @@ import com.srscons.shortlink.linkinbio.repository.entity.LinkInBioEntity;
 import com.srscons.shortlink.linkinbio.repository.entity.LinkItemEntity;
 import com.srscons.shortlink.linkinbio.service.dto.LinkInBioDto;
 import com.srscons.shortlink.linkinbio.service.mapper.LinkInBioMapper;
-import com.srscons.shortlink.linkinbio.util.FileUploadUtil;
+import com.srscons.shortlink.linkinbio.util.FileUploadService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class LinkInBioService {
 
     private final LinkInBioRepository repository;
     private final LinkInBioMapper mapper;
-    private final FileUploadUtil fileUploadUtil; // CDN üçün util
+    private final FileUploadService fileUploadService;
 
     public List<LinkInBioDto> findAll() {
         return repository.findAll().stream()
@@ -34,7 +34,7 @@ public class LinkInBioService {
 
         MultipartFile logoFile = linkInBioDto.getLogoFile();
         if (logoFile != null && !logoFile.isEmpty()) {
-            String cdnUrl = fileUploadUtil.saveFile(logoFile);
+            String cdnUrl = fileUploadService.saveFile(logoFile);
             entity.setLogoUrl(cdnUrl);
         }
 
@@ -45,7 +45,7 @@ public class LinkInBioService {
 
                 MultipartFile linkLogoFile = linkItemDto.getLogoFile();
                 if (linkLogoFile != null && !linkLogoFile.isEmpty()) {
-                    String cdnUrl = fileUploadUtil.saveFile(linkLogoFile);
+                    String cdnUrl = fileUploadService.saveFile(linkLogoFile);
                     linkItemEntity.setLogoUrl(cdnUrl);
                 }
             }
@@ -68,7 +68,7 @@ public class LinkInBioService {
 
         MultipartFile logoFile = linkInBioDto.getLogoFile();
         if (logoFile != null && !logoFile.isEmpty()) {
-            String cdnUrl = fileUploadUtil.saveFile(logoFile);
+            String cdnUrl = fileUploadService.saveFile(logoFile);
             existingEntity.setLogoUrl(cdnUrl);
         }
 
@@ -83,7 +83,7 @@ public class LinkInBioService {
 
                 MultipartFile linkLogoFile = linkItemDto.getLogoFile();
                 if (linkLogoFile != null && !linkLogoFile.isEmpty()) {
-                    String cdnUrl = fileUploadUtil.saveFile(linkLogoFile);
+                    String cdnUrl = fileUploadService.saveFile(linkLogoFile);
                     linkItemEntity.setLogoUrl(cdnUrl);
                 }
 

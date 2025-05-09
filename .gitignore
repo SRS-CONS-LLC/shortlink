@@ -1,5 +1,5 @@
 build
 uploads
 .gradle
-.idea/**
+.idea
 .vscode
