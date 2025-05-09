@@ -1,15 +1,13 @@
 package com.srscons.shortlink.linkinbio.service;
-
 import com.srscons.shortlink.linkinbio.exception.LinkInBioNotFoundException;
 import com.srscons.shortlink.linkinbio.repository.LinkInBioRepository;
 import com.srscons.shortlink.linkinbio.repository.entity.LinkInBioEntity;
 import com.srscons.shortlink.linkinbio.repository.entity.LinkItemEntity;
 import com.srscons.shortlink.linkinbio.service.dto.LinkInBioDto;
 import com.srscons.shortlink.linkinbio.service.mapper.LinkInBioMapper;
-import com.srscons.shortlink.linkinbio.util.FileUploadUtil;
+import com.srscons.shortlink.linkinbio.util.FileUploadService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,30 +19,25 @@ import java.util.stream.Collectors;
 public class LinkInBioService {
 
     private final LinkInBioRepository repository;
-
     private final LinkInBioMapper mapper;
-
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    private final FileUploadService fileUploadService;
 
     public List<LinkInBioDto> findAll() {
         return repository.findAll().stream()
-            .map(mapper::fromEntityToBusiness)
-            .collect(Collectors.toList());
+                .map(mapper::fromEntityToBusiness)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public LinkInBioDto create(LinkInBioDto linkInBioDto) {
         LinkInBioEntity entity = mapper.fromBusinessToEntity(linkInBioDto);
 
-        // Handle main logo
         MultipartFile logoFile = linkInBioDto.getLogoFile();
         if (logoFile != null && !logoFile.isEmpty()) {
-            String savedFileName = FileUploadUtil.saveFile(uploadDir, logoFile);
-            entity.setLogoFileName(savedFileName);
+            String cdnUrl = fileUploadService.saveFile(logoFile);
+            entity.setLogoUrl(cdnUrl);
         }
 
-        // Handle link item logos
         if (linkInBioDto.getLinks() != null) {
             for (int i = 0; i < linkInBioDto.getLinks().size(); i++) {
                 LinkInBioDto.LinkItemDto linkItemDto = linkInBioDto.getLinks().get(i);
@@ -52,41 +45,35 @@ public class LinkInBioService {
 
                 MultipartFile linkLogoFile = linkItemDto.getLogoFile();
                 if (linkLogoFile != null && !linkLogoFile.isEmpty()) {
-                    String savedFileName = FileUploadUtil.saveFile(uploadDir, linkLogoFile);
-                    linkItemEntity.setLogoFileName(savedFileName);
+                    String cdnUrl = fileUploadService.saveFile(linkLogoFile);
+                    linkItemEntity.setLogoUrl(cdnUrl);
                 }
             }
         }
 
         LinkInBioEntity savedEntity = repository.save(entity);
-
         return mapper.fromEntityToBusiness(savedEntity);
     }
 
     @Transactional
     public LinkInBioDto update(LinkInBioDto linkInBioDto) {
-        // Find existing entity
         LinkInBioEntity existingEntity = repository.findById(linkInBioDto.getId())
-            .orElseThrow(() -> new LinkInBioNotFoundException(linkInBioDto.getId()));
+                .orElseThrow(() -> new LinkInBioNotFoundException(linkInBioDto.getId()));
 
-        // Update basic fields
         existingEntity.setTitle(linkInBioDto.getTitle());
         existingEntity.setDescription(linkInBioDto.getDescription());
         existingEntity.setThemeType(linkInBioDto.getThemeType());
         existingEntity.setLayoutType(linkInBioDto.getLayoutType());
         existingEntity.setThemeColor(linkInBioDto.getThemeColor());
 
-        // Handle main logo if new one is provided
         MultipartFile logoFile = linkInBioDto.getLogoFile();
         if (logoFile != null && !logoFile.isEmpty()) {
-            String savedFileName = FileUploadUtil.saveFile(uploadDir, logoFile);
-            existingEntity.setLogoFileName(savedFileName);
+            String cdnUrl = fileUploadService.saveFile(logoFile);
+            existingEntity.setLogoUrl(cdnUrl);
         }
 
-        // Clear existing links
         existingEntity.getLinks().clear();
 
-        // Add new links
         if (linkInBioDto.getLinks() != null) {
             for (LinkInBioDto.LinkItemDto linkItemDto : linkInBioDto.getLinks()) {
                 LinkItemEntity linkItemEntity = new LinkItemEntity();
@@ -94,11 +81,10 @@ public class LinkInBioService {
                 linkItemEntity.setUrl(linkItemDto.getUrl());
                 linkItemEntity.setLinkInBio(existingEntity);
 
-                // Handle link item logo if provided
                 MultipartFile linkLogoFile = linkItemDto.getLogoFile();
                 if (linkLogoFile != null && !linkLogoFile.isEmpty()) {
-                    String savedFileName = FileUploadUtil.saveFile(uploadDir, linkLogoFile);
-                    linkItemEntity.setLogoFileName(savedFileName);
+                    String cdnUrl = fileUploadService.saveFile(linkLogoFile);
+                    linkItemEntity.setLogoUrl(cdnUrl);
                 }
 
                 existingEntity.getLinks().add(linkItemEntity);
@@ -114,5 +100,4 @@ public class LinkInBioService {
                 .map(mapper::fromEntityToBusiness)
                 .orElse(null);
     }
-
 }

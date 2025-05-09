@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface LinkInBioRepository extends JpaRepository<LinkInBioEntity, Long> {
 
-    Optional<LinkInBioEntity> findByTitle(String title);
+
 }

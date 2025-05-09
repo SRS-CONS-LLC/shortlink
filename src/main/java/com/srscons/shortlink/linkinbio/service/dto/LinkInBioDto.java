@@ -13,21 +13,23 @@ public class LinkInBioDto {
     private Long id;
     private String title;
     private String description;
-    @JsonIgnore
-    private MultipartFile logoFile;
     private String logoFileName;
     private ThemeType themeType;
     private LayoutType layoutType;
     private String themeColor;
     private List<LinkItemDto> links;
 
+    @JsonIgnore
+    private MultipartFile logoFile;
+    private String logoUrl;
     @Data
     public static class LinkItemDto {
         private String title;
         private String url;
         @JsonIgnore
         private MultipartFile logoFile;
-        private String logoFileName;
+
+        private String logoUrl;
     }
 }
 

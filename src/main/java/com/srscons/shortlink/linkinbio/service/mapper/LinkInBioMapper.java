@@ -7,23 +7,22 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public abstract class LinkInBioMapper {
 
-    @Mapping(target = "logoFileName", source = "logoFileName")
+    @Mapping(target = "logoUrl", source = "logoUrl")
     public abstract LinkInBioEntity fromBusinessToEntity(LinkInBioDto dto);
 
-    @Mapping(target = "logoFileName", source = "logoFileName")
+    @Mapping(target = "logoUrl", source = "logoUrl")
     public abstract LinkInBioDto fromEntityToBusiness(LinkInBioEntity entity);
 
-    @Mapping(target = "logoFileName", source = "logoFileName")
+    @Mapping(target = "logoUrl", source = "logoUrl")
     public abstract List<LinkItemEntity> toEntityLinks(List<LinkInBioDto.LinkItemDto> dtos);
 
-    @Mapping(target = "logoFileName", source = "logoFileName")
+    @Mapping(target = "logoUrl", source = "logoUrl")
     public abstract List<LinkInBioDto.LinkItemDto> toDtoLinks(List<LinkItemEntity> entities);
 
     @AfterMapping
