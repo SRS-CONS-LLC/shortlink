@@ -836,15 +836,11 @@
 
         // Update main logo if exists
         if (linkDetails.logoUrl) {
-            const logoPreview = document.getElementById('logo-preview');
-            const logoPreviewImg = logoPreview.querySelector('img');
             logoPreviewImg.src = linkDetails.logoUrl;
             logoPreview.style.display = 'block';
 
-            // Update preview section logo
-            const previewContent = document.getElementById('preview-content');
+            // Get or create the preview logo in the preview card
             let previewLogo = document.querySelector('.preview-logo');
-            
             if (!previewLogo) {
                 previewLogo = document.createElement('img');
                 previewLogo.className = 'preview-logo';
@@ -854,12 +850,17 @@
                 previewLogo.style.borderRadius = '50%';
                 previewLogo.style.objectFit = 'cover';
                 previewLogo.style.display = 'block';
+                const previewContent = document.getElementById('preview-content');
                 previewContent.insertBefore(previewLogo, previewContent.firstChild);
             }
-            
             previewLogo.src = linkDetails.logoUrl;
+        } else {
+            logoPreviewImg.src = '';
+            logoPreview.style.display = 'none';
+            const previewLogo = document.querySelector('.preview-logo');
+            if (previewLogo) previewLogo.remove();
         }
-        
+
         // Update links
         const linksContainer = document.querySelector('.links-container');
         const previewLinks = document.querySelector('.preview-links');
@@ -985,7 +986,7 @@
     function checkUrlParameters() {
         const urlParams = new URLSearchParams(window.location.search);
         const linkId = urlParams.get('id');
-        
+
         if (linkId) {
             // Load link details
             fetch(`/api/v1/link-in-bio/${linkId}`)
@@ -997,7 +998,7 @@
                 })
                 .then(linkDetails => {
                     // Dispatch the linkDetailsLoaded event with the fetched data
-                    const event = new CustomEvent('linkDetailsLoaded', { 
+                    const event = new CustomEvent('linkDetailsLoaded', {
                         detail: linkDetails,
                         bubbles: true
                     });
