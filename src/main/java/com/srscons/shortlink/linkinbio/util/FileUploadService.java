@@ -1,20 +1,30 @@
 package com.srscons.shortlink.linkinbio.util;
 
-import com.cloudinary.Cloudinary;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.srscons.shortlink.linkinbio.config.CloudflareProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
-import com.cloudinary.utils.ObjectUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class FileUploadService {
 
-    private final Cloudinary cloudinary;
+    private final CloudflareProperties cloudflareProperties;
+    private final RestTemplate restTemplate;
+
     private static final List<String> ALLOWED_EXTENSIONS = List.of(".jpg", ".jpeg", ".png");
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -36,10 +46,34 @@ public class FileUploadService {
         }
 
         try {
-            Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
-            return result.get("secure_url").toString();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(cloudflareProperties.getApiToken());
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", new MultipartInputStreamFileResource(file));
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            String url = "https://api.cloudflare.com/client/v4/accounts/" +
+                    cloudflareProperties.getAccountId() + "/images/v1";
+
+            ResponseEntity<JsonNode> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    requestEntity,
+                    JsonNode.class
+            );
+
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                String imageId = response.getBody().path("result").path("id").asText();
+                return cloudflareProperties.getDeliveryUrl() + "/" + imageId + "/public";
+            } else {
+                throw new RuntimeException("Cloudflare image upload failed: " + response);
+            }
+
         } catch (IOException e) {
-            throw new RuntimeException("CDN upload failed", e);
+            throw new RuntimeException("Cloudflare CDN upload failed", e);
         }
     }
 }

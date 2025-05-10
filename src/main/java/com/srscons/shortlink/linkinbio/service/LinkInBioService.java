@@ -29,75 +29,83 @@ public class LinkInBioService {
     }
 
     @Transactional
-    public LinkInBioDto create(LinkInBioDto linkInBioDto) {
-        LinkInBioEntity entity = mapper.fromBusinessToEntity(linkInBioDto);
+    public LinkInBioDto create(LinkInBioDto dto) {
+        LinkInBioEntity entity = mapper.fromBusinessToEntity(dto);
 
-        MultipartFile logoFile = linkInBioDto.getLogoFile();
-        if (logoFile != null && !logoFile.isEmpty()) {
-            String cdnUrl = fileUploadService.saveFile(logoFile);
-            entity.setLogoUrl(cdnUrl);
-        }
+        // Upload main logo
+        uploadLogoIfPresent(dto.getLogoFile(), entity);
 
-        if (linkInBioDto.getLinks() != null) {
-            for (int i = 0; i < linkInBioDto.getLinks().size(); i++) {
-                LinkInBioDto.LinkItemDto linkItemDto = linkInBioDto.getLinks().get(i);
-                LinkItemEntity linkItemEntity = entity.getLinks().get(i);
-
-                MultipartFile linkLogoFile = linkItemDto.getLogoFile();
-                if (linkLogoFile != null && !linkLogoFile.isEmpty()) {
-                    String cdnUrl = fileUploadService.saveFile(linkLogoFile);
-                    linkItemEntity.setLogoUrl(cdnUrl);
-                }
+        // Upload logos for each link item
+        if (dto.getLinks() != null && entity.getLinks() != null) {
+            for (int i = 0; i < dto.getLinks().size(); i++) {
+                MultipartFile linkLogo = dto.getLinks().get(i).getLogoFile();
+                uploadLogoIfPresent(linkLogo, entity.getLinks().get(i));
             }
         }
 
-        LinkInBioEntity savedEntity = repository.save(entity);
-        return mapper.fromEntityToBusiness(savedEntity);
+        LinkInBioEntity saved = repository.save(entity);
+        return mapper.fromEntityToBusiness(saved);
     }
 
     @Transactional
-    public LinkInBioDto update(LinkInBioDto linkInBioDto) {
-        LinkInBioEntity existingEntity = repository.findById(linkInBioDto.getId())
-                .orElseThrow(() -> new LinkInBioNotFoundException(linkInBioDto.getId()));
+    public LinkInBioDto update(LinkInBioDto dto) {
+        LinkInBioEntity existing = repository.findById(dto.getId())
+                .orElseThrow(() -> new LinkInBioNotFoundException(dto.getId()));
 
-        existingEntity.setTitle(linkInBioDto.getTitle());
-        existingEntity.setDescription(linkInBioDto.getDescription());
-        existingEntity.setThemeType(linkInBioDto.getThemeType());
-        existingEntity.setLayoutType(linkInBioDto.getLayoutType());
-        existingEntity.setThemeColor(linkInBioDto.getThemeColor());
+        existing.setTitle(dto.getTitle());
+        existing.setDescription(dto.getDescription());
+        existing.setThemeType(dto.getThemeType());
+        existing.setLayoutType(dto.getLayoutType());
+        existing.setThemeColor(dto.getThemeColor());
 
-        MultipartFile logoFile = linkInBioDto.getLogoFile();
-        if (logoFile != null && !logoFile.isEmpty()) {
-            String cdnUrl = fileUploadService.saveFile(logoFile);
-            existingEntity.setLogoUrl(cdnUrl);
-        }
+        // Update main logo
+        uploadLogoIfPresent(dto.getLogoFile(), existing);
 
-        existingEntity.getLinks().clear();
+        // Remove old links and re-add new ones
+        existing.getLinks().clear();
 
-        if (linkInBioDto.getLinks() != null) {
-            for (LinkInBioDto.LinkItemDto linkItemDto : linkInBioDto.getLinks()) {
-                LinkItemEntity linkItemEntity = new LinkItemEntity();
-                linkItemEntity.setTitle(linkItemDto.getTitle());
-                linkItemEntity.setUrl(linkItemDto.getUrl());
-                linkItemEntity.setLinkInBio(existingEntity);
+        if (dto.getLinks() != null) {
+            for (LinkInBioDto.LinkItemDto itemDto : dto.getLinks()) {
+                LinkItemEntity item = new LinkItemEntity();
+                item.setTitle(itemDto.getTitle());
+                item.setUrl(itemDto.getUrl());
+                item.setLinkInBio(existing);
 
-                MultipartFile linkLogoFile = linkItemDto.getLogoFile();
-                if (linkLogoFile != null && !linkLogoFile.isEmpty()) {
-                    String cdnUrl = fileUploadService.saveFile(linkLogoFile);
-                    linkItemEntity.setLogoUrl(cdnUrl);
-                }
-
-                existingEntity.getLinks().add(linkItemEntity);
+                uploadLogoIfPresent(itemDto.getLogoFile(), item);
+                existing.getLinks().add(item);
             }
         }
 
-        LinkInBioEntity updatedEntity = repository.save(existingEntity);
-        return mapper.fromEntityToBusiness(updatedEntity);
+        LinkInBioEntity updated = repository.save(existing);
+        return mapper.fromEntityToBusiness(updated);
     }
 
     public LinkInBioDto findById(Long id) {
         return repository.findById(id)
                 .map(mapper::fromEntityToBusiness)
-                .orElse(null);
+                .orElseThrow(() -> new LinkInBioNotFoundException(id));
+    }
+
+    private void uploadLogoIfPresent(MultipartFile file, LinkInBioEntity entity) {
+        if (file != null && !file.isEmpty()) {
+            String url = fileUploadService.saveFile(file);
+            entity.setLogoUrl(url);
+        }
+    }
+
+    private void uploadLogoIfPresent(MultipartFile file, LinkItemEntity item) {
+        if (file != null && !file.isEmpty()) {
+            String url = fileUploadService.saveFile(file);
+            item.setLogoUrl(url);
+        }
     }
 }
+
+
+
+
+
+
+
+
+
