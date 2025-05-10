@@ -835,10 +835,10 @@
         }
 
         // Update main logo if exists
-        if (linkDetails.logoFileName) {
+        if (linkDetails.logoUrl) {
             const logoPreview = document.getElementById('logo-preview');
             const logoPreviewImg = logoPreview.querySelector('img');
-            logoPreviewImg.src = linkDetails.logoFileName;
+            logoPreviewImg.src = linkDetails.logoUrl;
             logoPreview.style.display = 'block';
 
             // Update preview section logo
@@ -857,7 +857,7 @@
                 previewContent.insertBefore(previewLogo, previewContent.firstChild);
             }
             
-            previewLogo.src = linkDetails.logoFileName;
+            previewLogo.src = linkDetails.logoUrl;
         }
         
         // Update links
@@ -874,8 +874,8 @@
                 linkItem.innerHTML = `
                     <div class="drag-handle">☰</div>
                     <div class="link-upload">
-                        ${link.logoFileName ? 
-                            `<img src="${link.logoFileName}" alt="${link.title}" style="width: 100%; height: 100%; object-fit: cover;">` : 
+                        ${link.logoUrl ? 
+                            `<img src="${link.logoUrl}" alt="${link.title}" style="width: 100%; height: 100%; object-fit: cover;">` : 
                             '<span>↑</span>'}
                         <input type="file" accept="image/*" class="link-icon-upload">
                     </div>
@@ -892,7 +892,7 @@
                 previewLink.className = 'preview-link';
                 previewLink.innerHTML = `
                     <div class="preview-link-icon">
-                        ${link.logoFileName ? `<img src="${link.logoFileName}" alt="${link.title}">` : ''}
+                        ${link.logoUrl ? `<img src="${link.logoUrl}" alt="${link.title}">` : ''}
                     </div>
                     <span>${link.title || ''}</span>
                 `;

@@ -16,6 +16,7 @@ public class LinkInBioResponseDto {
     private String description;
     @JsonIgnore
     private MultipartFile logoFile;
+    private String logoUrl;
     private ThemeType themeType;
     private LayoutType layoutType;
     private String themeColor;
@@ -27,6 +28,7 @@ public class LinkInBioResponseDto {
         private String url;
         @JsonIgnore
         private MultipartFile logoFile;
+        private String logoUrl;
     }
 
 }
