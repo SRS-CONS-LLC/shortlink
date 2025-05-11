@@ -72,4 +72,16 @@ public class LinkInBioController {
         
         return ResponseEntity.ok(responseDto);
     }
+
+    @DeleteMapping("/{id}/logo")
+    public ResponseEntity<?> deleteLogo(@PathVariable Long id) {
+        linkInBioService.deleteLogo(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/link-logo")
+    public ResponseEntity<Void> deleteLinkLogo(@PathVariable Long id, @RequestParam int index) {
+        linkInBioService.deleteLinkLogo(id, index);
+        return ResponseEntity.ok().build();
+    }
 }

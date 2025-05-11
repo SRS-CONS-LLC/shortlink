@@ -76,4 +76,30 @@ public class FileUploadService {
             throw new RuntimeException("Cloudflare CDN upload failed", e);
         }
     }
+
+    public void deleteFileFromCloudflare(String fileUrl) {
+        String deliveryUrl = cloudflareProperties.getDeliveryUrl();
+        String accountId = cloudflareProperties.getAccountId();
+        String apiToken = cloudflareProperties.getApiToken();
+
+        if (fileUrl == null || !fileUrl.startsWith(deliveryUrl)) return;
+
+        // Extract image ID
+        String path = fileUrl.replace(deliveryUrl + "/", "");
+        String imageId = path.split("/")[0];
+        String apiUrl = "https://api.cloudflare.com/client/v4/accounts/" + accountId + "/images/v1/" + imageId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + apiToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.DELETE, entity, String.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                System.err.println("Failed to delete image from Cloudflare: " + response.getBody());
+            }
+        } catch (Exception e) {
+            System.err.println("Exception deleting image from Cloudflare: " + e.getMessage());
+        }
+    }
 }

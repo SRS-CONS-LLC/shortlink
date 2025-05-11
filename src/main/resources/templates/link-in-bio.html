@@ -313,6 +313,71 @@
             background-color: #f2dede;
             border-color: #ebccd1;
         }
+        .logo-file-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            background: #f8f9fb;
+            border: 1px solid #dbe3ea;
+            border-radius: 12px;
+            padding: 8px 16px;
+            box-sizing: border-box;
+            margin-top: 4px;
+        }
+        .logo-file-row img {
+            width: 28px;
+            height: 28px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 12px;
+        }
+        .logo-file-row .file-name {
+            color: #222b45;
+            font-weight: 500;
+            margin-right: auto;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+        }
+        .logo-file-row .delete-btn {
+            color: #f06529;
+            background: none;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 16px;
+            margin-left: 12px;
+            padding: 0;
+        }
+        .logo-file-row .delete-btn .icon {
+            font-size: 18px;
+            margin-left: 2px;
+            color: #ff0000;
+        }
+        .link-logo-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .link-logo-delete-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(255,255,255,0.8);
+            border: none;
+            border-radius: 50%;
+            padding: 2px;
+            cursor: pointer;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .link-logo-wrapper:hover .link-logo-delete-btn {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -332,13 +397,12 @@
 
         <div class="form-group">
             <label for="logo">Logo</label>
-            <div class="upload-btn">
-                <span class="upload-icon">↑</span>
-                <span class="upload-text">Upload</span>
-                <input type="file" id="logo" accept="image/*" style="display: none;">
-            </div>
-            <div id="logo-preview" style="margin-top: 10px; display: none;">
-                <img src="" alt="Logo Preview" style="max-width: 100px; max-height: 100px;">
+            <div id="logo-upload-section" class="upload-btn" style="position:relative;">
+                <label id="upload-label" style="width:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;margin:0;">
+                    <span class="upload-icon" style="margin-right:8px;">&#8679;</span>
+                    <span class="upload-text">Upload</span>
+                    <input type="file" id="logo-input" accept="image/*" style="display:none;" />
+                </label>
             </div>
         </div>
 
@@ -440,7 +504,13 @@
     </div>
 </div>
 
+<div id="logo-preview" style="margin-top: 10px; display: none;">
+    <img src="" alt="Logo Preview" style="max-width: 100px; max-height: 100px;">
+</div>
+
 <script>
+    let uploadedLogoFile = null;
+
     // Elements
     const titleInput = document.getElementById('title');
     const themeColorInput = document.getElementById('theme-color');
@@ -616,6 +686,25 @@
         titleInput.addEventListener('input', function() {
             newPreviewLink.querySelector('span').textContent = this.value;
         });
+
+        // Preserve main logo in preview
+        const mainLogoPreview = document.querySelector('#logo-preview img');
+        if (mainLogoPreview && mainLogoPreview.src) {
+            const previewContent = document.getElementById('preview-content');
+            let previewLogo = document.querySelector('.preview-logo');
+            if (!previewLogo) {
+                previewLogo = document.createElement('img');
+                previewLogo.className = 'preview-logo';
+                previewLogo.style.width = '80px';
+                previewLogo.style.height = '80px';
+                previewLogo.style.margin = '0 auto 20px';
+                previewLogo.style.borderRadius = '50%';
+                previewLogo.style.objectFit = 'cover';
+                previewLogo.style.display = 'block';
+                previewContent.insertBefore(previewLogo, previewContent.firstChild);
+            }
+            previewLogo.src = mainLogoPreview.src;
+        }
     });
 
     // Setup existing delete buttons
@@ -649,6 +738,25 @@
 
     saveBtn.addEventListener('click', async function() {
         try {
+            // Validate link logos
+            const linkItems = document.querySelectorAll('.link-item');
+            let hasInvalidLinks = false;
+            let invalidLinkIndex = -1;
+
+            linkItems.forEach((item, index) => {
+                const iconFile = item.querySelector('.link-icon-upload')?.files[0];
+                const existingLogoUrl = item.querySelector('.link-upload img')?.src;
+                
+                if (!iconFile && !existingLogoUrl) {
+                    hasInvalidLinks = true;
+                    invalidLinkIndex = index;
+                }
+            });
+
+            if (hasInvalidLinks) {
+                throw new Error(`Please upload a logo for link #${invalidLinkIndex + 1} before saving.`);
+            }
+
             // Get the link ID from URL if it exists
             const urlParams = new URLSearchParams(window.location.search);
             const linkId = urlParams.get('id');
@@ -659,10 +767,15 @@
             formData.append('description', document.getElementById('description').value);
             formData.append('themeColor', document.getElementById('theme-color').value);
             
-            // Get logo file if exists
-            const logoFile = document.getElementById('logo').files[0];
+            // Handle main logo
+            const logoFile = uploadedLogoFile;
+            const logoPreview = document.querySelector('#logo-upload-section img');
+            
             if (logoFile) {
                 formData.append('logoFile', logoFile);
+            } else if (logoPreview && logoPreview.src) {
+                // Preserve existing logo URL if no new file is uploaded
+                formData.append('logoUrl', logoPreview.src);
             }
 
             // Get theme type
@@ -678,14 +791,24 @@
                 const urlInput = item.querySelector('.link-input:first-of-type');
                 const titleInput = item.querySelector('.link-input:last-of-type');
                 const iconFile = item.querySelector('.link-icon-upload')?.files[0];
+                const existingLogoUrl = item.querySelector('.link-upload img')?.src;
 
                 if (urlInput.value && titleInput.value) {
                     formData.append(`links[${index}].title`, titleInput.value);
                     formData.append(`links[${index}].url`, urlInput.value);
                     
-                    // Add link icon file if exists
+                    // Handle link logo
                     if (iconFile) {
+                        // If a new file is selected, upload it
                         formData.append(`links[${index}].logoFile`, iconFile);
+                        formData.append(`links[${index}].removeLogo`, 'false');
+                    } else if (existingLogoUrl) {
+                        // If no new file but has existing logo, preserve it
+                        formData.append(`links[${index}].logoUrl`, existingLogoUrl);
+                        formData.append(`links[${index}].removeLogo`, 'false');
+                    } else {
+                        // If no logo at all, set removeLogo to true
+                        formData.append(`links[${index}].removeLogo`, 'true');
                     }
                 }
             });
@@ -743,45 +866,102 @@
     });
 
     // Logo upload functionality
-    const logoUploadBtn = document.querySelector('.upload-btn');
-    const logoInput = document.getElementById('logo');
-    const logoPreview = document.getElementById('logo-preview');
-    const logoPreviewImg = logoPreview.querySelector('img');
+    const logoUploadSection = document.getElementById('logo-upload-section');
 
-    logoUploadBtn.addEventListener('click', function() {
-        logoInput.click();
-    });
-
-    logoInput.addEventListener('change', function(e) {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            
-            reader.onload = function(evt) {
-                logoPreviewImg.src = evt.target.result;
-                logoPreview.style.display = 'block';
-                
-                // Update preview section logo
-                const previewContent = document.getElementById('preview-content');
-                let previewLogo = document.querySelector('.preview-logo');
-                
-                if (!previewLogo) {
-                    previewLogo = document.createElement('img');
-                    previewLogo.className = 'preview-logo';
-                    previewLogo.style.width = '80px';
-                    previewLogo.style.height = '80px';
-                    previewLogo.style.margin = '0 auto 20px';
-                    previewLogo.style.borderRadius = '50%';
-                    previewLogo.style.objectFit = 'cover';
-                    previewLogo.style.display = 'block';
-                    previewContent.insertBefore(previewLogo, previewContent.firstChild);
+    function renderLogoUpload(fileOrUrl) {
+        const section = document.getElementById('logo-upload-section');
+        if (!fileOrUrl) {
+            uploadedLogoFile = null;
+            section.innerHTML = `
+                <label id="upload-label" style="width:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;margin:0;">
+                    <span class="upload-icon" style="margin-right:8px;">&#8679;</span>
+                    <span class="upload-text">Upload</span>
+                    <input type="file" id="logo-input" accept="image/*" style="display:none;" />
+                </label>
+            `;
+            document.getElementById('logo-input').addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    renderLogoUpload(e.target.files[0]);
                 }
-                
-                previewLogo.src = evt.target.result;
+            });
+            updatePreviewLogo(null); // Remove logo from preview
+        } else if (typeof fileOrUrl === 'string') {
+            uploadedLogoFile = null;
+            section.innerHTML = `
+                <div class="logo-file-row">
+                    <img src="${fileOrUrl}" alt="logo" />
+                    <span class="file-name">${fileOrUrl.split('/').pop()}</span>
+                    <button class="delete-btn" type="button">
+                        <span style="color:#f06529;">Delete</span>
+                        <span class="icon" style="color:#f06529;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+            `;
+            section.querySelector('.delete-btn').onclick = async function() {
+                // If editing an existing link, send delete request to backend
+                const urlParams = new URLSearchParams(window.location.search);
+                const linkId = urlParams.get('id');
+                if (linkId) {
+                    try {
+                        await fetch(`/api/v1/link-in-bio/${linkId}/logo`, { method: 'DELETE' });
+                    } catch (e) {
+                        alert('Failed to delete logo from server!');
+                    }
+                }
+                renderLogoUpload(null);
             };
-
-            reader.readAsDataURL(this.files[0]);
+            updatePreviewLogo(fileOrUrl); // Show logo in preview
+        } else {
+            uploadedLogoFile = fileOrUrl;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                section.innerHTML = `
+                    <div class="logo-file-row">
+                        <img src="${evt.target.result}" alt="logo" />
+                        <span class="file-name">${fileOrUrl.name}</span>
+                        <button class="delete-btn" type="button">
+                            <span style="color:#f06529;">Delete</span>
+                            <span class="icon" style="color:#f06529;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                `;
+                section.querySelector('.delete-btn').onclick = async function() {
+                    // If editing an existing link, send delete request to backend
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const linkId = urlParams.get('id');
+                    if (linkId) {
+                        try {
+                            await fetch(`/api/v1/link-in-bio/${linkId}/logo`, { method: 'DELETE' });
+                        } catch (e) {
+                            alert('Failed to delete logo from server!');
+                        }
+                    }
+                    renderLogoUpload(null);
+                };
+                updatePreviewLogo(evt.target.result); // Show logo in preview
+            };
+            reader.readAsDataURL(fileOrUrl);
         }
-    });
+    }
+
+    // Initial render
+    renderLogoUpload(null);
 
     // Update preview description when description input changes
     const descriptionInput = document.getElementById('description');
@@ -836,29 +1016,9 @@
 
         // Update main logo if exists
         if (linkDetails.logoUrl) {
-            logoPreviewImg.src = linkDetails.logoUrl;
-            logoPreview.style.display = 'block';
-
-            // Get or create the preview logo in the preview card
-            let previewLogo = document.querySelector('.preview-logo');
-            if (!previewLogo) {
-                previewLogo = document.createElement('img');
-                previewLogo.className = 'preview-logo';
-                previewLogo.style.width = '80px';
-                previewLogo.style.height = '80px';
-                previewLogo.style.margin = '0 auto 20px';
-                previewLogo.style.borderRadius = '50%';
-                previewLogo.style.objectFit = 'cover';
-                previewLogo.style.display = 'block';
-                const previewContent = document.getElementById('preview-content');
-                previewContent.insertBefore(previewLogo, previewContent.firstChild);
-            }
-            previewLogo.src = linkDetails.logoUrl;
+            renderLogoUpload(linkDetails.logoUrl);
         } else {
-            logoPreviewImg.src = '';
-            logoPreview.style.display = 'none';
-            const previewLogo = document.querySelector('.preview-logo');
-            if (previewLogo) previewLogo.remove();
+            renderLogoUpload(null);
         }
 
         // Update links
@@ -868,7 +1028,7 @@
         previewLinks.innerHTML = ''; // Clear existing preview links
         
         if (linkDetails.links && linkDetails.links.length > 0) {
-            linkDetails.links.forEach(link => {
+            linkDetails.links.forEach((link, index) => {
                 // Create form link item
                 const linkItem = document.createElement('div');
                 linkItem.className = 'link-item';
@@ -876,8 +1036,18 @@
                     <div class="drag-handle">☰</div>
                     <div class="link-upload">
                         ${link.logoUrl ? 
-                            `<img src="${link.logoUrl}" alt="${link.title}" style="width: 100%; height: 100%; object-fit: cover;">` : 
-                            '<span>↑</span>'}
+                            `<div class="link-logo-wrapper" style="position:relative;display:inline-block;">
+                                <img src="${link.logoUrl}" alt="${link.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                                <button class="link-logo-delete-btn" style="position:absolute;top:2px;right:2px;background:rgba(255,255,255,0.8);border:none;border-radius:50%;padding:2px;cursor:pointer;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                    </svg>
+                                </button>
+                            </div>`
+                            : '<span>↑</span>'}
                         <input type="file" accept="image/*" class="link-icon-upload">
                     </div>
                     <div class="link-inputs">
@@ -944,6 +1114,35 @@
                 titleInput.addEventListener('input', function() {
                     previewLink.querySelector('span').textContent = this.value;
                 });
+
+                // Add logo delete functionality
+                if (link.logoUrl) {
+                    const logoDeleteBtn = linkItem.querySelector('.link-logo-delete-btn');
+                    logoDeleteBtn.addEventListener('click', async function(e) {
+                        e.stopPropagation();
+                        // Remove logo from UI
+                        const logoWrapper = linkItem.querySelector('.link-logo-wrapper');
+                        if (logoWrapper) {
+                            logoWrapper.remove();
+                        }
+                        // Remove from preview
+                        const previewIcon = previewLink.querySelector('.preview-link-icon');
+                        if (previewIcon) {
+                            previewIcon.innerHTML = '';
+                        }
+                        // Remove from database/Cloudflare
+                        if (link.logoUrl) {
+                            // Call your backend endpoint to delete the link logo
+                            // You need to know the link item ID or index
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const linkInBioId = urlParams.get('id');
+                            // If you have a linkItemId, use it; otherwise, send index
+                            await fetch(`/api/v1/link-in-bio/${linkInBioId}/link-logo?index=${index}`, { method: 'DELETE' });
+                        }
+                        // Optionally, set a flag or hidden input to remove logo on save if you batch update
+                        // e.g., linkItem.dataset.removeLogo = 'true';
+                    });
+                }
             });
         }
         
@@ -1012,4 +1211,27 @@
 
     // Call checkUrlParameters when the page loads
     document.addEventListener('DOMContentLoaded', checkUrlParameters);
+
+    function updatePreviewLogo(logoSrc) {
+        const previewContent = document.getElementById('preview-content');
+        let previewLogo = document.querySelector('.preview-logo');
+        if (logoSrc) {
+            if (!previewLogo) {
+                previewLogo = document.createElement('img');
+                previewLogo.className = 'preview-logo';
+                previewLogo.style.width = '80px';
+                previewLogo.style.height = '80px';
+                previewLogo.style.margin = '0 auto 20px';
+                previewLogo.style.borderRadius = '50%';
+                previewLogo.style.objectFit = 'cover';
+                previewLogo.style.display = 'block';
+                previewContent.insertBefore(previewLogo, previewContent.firstChild);
+            }
+            previewLogo.src = logoSrc;
+        } else if (previewLogo) {
+            previewLogo.remove();
+        }
+    }
 </script>
+</body>
+</html>

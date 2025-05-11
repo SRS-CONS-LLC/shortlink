@@ -22,6 +22,7 @@ public class LinkInBioRequestDto {
     private ThemeType themeType;
     private LayoutType layoutType;
     private String themeColor;
+    private Boolean removeLogo;
 
     private List<LinkItemResponseDto> links;
 
@@ -32,6 +33,7 @@ public class LinkInBioRequestDto {
         @JsonIgnore
         private MultipartFile logoFile;
         private String logoUrl;
+        private Boolean removeLogo;
     }
 
 }

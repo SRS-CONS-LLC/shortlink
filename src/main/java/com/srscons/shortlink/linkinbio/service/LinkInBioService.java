@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,8 +59,17 @@ public class LinkInBioService {
         existing.setLayoutType(dto.getLayoutType());
         existing.setThemeColor(dto.getThemeColor());
 
-        // Update main logo
-        uploadLogoIfPresent(dto.getLogoFile(), existing);
+        // Handle main logo
+        if (dto.getLogoFile() != null && !dto.getLogoFile().isEmpty()) {
+            // New logo file uploaded
+            uploadLogoIfPresent(dto.getLogoFile(), existing);
+        } else if (dto.getLogoUrl() != null) {
+            // Preserve existing logo URL
+            existing.setLogoUrl(dto.getLogoUrl());
+        } else {
+            // Remove logo
+            existing.setLogoUrl(null);
+        }
 
         // Remove old links and re-add new ones
         existing.getLinks().clear();
@@ -71,7 +81,18 @@ public class LinkInBioService {
                 item.setUrl(itemDto.getUrl());
                 item.setLinkInBio(existing);
 
-                uploadLogoIfPresent(itemDto.getLogoFile(), item);
+                // Handle link logo
+                if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
+                    // New logo file uploaded
+                    uploadLogoIfPresent(itemDto.getLogoFile(), item);
+                } else if (itemDto.getLogoUrl() != null) {
+                    // Preserve existing logo URL
+                    item.setLogoUrl(itemDto.getLogoUrl());
+                } else {
+                    // Remove logo
+                    item.setLogoUrl(null);
+                }
+
                 existing.getLinks().add(item);
             }
         }
@@ -97,6 +118,35 @@ public class LinkInBioService {
         if (file != null && !file.isEmpty()) {
             String url = fileUploadService.saveFile(file);
             item.setLogoUrl(url);
+        }
+    }
+
+    public void deleteLogo(Long id) {
+        LinkInBioEntity entity = repository.findById(id)
+            .orElseThrow(() -> new LinkInBioNotFoundException(id));
+        if (entity.getLogoUrl() != null) {
+            fileUploadService.deleteFileFromCloudflare(entity.getLogoUrl());
+            entity.setLogoUrl(null);
+            repository.save(entity);
+        }
+    }
+
+    @Transactional
+    public void deleteLinkLogo(Long id, int index) {
+        LinkInBioEntity entity = repository.findById(id)
+            .orElseThrow(() -> new LinkInBioNotFoundException(id));
+        
+        if (entity.getLinks() != null && index < entity.getLinks().size()) {
+            LinkItemEntity linkItem = entity.getLinks().get(index);
+            if (linkItem.getLogoUrl() != null) {
+                // First delete from Cloudflare
+                fileUploadService.deleteFileFromCloudflare(linkItem.getLogoUrl());
+                
+                // Then update database - make sure to set to null and save
+                linkItem.setLogoUrl(null);
+                entity.getLinks().set(index, linkItem); // Update the link in the list
+                repository.save(entity);
+            }
         }
     }
 }
