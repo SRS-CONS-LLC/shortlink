@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="/public/css/dashboard.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
 </head>
 <body>
 <div class="d-flex layout">
@@ -18,34 +20,6 @@
             <div class="section-title">Main</div>
             <a href="#" class="nav-link"><i class="bi bi-grid"></i> Summary</a>
             <a href="/plan" class="nav-link"><i class="bi bi-currency-dollar"></i> Plan</a>
-
-            <div class="section-title">Smartlinks</div>
-            <div id="links-container">
-                <a
-                        v-for="link in links"
-                        :key="link.id"
-                        href="#"
-                        class="nav-link"
-                        :class="{ 'active-link': selectedLinkId === link.id }"
-                        @click.prevent="selectLink(link.id)"
-                >
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="link-icon"
-                             style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background: #f8f9fa;">
-                            <img v-if="link.logoFileName" :src="link.logoFileName" :alt="link.title"
-                                 style="width: 100%; height: 100%; object-fit: cover;">
-                            <i v-else class="bi bi-link" style="font-size: 16px; color: #6c757d;"></i>
-                        </div>
-                        <div class="link-info">
-                            <div class="link-title">{{ link.title }}</div>
-                            <div class="link-description" style="font-size: 12px; color: #6c757d;">
-                                {{ link.description || '' }}
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <a href="#" class="btn btn-outline w-100 mt-2" @click.prevent="createNewLink">+ Create New</a>
         </div>
         <div>
             <div class="user-card mb-2">💡 Starter</div>
