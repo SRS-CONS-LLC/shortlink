@@ -22,6 +22,8 @@ public class ShortLinkRequestDto {
 
     private MultipartFile logoFile;
 
+    private String originalUrl;
+
     @NotNull(message = "Theme type is required")
     private ThemeType themeType;
 

@@ -128,6 +128,7 @@ public class ShortLinkService {
                 .orElseThrow(() -> new ShortLinkNotFoundException(dto.getId()));
 
         existing.setTitle(dto.getTitle());
+        existing.setOriginalUrl(dto.getOriginalUrl());
         existing.setDescription(dto.getDescription());
         existing.setThemeType(dto.getThemeType());
         existing.setLayoutType(dto.getLayoutType());

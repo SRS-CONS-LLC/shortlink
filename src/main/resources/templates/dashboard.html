@@ -99,6 +99,14 @@
                                         <input type="text" class="readonly-input" value="Draft Smartlink" v-model="linkInBio.title">
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-section-title">Redirect Url <i class="bi bi-question-circle"></i>
+                                    </div>
+                                    <div class="input-wrapper">
+                                        <i class="bi bi-bookmark"></i>
+                                        <input type="text" class="readonly-input" v-model="linkInBio.originalUrl">
+                                    </div>
+                                </div>
                                 <!--                                <div class="col-md-6">-->
                                 <!--                                    <div class="form-section-title">Open Graph Settings</div>-->
                                 <!--                                    <button class="custom-button w-100"><i class="bi bi-window me-2"></i>Open Graph-->
@@ -144,7 +152,7 @@
 
                 <div class="col-md-12">
                     <div class="mt-4">
-                        <label class="form-label fw-semibold">Smartlink settings</label>
+                        <label class="form-label fw-semibold">Lin in Bio settings</label>
                         <div class="smartlink-type">
                             <button
                                     v-for="tab in tabs"
@@ -541,6 +549,7 @@
                 themeType: 'dark',
                 shortCode: '',
                 shortUrl:'',
+                originalUrl:'',
                 links: [
                     {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
                     {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
@@ -748,6 +757,7 @@
                     linkInBio.removeMainLogo = false; // Reset flag when loading
                     linkInBio.shortCode = linkDetails.shortCode || '';
                     linkInBio.shortUrl = (baseUrl.value +'/'+linkDetails.shortCode) || '';
+                    linkInBio.originalUrl = linkDetails.originalUrl;
                     // Update theme color
                     if (linkDetails.themeColor) {
                         linkInBio.themeColor = linkDetails.themeColor;
@@ -810,6 +820,7 @@
                     formData.append('title', linkInBio.title);
                     formData.append('description', linkInBio.description);
                     formData.append('themeColor', linkInBio.themeColor);
+                    formData.append('originalUrl', linkInBio.originalUrl);
 
                     // Handle main logo
                     if (linkInBio.logoFile) {
