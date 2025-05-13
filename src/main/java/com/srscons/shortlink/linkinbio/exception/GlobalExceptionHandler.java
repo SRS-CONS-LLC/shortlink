@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(LinkInBioNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(LinkInBioNotFoundException ex) {
+    @ExceptionHandler(ShortLinkNotFoundException.class)
+    public ResponseEntity<String> handleNotFound(ShortLinkNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 

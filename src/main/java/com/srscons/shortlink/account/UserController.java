@@ -1,4 +1,4 @@
-package com.srscons.shortlink;
+package com.srscons.shortlink.account;
 
 import com.srscons.shortlink.auth.entity.UserEntity;
 import com.srscons.shortlink.auth.repository.UserRepository;

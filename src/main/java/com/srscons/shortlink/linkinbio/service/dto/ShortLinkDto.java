@@ -1,35 +1,33 @@
 package com.srscons.shortlink.linkinbio.service.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.srscons.shortlink.linkinbio.repository.entity.LayoutType;
-import com.srscons.shortlink.linkinbio.repository.entity.ThemeType;
+import com.srscons.shortlink.linkinbio.repository.entity.enums.LayoutType;
+import com.srscons.shortlink.linkinbio.repository.entity.enums.ThemeType;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Data
-public class LinkInBioDto {
+public class ShortLinkDto {
+    
     private Long id;
     private String title;
     private String description;
-    private String logoFileName;
+    private String logoUrl;
+    private MultipartFile logoFile;
     private ThemeType themeType;
     private LayoutType layoutType;
     private String themeColor;
+    private String shortCode;
+    private String originalUrl;
     private List<LinkItemDto> links;
 
-    @JsonIgnore
-    private MultipartFile logoFile;
-    private String logoUrl;
     @Data
     public static class LinkItemDto {
+        private Long id;
         private String title;
         private String url;
-        @JsonIgnore
-        private MultipartFile logoFile;
-
         private String logoUrl;
+        private MultipartFile logoFile;
     }
-}
-
+} 

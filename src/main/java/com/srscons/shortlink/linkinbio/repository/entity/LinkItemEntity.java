@@ -32,6 +32,6 @@ public class LinkItemEntity {
     private String logoUrl;
 
     @ManyToOne
-    @JoinColumn(name = "link_in_bio_id", nullable = false)
-    private LinkInBioEntity linkInBio;
+    @JoinColumn(name = "short_link_id", nullable = false)
+    private ShortLinkEntity shortLink;
 }

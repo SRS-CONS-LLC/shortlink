@@ -96,48 +96,47 @@
                                     </div>
                                     <div class="input-wrapper">
                                         <i class="bi bi-bookmark"></i>
-                                        <input type="text" class="readonly-input" value="Draft Smartlink" readonly>
+                                        <input type="text" class="readonly-input" value="Draft Smartlink" v-model="linkInBio.title">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-section-title">Open Graph Settings</div>
-                                    <button class="custom-button w-100"><i class="bi bi-window me-2"></i>Open Graph
-                                    </button>
-                                </div>
+                                <!--                                <div class="col-md-6">-->
+                                <!--                                    <div class="form-section-title">Open Graph Settings</div>-->
+                                <!--                                    <button class="custom-button w-100"><i class="bi bi-window me-2"></i>Open Graph-->
+                                <!--                                    </button>-->
+                                <!--                                </div>-->
 
-                                <div class="col-md-6">
+                                <div class="col-md-7">
                                     <div class="form-section-title">Smartlink URL <i class="bi bi-question-circle"></i>
                                     </div>
                                     <div class="input-wrapper">
                                         <i class="bi bi-link-45deg"></i>
-                                        <span class="readonly-input">CTOUT.me/s6l6wd</span>
-                                        <span class="badge-orange">Professional</span>
-                                        <button class="icon-btn"><i class="bi bi-copy"></i></button>
-                                        <button class="icon-btn"><i class="bi bi-box-arrow-up-right"></i></button>
+                                        <span class="readonly-input">{{ linkInBio.shortUrl }}</span>
+                                        <button class="icon-btn" @click="copyToClipboard(`${linkInBio.shortUrl}`)"><i class="bi bi-copy"></i></button>
+                                        <button class="icon-btn" @click="openSmartlink(`${linkInBio.shortUrl}`)"><i class="bi bi-box-arrow-up-right"></i></button>
                                     </div>
                                     <div class="note-muted">
                                         <i class="bi bi-info-circle me-1"></i> Custom URL available on premium plan
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-section-title">UTM Settings</div>
-                                    <button class="custom-button w-100"><i class="bi bi-graph-up-arrow me-2"></i>Generate
-                                        UTM
-                                    </button>
-                                </div>
+                                <!--                                <div class="col-md-6">-->
+                                <!--                                    <div class="form-section-title">UTM Settings</div>-->
+                                <!--                                    <button class="custom-button w-100"><i class="bi bi-graph-up-arrow me-2"></i>Generate-->
+                                <!--                                        UTM-->
+                                <!--                                    </button>-->
+                                <!--                                </div>-->
 
-                                <div class="col-md-6">
-                                    <div class="form-section-title">QR Settings</div>
-                                    <button class="custom-button w-100" disabled><i class="bi bi-qr-code me-2"></i>Edit
-                                        QR
-                                    </button>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-section-title">Script Injector</div>
-                                    <button class="custom-button w-100" disabled><i class="bi bi-code-slash me-2"></i>Insert
-                                        Script
-                                    </button>
-                                </div>
+                                <!--                                <div class="col-md-6">-->
+                                <!--                                    <div class="form-section-title">QR Settings</div>-->
+                                <!--                                    <button class="custom-button w-100" disabled><i class="bi bi-qr-code me-2"></i>Edit-->
+                                <!--                                        QR-->
+                                <!--                                    </button>-->
+                                <!--                                </div>-->
+                                <!--                                <div class="col-md-6">-->
+                                <!--                                    <div class="form-section-title">Script Injector</div>-->
+                                <!--                                    <button class="custom-button w-100" disabled><i class="bi bi-code-slash me-2"></i>Insert-->
+                                <!--                                        Script-->
+                                <!--                                    </button>-->
+                                <!--                                </div>-->
                             </div>
                         </div>
                     </div>
@@ -145,7 +144,7 @@
 
                 <div class="col-md-12">
                     <div class="mt-4">
-                        <label class="form-label fw-semibold">Select smartlink type</label>
+                        <label class="form-label fw-semibold">Smartlink settings</label>
                         <div class="smartlink-type">
                             <button
                                     v-for="tab in tabs"
@@ -161,77 +160,77 @@
                     </div>
 
                     <!-- App Shortener Tab -->
-                    <div type="tab" id="app-shortener" :class="{ active: activeTab === 'app-shortener' }" class="mt-4">
-                        <label class="form-label fw-semibold">App download links</label>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">App Store (iOS) app URL <i class="bi bi-question-circle"></i></label>
-                                <input type="text" class="form-control" v-model="appShortener.ios"
-                                       placeholder="https://apps.apple.com/en/app/your-app-name/id123456789">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Google Play (Android) app URL <i
-                                        class="bi bi-question-circle"></i></label>
-                                <input type="text" class="form-control" v-model="appShortener.android"
-                                       placeholder="https://play.google.com/store/apps/details?id=com.example.app">
-                            </div>
+                    <!--                    <div type="tab" id="app-shortener" :class="{ active: activeTab === 'app-shortener' }" class="mt-4">-->
+                    <!--                        <label class="form-label fw-semibold">App download links</label>-->
+                    <!--                        <div class="row g-3">-->
+                    <!--                            <div class="col-md-6">-->
+                    <!--                                <label class="form-label">App Store (iOS) app URL <i class="bi bi-question-circle"></i></label>-->
+                    <!--                                <input type="text" class="form-control" v-model="appShortener.ios"-->
+                    <!--                                       placeholder="https://apps.apple.com/en/app/your-app-name/id123456789">-->
+                    <!--                            </div>-->
+                    <!--                            <div class="col-md-6">-->
+                    <!--                                <label class="form-label">Google Play (Android) app URL <i-->
+                    <!--                                        class="bi bi-question-circle"></i></label>-->
+                    <!--                                <input type="text" class="form-control" v-model="appShortener.android"-->
+                    <!--                                       placeholder="https://play.google.com/store/apps/details?id=com.example.app">-->
+                    <!--                            </div>-->
 
-                            <div class="col-md-6">
-                                <label class="form-label">Windows app URL</label>
-                                <input type="text" class="form-control" v-model="appShortener.windows"
-                                       placeholder="https://example.com/windows/9NBLGGH4XXXX">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">MacOS app URL</label>
-                                <input type="text" class="form-control" v-model="appShortener.macos"
-                                       placeholder="https://apps.apple.com/us/app/your-macos-app/id123456789">
-                            </div>
+                    <!--                            <div class="col-md-6">-->
+                    <!--                                <label class="form-label">Windows app URL</label>-->
+                    <!--                                <input type="text" class="form-control" v-model="appShortener.windows"-->
+                    <!--                                       placeholder="https://example.com/windows/9NBLGGH4XXXX">-->
+                    <!--                            </div>-->
+                    <!--                            <div class="col-md-6">-->
+                    <!--                                <label class="form-label">MacOS app URL</label>-->
+                    <!--                                <input type="text" class="form-control" v-model="appShortener.macos"-->
+                    <!--                                       placeholder="https://apps.apple.com/us/app/your-macos-app/id123456789">-->
+                    <!--                            </div>-->
 
-                            <div class="col-md-6">
-                                <label class="form-label">iPad version App Store (iOS) app URL</label>
-                                <input type="text" class="form-control" v-model="appShortener.ipad"
-                                       placeholder="https://apps.apple.com/app/ipad-app/id123456789">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">AppGallery app URL</label>
-                                <input type="text" class="form-control" v-model="appShortener.appGallery"
-                                       placeholder="https://appgallery.huawei.com/app/C123456">
-                            </div>
+                    <!--                            <div class="col-md-6">-->
+                    <!--                                <label class="form-label">iPad version App Store (iOS) app URL</label>-->
+                    <!--                                <input type="text" class="form-control" v-model="appShortener.ipad"-->
+                    <!--                                       placeholder="https://apps.apple.com/app/ipad-app/id123456789">-->
+                    <!--                            </div>-->
+                    <!--                            <div class="col-md-6">-->
+                    <!--                                <label class="form-label">AppGallery app URL</label>-->
+                    <!--                                <input type="text" class="form-control" v-model="appShortener.appGallery"-->
+                    <!--                                       placeholder="https://appgallery.huawei.com/app/C123456">-->
+                    <!--                            </div>-->
 
-                            <div class="col-md-6">
-                                <label class="form-label">Amazon Appstore app URL</label>
-                                <input type="text" class="form-control" v-model="appShortener.amazon"
-                                       placeholder="https://www.amazon.com/gp/product/B00EXAMPLE">
-                            </div>
-                        </div>
-                    </div>
+                    <!--                            <div class="col-md-6">-->
+                    <!--                                <label class="form-label">Amazon Appstore app URL</label>-->
+                    <!--                                <input type="text" class="form-control" v-model="appShortener.amazon"-->
+                    <!--                                       placeholder="https://www.amazon.com/gp/product/B00EXAMPLE">-->
+                    <!--                            </div>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
 
                     <!-- URL Shortener Tab -->
-                    <div type="tab" id="url-shortener" :class="{ active: activeTab === 'url-shortener' }"
-                         class="mt-4 container py-5">
-                        <div class="row g-4 align-items-center">
-                            <div class="col-md-6">
-                                <label class="form-section-title">URL</label>
-                                <input type="text" class="rounded-pill-input" v-model="urlShortener.url"
-                                       placeholder="https://CTOUT.me" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-section-title">Password Protection</label>
-                                <div class="toggle-pill">
-                                    <button
-                                            :class="{ active: !urlShortener.passwordProtected }"
-                                            @click="urlShortener.passwordProtected = false"
-                                    >Off
-                                    </button>
-                                    <button
-                                            :class="{ active: urlShortener.passwordProtected }"
-                                            @click="urlShortener.passwordProtected = true"
-                                    >On
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!--                    <div type="tab" id="url-shortener" :class="{ active: activeTab === 'url-shortener' }"-->
+                    <!--                         class="mt-4 container py-5">-->
+                    <!--                        <div class="row g-4 align-items-center">-->
+                    <!--                            <div class="col-md-6">-->
+                    <!--                                <label class="form-section-title">URL</label>-->
+                    <!--                                <input type="text" class="rounded-pill-input" v-model="urlShortener.url"-->
+                    <!--                                       placeholder="https://CTOUT.me" readonly>-->
+                    <!--                            </div>-->
+                    <!--                            <div class="col-md-6">-->
+                    <!--                                <label class="form-section-title">Password Protection</label>-->
+                    <!--                                <div class="toggle-pill">-->
+                    <!--                                    <button-->
+                    <!--                                            :class="{ active: !urlShortener.passwordProtected }"-->
+                    <!--                                            @click="urlShortener.passwordProtected = false"-->
+                    <!--                                    >Off-->
+                    <!--                                    </button>-->
+                    <!--                                    <button-->
+                    <!--                                            :class="{ active: urlShortener.passwordProtected }"-->
+                    <!--                                            @click="urlShortener.passwordProtected = true"-->
+                    <!--                                    >On-->
+                    <!--                                    </button>-->
+                    <!--                                </div>-->
+                    <!--                            </div>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
 
                     <!-- Link-in-Bio Tab -->
                     <div type="tab" id="link-in-bio" :class="{ active: activeTab === 'link-in-bio' }">
@@ -398,54 +397,54 @@
                         </div>
                     </div>
 
-                    <!-- QR Tag Tab -->
-                    <div type="tab" id="qr-tag" :class="{ active: activeTab === 'qr-tag' }">
-                        <div class="container py-5">
-                            <div class="row g-4 mb-4">
-                                <div class="col-md-6">
-                                    <label class="form-section-title">Title</label>
-                                    <input type="text" class="form-control pill-input" v-model="qrTag.title"
-                                           placeholder="Enter title">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-section-title">Description</label>
-                                    <input type="text" class="form-control pill-input" v-model="qrTag.description"
-                                           placeholder="Enter description">
-                                </div>
+                    <!--                    &lt;!&ndash; QR Tag Tab &ndash;&gt;-->
+                    <!--                    <div type="tab" id="qr-tag" :class="{ active: activeTab === 'qr-tag' }">-->
+                    <!--                        <div class="container py-5">-->
+                    <!--                            <div class="row g-4 mb-4">-->
+                    <!--                                <div class="col-md-6">-->
+                    <!--                                    <label class="form-section-title">Title</label>-->
+                    <!--                                    <input type="text" class="form-control pill-input" v-model="qrTag.title"-->
+                    <!--                                           placeholder="Enter title">-->
+                    <!--                                </div>-->
+                    <!--                                <div class="col-md-6">-->
+                    <!--                                    <label class="form-section-title">Description</label>-->
+                    <!--                                    <input type="text" class="form-control pill-input" v-model="qrTag.description"-->
+                    <!--                                           placeholder="Enter description">-->
+                    <!--                                </div>-->
 
-                                <div class="col-md-6">
-                                    <label class="form-section-title">Picture</label>
-                                    <input type="file" accept="image/*" class="form-control pill-input"
-                                           @change="handleQRTagImageUpload">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-section-title">Theme color</label>
-                                    <input type="color" class="form-control form-control-color pill-input"
-                                           v-model="qrTag.themeColor">
-                                </div>
-                            </div>
+                    <!--                                <div class="col-md-6">-->
+                    <!--                                    <label class="form-section-title">Picture</label>-->
+                    <!--                                    <input type="file" accept="image/*" class="form-control pill-input"-->
+                    <!--                                           @change="handleQRTagImageUpload">-->
+                    <!--                                </div>-->
+                    <!--                                <div class="col-md-6">-->
+                    <!--                                    <label class="form-section-title">Theme color</label>-->
+                    <!--                                    <input type="color" class="form-control form-control-color pill-input"-->
+                    <!--                                           v-model="qrTag.themeColor">-->
+                    <!--                                </div>-->
+                    <!--                            </div>-->
 
-                            <div class="row g-0">
-                                <div class="col-md-6 bg-light p-4">
-                                    <label class="form-section-title">Select a preset</label>
-                                    <select class="form-select pill-input" v-model="qrTag.preset">
-                                        <option>Select a preset</option>
-                                        <option>Preset 1</option>
-                                        <option>Preset 2</option>
-                                        <option>Preset 3</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-4">
-                                    <div class="preview-box">
-                                        <h5>{{ qrTag.title }}</h5>
-                                        <i class="bi bi-link-45deg"></i>
-                                        <div class="text-muted fw-semibold">Add link to preview</div>
-                                        <small class="mt-2 d-block">Powered by <strong>CTOUT</strong></small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!--                            <div class="row g-0">-->
+                    <!--                                <div class="col-md-6 bg-light p-4">-->
+                    <!--                                    <label class="form-section-title">Select a preset</label>-->
+                    <!--                                    <select class="form-select pill-input" v-model="qrTag.preset">-->
+                    <!--                                        <option>Select a preset</option>-->
+                    <!--                                        <option>Preset 1</option>-->
+                    <!--                                        <option>Preset 2</option>-->
+                    <!--                                        <option>Preset 3</option>-->
+                    <!--                                    </select>-->
+                    <!--                                </div>-->
+                    <!--                                <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-4">-->
+                    <!--                                    <div class="preview-box">-->
+                    <!--                                        <h5>{{ qrTag.title }}</h5>-->
+                    <!--                                        <i class="bi bi-link-45deg"></i>-->
+                    <!--                                        <div class="text-muted fw-semibold">Add link to preview</div>-->
+                    <!--                                        <small class="mt-2 d-block">Powered by <strong>CTOUT</strong></small>-->
+                    <!--                                    </div>-->
+                    <!--                                </div>-->
+                    <!--                            </div>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
                 </div>
             </div>
         </div>
@@ -476,6 +475,11 @@
 
     createApp({
         setup() {
+
+            const baseUrl = computed(() => {
+                // Get the current origin (protocol + hostname + port)
+                return window.location.origin;
+            });
             // User information
             const loggedInUser = reactive({
                 name: 'John',
@@ -489,10 +493,10 @@
 
             // Tabs configuration
             const tabs = [
-                {id: 'app-shortener', name: 'App shortener'},
-                {id: 'url-shortener', name: 'URL shortener'},
+                // {id: 'app-shortener', name: 'App shortener'},
+                // {id: 'url-shortener', name: 'URL shortener'},
                 {id: 'link-in-bio', name: 'Link-in-Bio'},
-                {id: 'qr-tag', name: 'QR Tag'}
+                // {id: 'qr-tag', name: 'QR Tag'}
             ];
             const activeTab = ref('app-shortener');
 
@@ -535,6 +539,8 @@
                 themeColor: '#101223',
                 layoutType: 'list',
                 themeType: 'dark',
+                shortCode: '',
+                shortUrl:'',
                 links: [
                     {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
                     {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
@@ -562,7 +568,7 @@
             // Methods
             async function loadLinks() {
                 try {
-                    const response = await fetch('/api/v1/link-in-bio');
+                    const response = await fetch('/api/short-links');
                     links.value = await response.json();
                 } catch (error) {
                     console.error('Error loading links:', error);
@@ -625,7 +631,7 @@
                     formData.append('links[0].url', '');
 
                     // Send to API
-                    const response = await fetch('/api/v1/link-in-bio', {
+                    const response = await fetch('/api/short-links', {
                         method: 'POST',
                         body: formData
                     });
@@ -730,7 +736,7 @@
 // Updated loadLinkDetails function to initialize removeLogo flags
             async function loadLinkDetails(linkId) {
                 try {
-                    const response = await fetch(`/api/v1/link-in-bio/${linkId}`);
+                    const response = await fetch(`/api/short-links/${linkId}`);
                     if (!response.ok) {
                         throw new Error('Failed to fetch link details');
                     }
@@ -740,7 +746,8 @@
                     linkInBio.title = linkDetails.title || '';
                     linkInBio.description = linkDetails.description || '';
                     linkInBio.removeMainLogo = false; // Reset flag when loading
-
+                    linkInBio.shortCode = linkDetails.shortCode || '';
+                    linkInBio.shortUrl = (baseUrl.value +'/'+linkDetails.shortCode) || '';
                     // Update theme color
                     if (linkDetails.themeColor) {
                         linkInBio.themeColor = linkDetails.themeColor;
@@ -842,7 +849,7 @@
 
                     // Determine if this is an update or create
                     const method = selectedLinkId.value ? 'PUT' : 'POST';
-                    const url = selectedLinkId.value ? `/api/v1/link-in-bio/${selectedLinkId.value}` : '/api/v1/link-in-bio';
+                    const url = selectedLinkId.value ? `/api/short-links/${selectedLinkId.value}` : '/api/short-links';
 
                     // Send to API
                     const response = await fetch(url, {
@@ -904,7 +911,7 @@
                     isDeleting.value = true;
 
                     // Call the delete endpoint
-                    const response = await fetch(`/api/v1/link-in-bio/${selectedLinkId.value}`, {
+                    const response = await fetch(`/api/short-links/${selectedLinkId.value}`, {
                         method: 'DELETE',
                     });
 
@@ -950,6 +957,26 @@
                 }
             }
 
+
+
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        alerts.success.show = true;
+                        alerts.success.message = 'URL copied to clipboard!';
+                        setTimeout(() => {
+                            alerts.success.show = false;
+                        }, 3000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy URL: ', err);
+                    });
+            }
+
+            function openSmartlink(url) {
+                window.open(`${url}`, '_blank');
+            }
+
             // Lifecycle hooks
             onMounted(() => {
                 loadLinks();
@@ -974,6 +1001,9 @@
                 isDeleting,
 
                 // Methods
+                baseUrl,
+                copyToClipboard,
+                openSmartlink,
                 deleteSmartlink,
                 selectLink,
                 handleLogoUpload,
