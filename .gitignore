@@ -14,3 +14,4 @@ build/
 .idea/dataSources.local.xml
 .idea/dataSources/
 .idea/modules/
+src/main/java/com/srscons/shortlink/linkinbio/
