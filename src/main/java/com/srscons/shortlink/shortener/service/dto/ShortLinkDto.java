@@ -21,6 +21,7 @@ public class ShortLinkDto {
     private String shortCode;
     private String originalUrl;
     private List<LinkItemDto> links;
+    private boolean deleted = false;
 
     @Data
     public static class LinkItemDto {

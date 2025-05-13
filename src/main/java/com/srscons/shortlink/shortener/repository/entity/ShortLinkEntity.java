@@ -72,6 +72,9 @@ public class ShortLinkEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
     public ShortLinkEntity() {
         this.links = new ArrayList<>();
         this.visitMetadata = new ArrayList<>();

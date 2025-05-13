@@ -37,7 +37,7 @@ public class ShortLinkService {
     private static final int MAX_ATTEMPTS = 10;
 
     public List<ShortLinkDto> findAll() {
-        return repository.findAll().stream()
+        return repository.findAllByDeletedFalse().stream()
                 .map(mapper::fromEntityToBusiness)
                 .collect(Collectors.toList());
     }
@@ -53,7 +53,7 @@ public class ShortLinkService {
     }
 
     public ShortLinkDto findById(Long id) {
-        return repository.findById(id)
+        return repository.findByIdAndDeletedFalse(id)
                 .map(mapper::fromEntityToBusiness)
                 .orElseThrow(() -> new ShortLinkNotFoundException(id));
     }
@@ -295,6 +295,14 @@ public class ShortLinkService {
         }
 
         return null;
+    }
+
+    @Transactional
+    public void softDelete(Long id) {
+        ShortLinkEntity entity = repository.findByIdAndDeletedFalse(id)
+            .orElseThrow(() -> new ShortLinkNotFoundException(id));
+        entity.setDeleted(true);
+        repository.save(entity);
     }
 
 } 
