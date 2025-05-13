@@ -9,3 +9,8 @@ uploads
 # Gradle build output
 .gradle/
 build/
+
+# IDEA-specific files
+.idea/dataSources.local.xml
+.idea/dataSources/
+.idea/modules/
