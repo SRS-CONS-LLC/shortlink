@@ -1,4 +1,4 @@
-package com.srscons.shortlink.Tracker.Entity;
+package com.srscons.shortlink.tracker.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

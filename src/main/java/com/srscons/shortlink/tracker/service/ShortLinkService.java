@@ -1,7 +1,7 @@
-package com.srscons.shortlink.Tracker.Service;
+package com.srscons.shortlink.tracker.service;
 
-import com.srscons.shortlink.Tracker.Entity.ShortlinkEntity;
-import com.srscons.shortlink.Tracker.Repository.ShortLinkRepository;
+import com.srscons.shortlink.tracker.entity.ShortlinkEntity;
+import com.srscons.shortlink.tracker.repository.ShortLinkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

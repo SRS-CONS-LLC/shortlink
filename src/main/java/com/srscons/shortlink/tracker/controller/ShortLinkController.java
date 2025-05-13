@@ -1,7 +1,7 @@
-package com.srscons.shortlink.Tracker.Controller;
+package com.srscons.shortlink.tracker.controller;
 
-import com.srscons.shortlink.Tracker.Service.ShortLinkService;
-import com.srscons.shortlink.Tracker.Service.MetaDataService;
+import com.srscons.shortlink.tracker.service.ShortLinkService;
+import com.srscons.shortlink.tracker.service.MetaDataService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -37,6 +37,7 @@ public class ShortLinkController {
 
         return "intermediate"; // Bu HTML səhifə göstəriləcək (intermediate.html)
     }
+
     @PostMapping("/visit")
     @ResponseBody
     public void saveMetadata(

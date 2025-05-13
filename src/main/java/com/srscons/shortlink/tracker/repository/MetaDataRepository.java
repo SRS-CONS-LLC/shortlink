@@ -1,6 +1,6 @@
-package com.srscons.shortlink.Tracker.Repository;
+package com.srscons.shortlink.tracker.repository;
 
-import com.srscons.shortlink.Tracker.Entity.MetaDataEntity;
+import com.srscons.shortlink.tracker.entity.MetaDataEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

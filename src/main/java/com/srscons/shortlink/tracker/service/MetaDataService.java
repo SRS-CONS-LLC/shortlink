@@ -1,7 +1,7 @@
-package com.srscons.shortlink.Tracker.Service;//package com.srscons.shortlink.VisitLog.Service;
+package com.srscons.shortlink.tracker.service;//package com.srscons.shortlink.VisitLog.Service;
 
-import com.srscons.shortlink.Tracker.Entity.MetaDataEntity;
-import com.srscons.shortlink.Tracker.Repository.MetaDataRepository;
+import com.srscons.shortlink.tracker.entity.MetaDataEntity;
+import com.srscons.shortlink.tracker.repository.MetaDataRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
