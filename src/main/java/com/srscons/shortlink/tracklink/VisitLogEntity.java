@@ -1,4 +1,4 @@
-package com.srscons.shortlink.VisitLog;
+package com.srscons.shortlink.tracklink;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
