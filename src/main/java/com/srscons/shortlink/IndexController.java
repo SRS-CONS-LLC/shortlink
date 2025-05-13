@@ -1,6 +1,6 @@
 package com.srscons.shortlink;
 
-import com.srscons.shortlink.linkinbio.service.ShortLinkService;
+import com.srscons.shortlink.shortener.service.ShortLinkService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
