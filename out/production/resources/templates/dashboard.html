@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CTOUT Dashboard – Draft Smartlink</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="/public/css/dashboard.css" rel="stylesheet">
+</head>
+<body>
+<div class="d-flex layout">
+
+<!-- Sidebar -->
+<div th:insert="~{sidebar.html}"></div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <h4 class="fw-bold mb-3"><i class="bi bi-link-45deg"></i> Draft Smartlink</h4>
+
+    <div class="config-card">
+        <div class="d-flex justify-content-start mb-4 gap-3">
+            <button class="btn btn-outline-dark">Analytics</button>
+            <button class="btn btn-dark active">Configuration</button>
+        </div>
+
+        <h5 class="fw-semibold">General configuration</h5>
+        <div class="row mt-3">
+            <div class="col-md-2 text-center">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=CTOUT.me/s6l6wd&size=120x120" class="rounded shadow-sm p-2" alt="QR Code">
+                <div class="text-muted small mt-2">Click for download</div>
+            </div>
+            <div class="col-md-10">
+
+                <div class="row mb-3">
+                    <div class="container py-4">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="form-section-title">Smartlink Name <i class="bi bi-question-circle"></i></div>
+                                <div class="input-wrapper">
+                                    <i class="bi bi-bookmark"></i>
+                                    <input type="text" class="readonly-input" value="Draft Smartlink" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-section-title">Open Graph Settings</div>
+                                <button class="custom-button w-100"><i class="bi bi-window me-2"></i>Open Graph</button>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-section-title">Smartlink URL <i class="bi bi-question-circle"></i></div>
+                                <div class="input-wrapper">
+                                    <i class="bi bi-link-45deg"></i>
+                                    <span class="readonly-input">CTOUT.me/s6l6wd</span>
+                                    <span class="badge-orange">Professional</span>
+                                    <button class="icon-btn"><i class="bi bi-copy"></i></button>
+                                    <button class="icon-btn"><i class="bi bi-box-arrow-up-right"></i></button>
+                                </div>
+                                <div class="note-muted">
+                                    <i class="bi bi-info-circle me-1"></i> Custom URL available on premium plan
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-section-title">UTM Settings</div>
+                                <button class="custom-button w-100"><i class="bi bi-graph-up-arrow me-2"></i>Generate UTM</button>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-section-title">QR Settings</div>
+                                <button class="custom-button w-100" disabled><i class="bi bi-qr-code me-2"></i>Edit QR</button>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-section-title">Script Injector</div>
+                                <button class="custom-button w-100" disabled><i class="bi bi-code-slash me-2"></i>Insert Script</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="col-md-12">
+                <div class="mt-4">
+                    <label class="form-label fw-semibold">Select smartlink type</label>
+                    <div class="smartlink-type">
+                        <button type="tab-button" class="btn btn-dark" for="app-shortener">App shortener</button>
+                        <button type="tab-button" class="btn btn-outline-secondary" for="url-shortener">URL shortener</button>
+                        <button type="tab-button"class="btn btn-outline-secondary" for="link-in-bio">Link-in-Bio</button>
+                        <button type="tab-button"class="btn btn-outline-secondary" for="qr-tag">QR Tag</button>
+                    </div>
+                </div>
+
+                <div type="tab" id="app-shortener" class="mt-4">
+                    <label class="form-label fw-semibold">App download links</label>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">App Store (iOS) app URL <i class="bi bi-question-circle"></i></label>
+                            <input type="text" class="form-control" placeholder="https://apps.apple.com/en/app/your-app-name/id123456789">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Google Play (Android) app URL <i class="bi bi-question-circle"></i></label>
+                            <input type="text" class="form-control" placeholder="https://play.google.com/store/apps/details?id=com.example.app">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Windows app URL</label>
+                            <input type="text" class="form-control" placeholder="https://example.com/windows/9NBLGGH4XXXX">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">MacOS app URL</label>
+                            <input type="text" class="form-control" placeholder="https://apps.apple.com/us/app/your-macos-app/id123456789">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">iPad version App Store (iOS) app URL</label>
+                            <input type="text" class="form-control" placeholder="https://apps.apple.com/app/ipad-app/id123456789">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">AppGallery app URL</label>
+                            <input type="text" class="form-control" placeholder="https://appgallery.huawei.com/app/C123456">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Amazon Appstore app URL</label>
+                            <input type="text" class="form-control" placeholder="https://www.amazon.com/gp/product/B00EXAMPLE">
+                        </div>
+                    </div>
+                </div>
+
+                <div type="tab"  id="url-shortener" class="mt-4 container py-5">
+                    <div class="row g-4 align-items-center">
+                        <div class="col-md-6">
+                            <label class="form-section-title">URL</label>
+                            <input type="text" class="rounded-pill-input" placeholder="https://CTOUT.me" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-section-title">Password Protection</label>
+                            <div class="toggle-pill">
+                                <button class="active">Off</button>
+                                <button>On</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div type="tab"  id="link-in-bio">
+                    <div th:insert="~{link-in-bio.html}"></div>
+                </div>
+
+                <div type="tab"  id="qr-tag">
+                    <div class="container py-5">
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-section-title">Title</label>
+                                <input type="text" class="form-control pill-input" placeholder="Enter title" value="CTOUT Smartlink">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-section-title">Description</label>
+                                <input type="text" class="form-control pill-input" placeholder="Enter description" value="CTOUT">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-section-title">Picture</label>
+                                <input type="file" accept="image/*" class="form-control pill-input">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-section-title">Theme color</label>
+                                <input type="color" class="form-control form-control-color pill-input" value="#000000">
+                            </div>
+                        </div>
+
+                        <div class="row g-0">
+                            <div class="col-md-6 bg-light p-4">
+                                <label class="form-section-title">Select a preset</label>
+                                <select class="form-select pill-input">
+                                    <option>Select a preset</option>
+                                    <option>Preset 1</option>
+                                    <option>Preset 2</option>
+                                    <option>Preset 3</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-4">
+                                <div class="preview-box">
+                                    <h5>CTOUT Smartlink</h5>
+                                    <i class="bi bi-link-45deg"></i>
+                                    <div class="text-muted fw-semibold">Add link to preview</div>
+                                    <small class="mt-2 d-block">Powered by <strong>CTOUT</strong></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/public/js/dashboard.js"></script>
+
+</body>
+</html>

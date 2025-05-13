@@ -6,201 +6,898 @@
     <title>CTOUT Dashboard – Draft Smartlink</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="/public/css/dashboard.css" rel="stylesheet">
+
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="/public/css/dashboard.css"/>
 </head>
 <body>
-<div class="d-flex layout">
+<div id="app" class="d-flex layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div>
+            <h5 class="fw-bold ps-2">CTOUT</h5>
+            <div class="section-title">Main</div>
+            <a href="#" class="nav-link"><i class="bi bi-grid"></i> Summary</a>
+            <a href="/plan" class="nav-link"><i class="bi bi-currency-dollar"></i> Plan</a>
 
-<!-- Sidebar -->
-<div th:insert="~{sidebar.html}"></div>
-
-<!-- Main Content -->
-<div class="main-content">
-    <h4 class="fw-bold mb-3"><i class="bi bi-link-45deg"></i> Draft Smartlink</h4>
-
-    <div class="config-card">
-        <div class="d-flex justify-content-start mb-4 gap-3">
-            <button class="btn btn-outline-dark">Analytics</button>
-            <button class="btn btn-dark active">Configuration</button>
+            <div class="section-title">Smartlinks</div>
+            <div id="links-container">
+                <a
+                        v-for="link in links"
+                        :key="link.id"
+                        href="#"
+                        class="nav-link"
+                        :class="{ 'active-link': selectedLinkId === link.id }"
+                        @click.prevent="selectLink(link.id)"
+                >
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="link-icon"
+                             style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background: #f8f9fa;">
+                            <img v-if="link.logoFileName" :src="link.logoFileName" :alt="link.title"
+                                 style="width: 100%; height: 100%; object-fit: cover;">
+                            <i v-else class="bi bi-link" style="font-size: 16px; color: #6c757d;"></i>
+                        </div>
+                        <div class="link-info">
+                            <div class="link-title">{{ link.title }}</div>
+                            <div class="link-description" style="font-size: 12px; color: #6c757d;">
+                                {{ link.description || '' }}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <a href="#" class="btn btn-outline w-100 mt-2" @click.prevent="createNewLink">+ Create New</a>
         </div>
+        <div>
+            <div class="user-card mb-2">💡 Starter</div>
+            <a href="/account" class="d-flex align-items-center gap-2 px-3 py-2 rounded-pill text-decoration-none"
+               style="background: #f8fafd; border: 1px solid #dbe1ea;">
+                <img th:src="${loggedInUser.picture}" alt="User" referrerpolicy="no-referrer" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
+                <span class="fw-bold text-dark" th:text="${loggedInUser.name+' '+loggedInUser.surname}"></span>
+            </a>
+        </div>
+    </div>
 
-        <h5 class="fw-semibold">General configuration</h5>
-        <div class="row mt-3">
-            <div class="col-md-2 text-center">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?data=CTOUT.me/s6l6wd&size=120x120" class="rounded shadow-sm p-2" alt="QR Code">
-                <div class="text-muted small mt-2">Click for download</div>
-            </div>
-            <div class="col-md-10">
+    <!-- Main Content -->
+    <div class="main-content">
+        <h4 class="fw-bold mb-3"><i class="bi bi-link-45deg"></i> Draft Smartlink</h4>
 
-                <div class="row mb-3">
-                    <div class="container py-4">
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <div class="form-section-title">Smartlink Name <i class="bi bi-question-circle"></i></div>
-                                <div class="input-wrapper">
-                                    <i class="bi bi-bookmark"></i>
-                                    <input type="text" class="readonly-input" value="Draft Smartlink" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-section-title">Open Graph Settings</div>
-                                <button class="custom-button w-100"><i class="bi bi-window me-2"></i>Open Graph</button>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-section-title">Smartlink URL <i class="bi bi-question-circle"></i></div>
-                                <div class="input-wrapper">
-                                    <i class="bi bi-link-45deg"></i>
-                                    <span class="readonly-input">CTOUT.me/s6l6wd</span>
-                                    <span class="badge-orange">Professional</span>
-                                    <button class="icon-btn"><i class="bi bi-copy"></i></button>
-                                    <button class="icon-btn"><i class="bi bi-box-arrow-up-right"></i></button>
-                                </div>
-                                <div class="note-muted">
-                                    <i class="bi bi-info-circle me-1"></i> Custom URL available on premium plan
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-section-title">UTM Settings</div>
-                                <button class="custom-button w-100"><i class="bi bi-graph-up-arrow me-2"></i>Generate UTM</button>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-section-title">QR Settings</div>
-                                <button class="custom-button w-100" disabled><i class="bi bi-qr-code me-2"></i>Edit QR</button>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-section-title">Script Injector</div>
-                                <button class="custom-button w-100" disabled><i class="bi bi-code-slash me-2"></i>Insert Script</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
+        <div class="config-card">
+            <div class="d-flex justify-content-start mb-4 gap-3">
+                <button class="btn btn-outline-dark">Analytics</button>
+                <button class="btn btn-dark active">Configuration</button>
             </div>
 
-            <div class="col-md-12">
-                <div class="mt-4">
-                    <label class="form-label fw-semibold">Select smartlink type</label>
-                    <div class="smartlink-type">
-                        <button type="tab-button" class="btn btn-dark" for="app-shortener">App shortener</button>
-                        <button type="tab-button" class="btn btn-outline-secondary" for="url-shortener">URL shortener</button>
-                        <button type="tab-button"class="btn btn-outline-secondary" for="link-in-bio">Link-in-Bio</button>
-                        <button type="tab-button"class="btn btn-outline-secondary" for="qr-tag">QR Tag</button>
+            <h5 class="fw-semibold">General configuration</h5>
+            <div class="row mt-3">
+                <div class="col-md-2 text-center">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?data=CTOUT.me/s6l6wd&size=120x120"
+                         class="rounded shadow-sm p-2" alt="QR Code">
+                    <div class="text-muted small mt-2">Click for download</div>
+                </div>
+                <div class="col-md-10">
+                    <div class="row mb-3">
+                        <div class="container py-4">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="form-section-title">Smartlink Name <i class="bi bi-question-circle"></i>
+                                    </div>
+                                    <div class="input-wrapper">
+                                        <i class="bi bi-bookmark"></i>
+                                        <input type="text" class="readonly-input" value="Draft Smartlink" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-section-title">Open Graph Settings</div>
+                                    <button class="custom-button w-100"><i class="bi bi-window me-2"></i>Open Graph
+                                    </button>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-section-title">Smartlink URL <i class="bi bi-question-circle"></i>
+                                    </div>
+                                    <div class="input-wrapper">
+                                        <i class="bi bi-link-45deg"></i>
+                                        <span class="readonly-input">CTOUT.me/s6l6wd</span>
+                                        <span class="badge-orange">Professional</span>
+                                        <button class="icon-btn"><i class="bi bi-copy"></i></button>
+                                        <button class="icon-btn"><i class="bi bi-box-arrow-up-right"></i></button>
+                                    </div>
+                                    <div class="note-muted">
+                                        <i class="bi bi-info-circle me-1"></i> Custom URL available on premium plan
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-section-title">UTM Settings</div>
+                                    <button class="custom-button w-100"><i class="bi bi-graph-up-arrow me-2"></i>Generate
+                                        UTM
+                                    </button>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-section-title">QR Settings</div>
+                                    <button class="custom-button w-100" disabled><i class="bi bi-qr-code me-2"></i>Edit
+                                        QR
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-section-title">Script Injector</div>
+                                    <button class="custom-button w-100" disabled><i class="bi bi-code-slash me-2"></i>Insert
+                                        Script
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div type="tab" id="app-shortener" class="mt-4">
-                    <label class="form-label fw-semibold">App download links</label>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">App Store (iOS) app URL <i class="bi bi-question-circle"></i></label>
-                            <input type="text" class="form-control" placeholder="https://apps.apple.com/en/app/your-app-name/id123456789">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Google Play (Android) app URL <i class="bi bi-question-circle"></i></label>
-                            <input type="text" class="form-control" placeholder="https://play.google.com/store/apps/details?id=com.example.app">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Windows app URL</label>
-                            <input type="text" class="form-control" placeholder="https://example.com/windows/9NBLGGH4XXXX">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">MacOS app URL</label>
-                            <input type="text" class="form-control" placeholder="https://apps.apple.com/us/app/your-macos-app/id123456789">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">iPad version App Store (iOS) app URL</label>
-                            <input type="text" class="form-control" placeholder="https://apps.apple.com/app/ipad-app/id123456789">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">AppGallery app URL</label>
-                            <input type="text" class="form-control" placeholder="https://appgallery.huawei.com/app/C123456">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Amazon Appstore app URL</label>
-                            <input type="text" class="form-control" placeholder="https://www.amazon.com/gp/product/B00EXAMPLE">
+                <div class="col-md-12">
+                    <div class="mt-4">
+                        <label class="form-label fw-semibold">Select smartlink type</label>
+                        <div class="smartlink-type">
+                            <button
+                                    v-for="tab in tabs"
+                                    :key="tab.id"
+                                    type="tab-button"
+                                    class="btn"
+                                    :class="activeTab === tab.id ? 'btn-dark' : 'btn-outline-secondary'"
+                                    @click="activeTab = tab.id"
+                            >
+                                {{ tab.name }}
+                            </button>
                         </div>
                     </div>
-                </div>
 
-                <div type="tab"  id="url-shortener" class="mt-4 container py-5">
-                    <div class="row g-4 align-items-center">
-                        <div class="col-md-6">
-                            <label class="form-section-title">URL</label>
-                            <input type="text" class="rounded-pill-input" placeholder="https://CTOUT.me" readonly>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-section-title">Password Protection</label>
-                            <div class="toggle-pill">
-                                <button class="active">Off</button>
-                                <button>On</button>
+                    <!-- App Shortener Tab -->
+                    <div type="tab" id="app-shortener" :class="{ active: activeTab === 'app-shortener' }" class="mt-4">
+                        <label class="form-label fw-semibold">App download links</label>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">App Store (iOS) app URL <i class="bi bi-question-circle"></i></label>
+                                <input type="text" class="form-control" v-model="appShortener.ios"
+                                       placeholder="https://apps.apple.com/en/app/your-app-name/id123456789">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Google Play (Android) app URL <i
+                                        class="bi bi-question-circle"></i></label>
+                                <input type="text" class="form-control" v-model="appShortener.android"
+                                       placeholder="https://play.google.com/store/apps/details?id=com.example.app">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Windows app URL</label>
+                                <input type="text" class="form-control" v-model="appShortener.windows"
+                                       placeholder="https://example.com/windows/9NBLGGH4XXXX">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">MacOS app URL</label>
+                                <input type="text" class="form-control" v-model="appShortener.macos"
+                                       placeholder="https://apps.apple.com/us/app/your-macos-app/id123456789">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">iPad version App Store (iOS) app URL</label>
+                                <input type="text" class="form-control" v-model="appShortener.ipad"
+                                       placeholder="https://apps.apple.com/app/ipad-app/id123456789">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">AppGallery app URL</label>
+                                <input type="text" class="form-control" v-model="appShortener.appGallery"
+                                       placeholder="https://appgallery.huawei.com/app/C123456">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Amazon Appstore app URL</label>
+                                <input type="text" class="form-control" v-model="appShortener.amazon"
+                                       placeholder="https://www.amazon.com/gp/product/B00EXAMPLE">
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div type="tab"  id="link-in-bio">
-                    <div th:insert="~{link-in-bio.html}"></div>
-                </div>
-
-                <div type="tab"  id="qr-tag">
-                    <div class="container py-5">
-                        <div class="row g-4 mb-4">
+                    <!-- URL Shortener Tab -->
+                    <div type="tab" id="url-shortener" :class="{ active: activeTab === 'url-shortener' }"
+                         class="mt-4 container py-5">
+                        <div class="row g-4 align-items-center">
                             <div class="col-md-6">
-                                <label class="form-section-title">Title</label>
-                                <input type="text" class="form-control pill-input" placeholder="Enter title" value="CTOUT Smartlink">
+                                <label class="form-section-title">URL</label>
+                                <input type="text" class="rounded-pill-input" v-model="urlShortener.url"
+                                       placeholder="https://CTOUT.me" readonly>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-section-title">Description</label>
-                                <input type="text" class="form-control pill-input" placeholder="Enter description" value="CTOUT">
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-section-title">Picture</label>
-                                <input type="file" accept="image/*" class="form-control pill-input">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-section-title">Theme color</label>
-                                <input type="color" class="form-control form-control-color pill-input" value="#000000">
-                            </div>
-                        </div>
-
-                        <div class="row g-0">
-                            <div class="col-md-6 bg-light p-4">
-                                <label class="form-section-title">Select a preset</label>
-                                <select class="form-select pill-input">
-                                    <option>Select a preset</option>
-                                    <option>Preset 1</option>
-                                    <option>Preset 2</option>
-                                    <option>Preset 3</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-4">
-                                <div class="preview-box">
-                                    <h5>CTOUT Smartlink</h5>
-                                    <i class="bi bi-link-45deg"></i>
-                                    <div class="text-muted fw-semibold">Add link to preview</div>
-                                    <small class="mt-2 d-block">Powered by <strong>CTOUT</strong></small>
+                                <label class="form-section-title">Password Protection</label>
+                                <div class="toggle-pill">
+                                    <button
+                                            :class="{ active: !urlShortener.passwordProtected }"
+                                            @click="urlShortener.passwordProtected = false"
+                                    >Off
+                                    </button>
+                                    <button
+                                            :class="{ active: urlShortener.passwordProtected }"
+                                            @click="urlShortener.passwordProtected = true"
+                                    >On
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Link-in-Bio Tab -->
+                    <div type="tab" id="link-in-bio" :class="{ active: activeTab === 'link-in-bio' }">
+                        <div class="container">
+                            <div class="form-section">
+                                <div class="alert alert-success" v-if="alerts.success.show">{{ alerts.success.message
+                                    }}
+                                </div>
+                                <div class="alert alert-danger" v-if="alerts.error.show">{{ alerts.error.message }}
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="title">Title</label>
+                                    <input type="text" id="title" class="form-control" v-model="linkInBio.title">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <input type="text" id="description" class="form-control"
+                                           v-model="linkInBio.description" placeholder="CTOUT">
+                                </div>
+
+                                <!-- Updated Main Logo Upload Section with X Button -->
+                                <div class="form-group">
+                                    <label for="logo">Logo</label>
+                                    <div id="logo-upload-section" class="upload-btn" style="position:relative;">
+                                        <template v-if="!linkInBio.logoPreview">
+                                            <label id="upload-label"
+                                                   style="width:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;margin:0;">
+                                                <span class="upload-icon" style="margin-right:8px;">&#8679;</span>
+                                                <span class="upload-text">Upload</span>
+                                                <input type="file" id="logo-input" accept="image/*"
+                                                       style="display:none;" @change="handleLogoUpload">
+                                            </label>
+                                        </template>
+                                        <div v-else class="logo-file-row">
+                                            <div class="logo-container">
+                                                <img :src="linkInBio.logoPreview" alt="logo"/>
+
+                                            </div>
+                                            <span class="file-name">{{ linkInBio.logoFile ? linkInBio.logoFile.name : 'Uploaded logo'}}</span>
+                                            <button class="logo-remove-btn logo-remove-btn-main" type="button" @click="deleteLogo"
+                                                    title="Remove logo">
+                                                <i class="bi bi-x"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="theme-color">Theme color</label>
+                                    <div class="color-picker">
+                                        <input type="color" id="theme-color" class="color-input"
+                                               v-model="linkInBio.themeColor">
+                                        <div class="color-swatch"
+                                             :style="{ backgroundColor: linkInBio.themeColor }"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Layout</label>
+                                    <div class="layout-options">
+                                        <button
+                                                v-for="layout in layouts"
+                                                :key="layout.value"
+                                                class="option-btn"
+                                                :class="{ active: linkInBio.layoutType === layout.value }"
+                                                :data-layout="layout.value"
+                                                @click="linkInBio.layoutType = layout.value"
+                                        >
+                                            {{ layout.name }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Theme</label>
+                                    <div class="theme-options">
+                                        <button
+                                                v-for="theme in themes"
+                                                :key="theme.value"
+                                                class="option-btn"
+                                                :class="{
+                                                    'light-theme': theme.value === 'light',
+                                                    'dark-theme': theme.value !== 'light',
+                                                    'active': linkInBio.themeType === theme.value
+                                                }"
+                                                :data-theme="theme.value"
+                                                @click="linkInBio.themeType = theme.value"
+                                        >
+                                            {{ theme.name }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button class="add-link-btn" @click="addLink">
+                                    <span>+</span>
+                                    Add Link
+                                </button>
+
+                                <!-- Updated Link Item with X Button on Logo -->
+                                <div class="links-container">
+                                    <div class="link-item" v-for="(link, index) in linkInBio.links" :key="index">
+                                        <div class="drag-handle">☰</div>
+                                        <div class="link-upload">
+                                            <template v-if="!link.logoPreview">
+                                                <span>↑</span>
+                                                <input type="file" accept="image/*" class="link-icon-upload"
+                                                       @change="handleLinkLogoUpload($event, index)">
+                                            </template>
+                                            <div v-else class="link-logo-wrapper">
+                                                <img :src="link.logoPreview" :alt="link.title"
+                                                     style="width: 100%; height: 100%; object-fit: cover;">
+                                                <button class="link-logo-delete-btn" @click="deleteLinkLogo(index)"
+                                                        title="Remove logo">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                                <input type="file" accept="image/*" class="link-icon-upload"
+                                                       @change="handleLinkLogoUpload($event, index)"
+                                                       style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;">
+                                            </div>
+                                        </div>
+                                        <div class="link-inputs">
+                                            <input type="text" class="link-input" placeholder="Your link address"
+                                                   v-model="link.url">
+                                            <input type="text" class="link-input" placeholder="Title"
+                                                   v-model="link.title">
+                                        </div>
+                                        <button class="delete-btn" @click="deleteLink(index)">🗑️</button>
+                                    </div>
+                                </div>
+                                <button class="save-btn" @click="saveChanges" :disabled="isSaving">
+                                    {{ isSaving ? 'Saving...' : 'Save Changes' }}
+                                </button>
+                            </div>
+
+                            <div class="preview-section">
+                                <div class="preview-container">
+                                    <div
+                                            :class="linkInBio.themeType === 'light' ? 'preview-light' : 'preview-dark'"
+                                            id="preview-content"
+                                            :style="{ backgroundColor: linkInBio.themeType !== 'light' ? linkInBio.themeColor : '' }"
+                                    >
+                                        <img v-if="linkInBio.logoPreview" :src="linkInBio.logoPreview"
+                                             class="preview-logo">
+                                        <div class="preview-title" id="preview-title">{{ linkInBio.title }}</div>
+                                        <div class="preview-description" id="preview-description">
+                                            {{ linkInBio.description || 'CTOUT' }}
+                                        </div>
+                                        <div class="preview-links" :class="{ 'grid': linkInBio.layoutType === 'grid' }">
+                                            <div class="preview-link" v-for="(link, index) in linkInBio.links"
+                                                 :key="'preview-'+index">
+                                                <div class="preview-link-icon">
+                                                    <img v-if="link.logoPreview" :src="link.logoPreview"
+                                                         :alt="link.title">
+                                                </div>
+                                                <span>{{ link.title }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="preview-footer">Powered by CTOUT</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QR Tag Tab -->
+                    <div type="tab" id="qr-tag" :class="{ active: activeTab === 'qr-tag' }">
+                        <div class="container py-5">
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-section-title">Title</label>
+                                    <input type="text" class="form-control pill-input" v-model="qrTag.title"
+                                           placeholder="Enter title">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-section-title">Description</label>
+                                    <input type="text" class="form-control pill-input" v-model="qrTag.description"
+                                           placeholder="Enter description">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-section-title">Picture</label>
+                                    <input type="file" accept="image/*" class="form-control pill-input"
+                                           @change="handleQRTagImageUpload">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-section-title">Theme color</label>
+                                    <input type="color" class="form-control form-control-color pill-input"
+                                           v-model="qrTag.themeColor">
+                                </div>
+                            </div>
+
+                            <div class="row g-0">
+                                <div class="col-md-6 bg-light p-4">
+                                    <label class="form-section-title">Select a preset</label>
+                                    <select class="form-select pill-input" v-model="qrTag.preset">
+                                        <option>Select a preset</option>
+                                        <option>Preset 1</option>
+                                        <option>Preset 2</option>
+                                        <option>Preset 3</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-4">
+                                    <div class="preview-box">
+                                        <h5>{{ qrTag.title }}</h5>
+                                        <i class="bi bi-link-45deg"></i>
+                                        <div class="text-muted fw-semibold">Add link to preview</div>
+                                        <small class="mt-2 d-block">Powered by <strong>CTOUT</strong></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-</div>
+<script>
+    const {createApp, ref, reactive, computed, watch, onMounted} = Vue;
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/public/js/dashboard.js"></script>
+    createApp({
+        setup() {
+            // User information
+            const loggedInUser = reactive({
+                name: 'John',
+                surname: 'Doe',
+                picture: 'https://via.placeholder.com/32'
+            });
 
+            // Sidebar links
+            const links = ref([]);
+            const selectedLinkId = ref(null);
+
+            // Tabs configuration
+            const tabs = [
+                {id: 'app-shortener', name: 'App shortener'},
+                {id: 'url-shortener', name: 'URL shortener'},
+                {id: 'link-in-bio', name: 'Link-in-Bio'},
+                {id: 'qr-tag', name: 'QR Tag'}
+            ];
+            const activeTab = ref('app-shortener');
+
+            // App shortener data
+            const appShortener = reactive({
+                ios: '',
+                android: '',
+                windows: '',
+                macos: '',
+                ipad: '',
+                appGallery: '',
+                amazon: ''
+            });
+
+            // URL shortener data
+            const urlShortener = reactive({
+                url: 'https://CTOUT.me',
+                passwordProtected: false
+            });
+
+            // Link-in-Bio data
+            const layouts = [
+                {name: 'List', value: 'list'},
+                {name: 'Grid', value: 'grid'}
+            ];
+
+            const themes = [
+                {name: 'Light', value: 'light'},
+                {name: 'Auto', value: 'auto'},
+                {name: 'Dark', value: 'dark'}
+            ];
+
+            const linkInBio = reactive({
+                title: 'MyTitle',
+                description: 'CTOUT',
+                logoFile: null,
+                logoPreview: null,
+                logoUrl: null,
+                removeMainLogo: false, // Add this flag
+                themeColor: '#101223',
+                layoutType: 'list',
+                themeType: 'dark',
+                links: [
+                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
+                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
+                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false}
+                ]
+            });
+
+            // QR Tag data
+            const qrTag = reactive({
+                title: 'CTOUT Smartlink',
+                description: 'CTOUT',
+                imageFile: null,
+                imagePreview: null,
+                themeColor: '#000000',
+                preset: 'Select a preset'
+            });
+
+            // Status flags
+            const isSaving = ref(false);
+            const alerts = reactive({
+                success: {show: false, message: 'Link in bio saved successfully!'},
+                error: {show: false, message: ''}
+            });
+
+            // Methods
+            async function loadLinks() {
+                try {
+                    const response = await fetch('/api/v1/link-in-bio');
+                    links.value = await response.json();
+                } catch (error) {
+                    console.error('Error loading links:', error);
+                }
+            }
+
+            function selectLink(linkId) {
+                selectedLinkId.value = linkId;
+                activeTab.value = 'link-in-bio';
+
+                // Update URL with both tab and id parameters
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('tab', 'link-in-bio');
+                newUrl.searchParams.set('id', linkId);
+                window.history.pushState({}, '', newUrl);
+
+                // Load link details
+                loadLinkDetails(linkId);
+            }
+
+
+            function addLink() {
+                linkInBio.links.push({
+                    title: 'New Link',
+                    url: '',
+                    logoFile: null,
+                    logoPreview: null,
+                    logoUrl: null
+                });
+            }
+
+            function deleteLink(index) {
+                linkInBio.links.splice(index, 1);
+            }
+
+            function handleQRTagImageUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    qrTag.imageFile = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        qrTag.imagePreview = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            async function createNewLink() {
+                try {
+                    // Create empty link in database
+                    const formData = new FormData();
+                    formData.append('title', 'New Link');
+                    formData.append('description', 'CTOUT');
+                    formData.append('themeColor', '#000000');
+                    formData.append('themeType', 'AUTO');
+                    formData.append('layoutType', 'LIST');
+
+                    // Add one empty link
+                    formData.append('links[0].title', 'New Link');
+                    formData.append('links[0].url', '');
+
+                    // Send to API
+                    const response = await fetch('/api/v1/link-in-bio', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to create new link');
+                    }
+
+                    const newLink = await response.json();
+
+                    // Update URL with the new ID
+                    const newUrl = new URL(window.location.href);
+                    newUrl.searchParams.set('tab', 'link-in-bio');
+                    newUrl.searchParams.set('id', newLink.id);
+                    window.history.pushState({}, '', newUrl);
+
+                    // Update UI
+                    await loadLinks();
+                    activeTab.value = 'link-in-bio';
+                    selectedLinkId.value = newLink.id;
+
+                    // Load the new link details
+                    await loadLinkDetails(newLink.id);
+                } catch (error) {
+                    console.error('Error creating new link:', error);
+                }
+            }
+
+            // Check URL parameters on page load
+            function checkUrlParameters() {
+                const url = new URL(window.location.href);
+                const tabParam = url.searchParams.get('tab');
+                const idParam = url.searchParams.get('id');
+
+                if (tabParam) {
+                    activeTab.value = tabParam;
+                }
+
+                if (tabParam === 'link-in-bio' && idParam) {
+                    selectedLinkId.value = idParam;
+                    loadLinkDetails(idParam);
+                }
+            }
+
+
+// Updated handleLogoUpload function
+            function handleLogoUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    linkInBio.logoFile = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        linkInBio.logoPreview = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+
+                    // Clear the existing logoUrl and reset remove flag
+                    linkInBio.logoUrl = null;
+                    linkInBio.removeMainLogo = false;
+                }
+            }
+
+// Updated deleteLogo function with no immediate DELETE request
+            function deleteLogo() {
+                // Flag that the logo should be removed when saving
+                linkInBio.removeMainLogo = true;
+
+                // Clear logo data for UI updates
+                linkInBio.logoFile = null;
+                linkInBio.logoPreview = null;
+                linkInBio.logoUrl = null;
+            }
+
+// Updated handleLinkLogoUpload function
+            function handleLinkLogoUpload(event, index) {
+                const file = event.target.files[0];
+                if (file) {
+                    linkInBio.links[index].logoFile = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        linkInBio.links[index].logoPreview = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+
+                    // Clear the existing logoUrl and reset remove flag
+                    linkInBio.links[index].logoUrl = null;
+                    linkInBio.links[index].removeLogo = false;
+                }
+            }
+
+// Updated deleteLinkLogo function with no immediate DELETE request
+            function deleteLinkLogo(index) {
+                // Flag this link's logo for removal when saving
+                linkInBio.links[index].removeLogo = true;
+
+                // Clear logo data for UI updates
+                linkInBio.links[index].logoFile = null;
+                linkInBio.links[index].logoPreview = null;
+                linkInBio.links[index].logoUrl = null;
+            }
+
+// Updated loadLinkDetails function to initialize removeLogo flags
+            async function loadLinkDetails(linkId) {
+                try {
+                    const response = await fetch(`/api/v1/link-in-bio/${linkId}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch link details');
+                    }
+                    const linkDetails = await response.json();
+
+                    // Update form fields
+                    linkInBio.title = linkDetails.title || '';
+                    linkInBio.description = linkDetails.description || '';
+                    linkInBio.removeMainLogo = false; // Reset flag when loading
+
+                    // Update theme color
+                    if (linkDetails.themeColor) {
+                        linkInBio.themeColor = linkDetails.themeColor;
+                    } else {
+                        // Set default color based on theme type
+                        linkInBio.themeColor = linkDetails.themeType === 'LIGHT' ? '#FFFFFF' : '#101223';
+                    }
+
+                    // Update layout type and theme type
+                    linkInBio.layoutType = linkDetails.layoutType.toLowerCase();
+                    linkInBio.themeType = linkDetails.themeType.toLowerCase();
+
+                    // Update main logo
+                    if (linkDetails.logoUrl) {
+                        linkInBio.logoPreview = linkDetails.logoUrl;
+                        linkInBio.logoUrl = linkDetails.logoUrl;
+                        linkInBio.logoFile = null;
+                    } else {
+                        linkInBio.logoPreview = null;
+                        linkInBio.logoUrl = null;
+                        linkInBio.logoFile = null;
+                    }
+
+                    // Update links
+                    if (linkDetails.links && linkDetails.links.length > 0) {
+                        linkInBio.links = linkDetails.links.map(link => ({
+                            title: link.title || '',
+                            url: link.url || '',
+                            logoFile: null,
+                            logoPreview: link.logoUrl || null,
+                            logoUrl: link.logoUrl || null,
+                            removeLogo: false // Initialize flag for each link
+                        }));
+                    } else {
+                        // Reset to default if no links
+                        linkInBio.links = [
+                            {
+                                title: 'Title',
+                                url: '',
+                                logoFile: null,
+                                logoPreview: null,
+                                logoUrl: null,
+                                removeLogo: false
+                            }
+                        ];
+                    }
+                } catch (error) {
+                    console.error('Error loading link details:', error);
+                }
+            }
+
+// Updated saveChanges function to handle logo flags
+            async function saveChanges() {
+                try {
+                    // Show loading state
+                    isSaving.value = true;
+
+                    // Collect form data
+                    const formData = new FormData();
+                    formData.append('title', linkInBio.title);
+                    formData.append('description', linkInBio.description);
+                    formData.append('themeColor', linkInBio.themeColor);
+
+                    // Handle main logo
+                    if (linkInBio.logoFile) {
+                        // New file uploaded
+                        formData.append('logoFile', linkInBio.logoFile);
+                    } else if (linkInBio.logoUrl && !linkInBio.removeMainLogo) {
+                        // Existing logo kept
+                        formData.append('logoUrl', linkInBio.logoUrl);
+                    } else if (linkInBio.removeMainLogo) {
+                        // Logo removed
+                        formData.append('removeMainLogo', 'true');
+                    }
+
+                    // Add theme and layout
+                    formData.append('themeType', linkInBio.themeType.toUpperCase());
+                    formData.append('layoutType', linkInBio.layoutType.toUpperCase());
+
+                    // Collect links
+                    linkInBio.links.forEach((link, index) => {
+                        if (link.url && link.title) {
+                            formData.append(`links[${index}].title`, link.title);
+                            formData.append(`links[${index}].url`, link.url);
+
+                            // Handle link logo
+                            if (link.logoFile) {
+                                // New logo file uploaded
+                                formData.append(`links[${index}].logoFile`, link.logoFile);
+                            } else if (link.logoUrl && !link.removeLogo) {
+                                // Existing logo kept
+                                formData.append(`links[${index}].logoUrl`, link.logoUrl);
+                            } else if (link.removeLogo) {
+                                // Logo was removed
+                                formData.append(`links[${index}].removeLogo`, 'true');
+                            }
+                        }
+                    });
+
+                    // Determine if this is an update or create
+                    const method = selectedLinkId.value ? 'PUT' : 'POST';
+                    const url = selectedLinkId.value ? `/api/v1/link-in-bio/${selectedLinkId.value}` : '/api/v1/link-in-bio';
+
+                    // Send to API
+                    const response = await fetch(url, {
+                        method: method,
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => null);
+                        throw new Error(errorData?.message || 'Failed to save link in bio');
+                    }
+
+                    // Reset remove flags after successful save
+                    linkInBio.removeMainLogo = false;
+                    linkInBio.links.forEach(link => {
+                        link.removeLogo = false;
+                    });
+
+                    // Show success message
+                    alerts.success.show = true;
+                    alerts.error.show = false;
+                    setTimeout(() => {
+                        alerts.success.show = false;
+                    }, 3000);
+
+                    // If this was a new creation, update the URL with the new ID
+                    if (!selectedLinkId.value) {
+                        const responseData = await response.json();
+                        if (responseData.id) {
+                            selectedLinkId.value = responseData.id;
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('id', responseData.id);
+                            window.history.pushState({}, '', newUrl);
+                        }
+                    }
+
+                    // Reload the links list in the sidebar
+                    await loadLinks();
+
+                } catch (error) {
+                    // Show error message
+                    alerts.error.show = true;
+                    alerts.error.message = error.message;
+                    alerts.success.show = false;
+                } finally {
+                    // Reset button state
+                    isSaving.value = false;
+                }
+            }
+
+            // Lifecycle hooks
+            onMounted(() => {
+                loadLinks();
+                checkUrlParameters();
+            });
+
+            return {
+                loggedInUser,
+                links,
+                selectedLinkId,
+                tabs,
+                activeTab,
+                appShortener,
+                urlShortener,
+                linkInBio,
+                qrTag,
+                layouts,
+                themes,
+                alerts,
+                isSaving,
+
+                // Methods
+                selectLink,
+                handleLogoUpload,
+                deleteLogo,
+                handleLinkLogoUpload,
+                deleteLinkLogo,
+                addLink,
+                deleteLink,
+                createNewLink,
+                saveChanges,
+                handleQRTagImageUpload
+            };
+        }
+    }).mount('#app');
+</script>
 </body>
 </html>
