@@ -298,11 +298,17 @@ public class ShortLinkService {
     }
 
     @Transactional
-    public void softDelete(Long id) {
-        ShortLinkEntity entity = repository.findByIdAndDeletedFalse(id)
-            .orElseThrow(() -> new ShortLinkNotFoundException(id));
-        entity.setDeleted(true);
-        repository.save(entity);
+    public void softDeleteShortlink(Long shortlinkId) {
+        ShortLinkEntity shortlink = repository.findById(shortlinkId)
+                .orElseThrow(() -> new ShortLinkNotFoundException("Shortlink not found"));
+
+        shortlink.setDeleted(true);
+
+        for (LinkItemEntity item : shortlink.getLinks()) {
+            item.setDeleted(true);
+        }
+
+        repository.save(shortlink);
     }
 
 } 
