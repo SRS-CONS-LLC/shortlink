@@ -1,62 +1,39 @@
 package com.srscons.shortlink.tracker.controller;
 
+import com.srscons.shortlink.tracker.dto.CreateShortLinkRequest;
+import com.srscons.shortlink.tracker.dto.ShortLinkResponse;
 import com.srscons.shortlink.tracker.service.ShortLinkService;
-import com.srscons.shortlink.tracker.service.MetaDataService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@Controller
+import java.net.URI;
+
+@RestController
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/api/v1")
 public class ShortLinkController {
 
-    private final MetaDataService metaDataService;
     private final ShortLinkService shortLinkService;
 
     @PostMapping("/shorten")
-    public String createShortLink(@RequestParam String url, RedirectAttributes redirectAttributes) {
-        String shortCode = shortLinkService.createShortLink(url);
-        String shortUrl = "http://localhost:8080/" + shortCode;
-        redirectAttributes.addFlashAttribute("shortUrl", shortUrl);
-        return "redirect:/dashboard";
+    public ResponseEntity<ShortLinkResponse> createShortLink(@Valid @RequestBody CreateShortLinkRequest request) {
+        ShortLinkResponse response = shortLinkService.createShortLink(request.getUrl());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{shortCode}")
-    public String handleShortLink(@PathVariable String shortCode, Model model) {
+    public ResponseEntity<Void> handleShortLink(@PathVariable String shortCode, HttpServletRequest request) {
         String originalUrl = shortLinkService.getOriginalUrl(shortCode);
         if (originalUrl == null) {
-            return "redirect:/not-found";
+            return ResponseEntity.notFound().build();
         }
 
-        model.addAttribute("shortCode", shortCode);
-        model.addAttribute("redirectUrl", originalUrl); // JS bu URL-ə yönləndirəcək
+        // Save metadata about this visit
+        shortLinkService.saveVisitMetadata(shortCode, originalUrl, request);
 
-        return "intermediate"; // Bu HTML səhifə göstəriləcək (intermediate.html)
+        return ResponseEntity.status(302).location(URI.create(originalUrl)).build();
     }
-
-    @PostMapping("/visit")
-    @ResponseBody
-    public void saveMetadata(
-            @RequestParam String shortCode,
-            @RequestParam String redirectUrl,
-            @RequestParam(required = false) String timezone,
-            @RequestParam(required = false) String utmSource,
-            @RequestParam(required = false) String country,
-            HttpServletRequest request
-    ) {
-        metaDataService.saveMetadata(
-                shortCode,
-                redirectUrl,
-                request,
-                timezone,
-                utmSource,
-                country
-        );
-    }
-
-
 }

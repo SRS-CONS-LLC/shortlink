@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ShortLinkRepository extends JpaRepository<ShortlinkEntity, Long> {
     Optional<ShortlinkEntity> findByShortCode(String shortCode);
-
+    boolean existsByShortCode(String shortCode);
 }
