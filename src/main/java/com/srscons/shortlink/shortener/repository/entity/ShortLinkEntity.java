@@ -2,6 +2,7 @@ package com.srscons.shortlink.shortener.repository.entity;
 
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
 import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
+import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -52,6 +53,10 @@ public class ShortLinkEntity {
     @Column(name = "layout_type", columnDefinition = "varchar(10) default 'LIST'")
     private LayoutType layoutType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "link_type", columnDefinition = "varchar(10) default 'REDIRECT'")
+    private LinkType linkType;
+
     @Column(name = "theme_color")
     private String themeColor;
 
@@ -99,4 +104,4 @@ public class ShortLinkEntity {
         links.remove(link);
         link.setShortLink(null);
     }
-} 
+}

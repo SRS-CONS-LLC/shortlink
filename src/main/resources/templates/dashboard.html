@@ -107,11 +107,17 @@
                                         <input type="text" class="readonly-input" v-model="linkInBio.originalUrl">
                                     </div>
                                 </div>
-                                <!--                                <div class="col-md-6">-->
-                                <!--                                    <div class="form-section-title">Open Graph Settings</div>-->
-                                <!--                                    <button class="custom-button w-100"><i class="bi bi-window me-2"></i>Open Graph-->
-                                <!--                                    </button>-->
-                                <!--                                </div>-->
+
+                                <div class="col-md-6">
+                                    <div class="form-section-title">Link Type <i class="bi bi-question-circle"></i>
+                                    </div>
+                                    <div class="input-wrapper">
+                                        <select class="form-control" v-model="linkInBio.linkType">
+                                            <option value="REDIRECT">Redirect</option>
+                                            <option value="BIO">Bio</option>
+                                        </select>
+                                    </div>
+                                </div>
 
                                 <div class="col-md-6">
                                     <div class="form-section-title">Smartlink URL <i class="bi bi-question-circle"></i>
@@ -540,10 +546,11 @@
                 logoFile: null,
                 logoPreview: null,
                 logoUrl: null,
-                removeMainLogo: false, // Add this flag
+                removeMainLogo: false,
                 themeColor: '#101223',
                 layoutType: 'list',
                 themeType: 'dark',
+                linkType: 'REDIRECT',
                 shortCode: '',
                 shortUrl:'',
                 originalUrl:'',
@@ -631,6 +638,7 @@
                     formData.append('themeColor', '#000000');
                     formData.append('themeType', 'AUTO');
                     formData.append('layoutType', 'LIST');
+                    formData.append('linkType', 'REDIRECT');
 
                     // Add one empty link
                     formData.append('links[0].title', 'New Link');
@@ -751,10 +759,11 @@
                     // Update form fields
                     linkInBio.title = linkDetails.title || '';
                     linkInBio.description = linkDetails.description || '';
-                    linkInBio.removeMainLogo = false; // Reset flag when loading
+                    linkInBio.removeMainLogo = false;
                     linkInBio.shortCode = linkDetails.shortCode || '';
                     linkInBio.shortUrl = (baseUrl.value +'/'+linkDetails.shortCode) || '';
                     linkInBio.originalUrl = linkDetails.originalUrl;
+                    linkInBio.linkType = linkDetails.linkType || 'REDIRECT';
                     // Update theme color
                     if (linkDetails.themeColor) {
                         linkInBio.themeColor = linkDetails.themeColor;
@@ -818,6 +827,7 @@
                     formData.append('description', linkInBio.description);
                     formData.append('themeColor', linkInBio.themeColor);
                     formData.append('originalUrl', linkInBio.originalUrl);
+                    formData.append('linkType', linkInBio.linkType);
 
                     // Handle main logo
                     if (linkInBio.logoFile) {

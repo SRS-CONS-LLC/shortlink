@@ -5,6 +5,7 @@ import com.srscons.shortlink.shortener.repository.ShortLinkRepository;
 import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.repository.entity.LinkItemEntity;
 import com.srscons.shortlink.shortener.repository.entity.MetaDataEntity;
+import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import com.srscons.shortlink.shortener.service.mapper.ShortLinkMapper;
 import com.srscons.shortlink.shortener.util.FileUploadService;
@@ -47,7 +48,13 @@ public class ShortLinkService {
         ShortLinkEntity entity = mapper.fromBusinessToEntity(dto);
         entity.setOriginalUrl("https://www.ctout.com");
         entity.setShortCode(generateUniqueShortCode());
+        if (dto.getLinkType() == null) {
+            entity.setLinkType(LinkType.REDIRECT); // Default to REDIRECT if not specified
+        } else {
+            entity.setLinkType(dto.getLinkType());
+        }
 
+        System.out.println("Saving ShortLink with linkType: " + entity.getLinkType());
         ShortLinkEntity saved = repository.save(entity);
         return mapper.fromEntityToBusiness(saved);
     }
@@ -56,6 +63,12 @@ public class ShortLinkService {
         return repository.findByIdAndDeletedFalse(id)
                 .map(mapper::fromEntityToBusiness)
                 .orElseThrow(() -> new ShortLinkNotFoundException(id));
+    }
+
+    @Transactional
+    public ShortLinkEntity getShortLinkByCode(String shortCode) {
+        return repository.findByShortCode(shortCode)
+                .orElse(null);
     }
 
     @Transactional
@@ -85,40 +98,7 @@ public class ShortLinkService {
         metadata.setProxy(detectProxy(request));
         metadata.setVpn(detectVPN(request));
 
-        // Parse user agent manually
-        if (userAgent != null) {
-            // Detect browser
-            java.util.regex.Matcher browserMatcher = BROWSER_PATTERN.matcher(userAgent);
-            if (browserMatcher.find()) {
-                metadata.setBrowser(browserMatcher.group(1));
-            }
-
-            // Detect OS
-            java.util.regex.Matcher osMatcher = OS_PATTERN.matcher(userAgent);
-            if (osMatcher.find()) {
-                String os = osMatcher.group(1);
-                metadata.setOs(os);
-                metadata.setOsVersion(osMatcher.group(2));
-            }
-
-            // Detect device type
-            String userAgentLower = userAgent.toLowerCase();
-            metadata.setIsMobile(userAgentLower.contains("mobile") || userAgentLower.contains("android") || userAgentLower.contains("iphone"));
-            metadata.setIsTablet(userAgentLower.contains("tablet") || userAgentLower.contains("ipad"));
-            metadata.setIsDesktop(!metadata.getIsMobile() && !metadata.getIsTablet());
-        }
-
-        // Parse UTM parameters
-        if (queryString != null) {
-            Map<String, String> params = parseQueryString(queryString);
-            metadata.setUtmSource(params.get("utm_source"));
-            metadata.setUtmMedium(params.get("utm_medium"));
-            metadata.setUtmCampaign(params.get("utm_campaign"));
-            metadata.setUtmTerm(params.get("utm_term"));
-            metadata.setUtmContent(params.get("utm_content"));
-        }
-
-        shortLink.getVisitMetadata().add(metadata);
+        shortLink.addVisitMetadata(metadata);
         repository.save(shortLink);
     }
 
@@ -133,6 +113,7 @@ public class ShortLinkService {
         existing.setThemeType(dto.getThemeType());
         existing.setLayoutType(dto.getLayoutType());
         existing.setThemeColor(dto.getThemeColor());
+        existing.setLinkType(dto.getLinkType());
 
         // Handle main logo
         if (dto.getLogoFile() != null && !dto.getLogoFile().isEmpty()) {

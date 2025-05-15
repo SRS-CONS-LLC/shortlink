@@ -2,6 +2,7 @@ package com.srscons.shortlink.shortener.service.dto;
 
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
 import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
+import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ public class ShortLinkDto {
     private MultipartFile logoFile;
     private ThemeType themeType;
     private LayoutType layoutType;
+    private LinkType linkType;
     private String themeColor;
     private String shortCode;
     private String originalUrl;

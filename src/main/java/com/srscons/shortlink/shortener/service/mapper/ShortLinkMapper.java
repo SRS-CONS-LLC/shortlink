@@ -14,12 +14,14 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface ShortLinkMapper {
     @Mapping(target = "links", source = "links", qualifiedByName = "mapLinks")
+    @Mapping(target = "linkType", source = "linkType")
     ShortLinkDto fromEntityToBusiness(ShortLinkEntity entity);
 
     @Mapping(target = "links", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "shortCode", ignore = true)
     @Mapping(target = "visitMetadata", ignore = true)
+    @Mapping(target = "linkType", source = "linkType")
     ShortLinkEntity fromBusinessToEntity(ShortLinkDto dto);
 
     @Mapping(target = "links", ignore = true)
