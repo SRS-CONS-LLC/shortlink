@@ -65,5 +65,14 @@ public class ShortLinkController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> softDeleteShortLink(@PathVariable("id") Long id) {
+        try {
+            shortLinkService.softDeleteShortlink(id);
+            return ResponseEntity.noContent().build();
+        } catch (ShortLinkNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 } 
