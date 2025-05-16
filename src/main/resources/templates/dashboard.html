@@ -345,32 +345,39 @@
                                 <!-- Updated Link Item with X Button on Logo -->
                                 <div class="links-container">
                                     <div class="link-item" v-for="(link, index) in linkInBio.links" :key="index">
-                                        <div class="drag-handle">☰</div>
-                                        <div class="link-upload">
-                                            <template v-if="!link.logoPreview">
-                                                <span>↑</span>
-                                                <input type="file" accept="image/*" class="link-icon-upload"
-                                                       @change="handleLinkLogoUpload($event, index)">
-                                            </template>
-                                            <div v-else class="link-logo-wrapper">
-                                                <img :src="link.logoPreview" :alt="link.title"
-                                                     style="width: 100%; height: 100%; object-fit: cover;">
-                                                <button class="link-logo-delete-btn" @click="deleteLinkLogo(index)"
-                                                        title="Remove logo">
-                                                    <i class="bi bi-x"></i>
-                                                </button>
-                                                <input type="file" accept="image/*" class="link-icon-upload"
-                                                       @change="handleLinkLogoUpload($event, index)"
-                                                       style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;">
+                                        <template v-if="!link.deleted">
+                                            <div class="drag-handle">☰</div>
+                                            <div class="link-upload">
+                                                <template v-if="!link.logoPreview">
+                                                    <span>↑</span>
+                                                    <input type="file" accept="image/*" class="link-icon-upload"
+                                                           @change="handleLinkLogoUpload($event, index)">
+                                                </template>
+                                                <div v-else class="link-logo-wrapper">
+                                                    <img :src="link.logoPreview" :alt="link.title"
+                                                         style="width: 100%; height: 100%; object-fit: cover;">
+                                                    <button class="link-logo-delete-btn" @click="deleteLinkLogo(index)" title="Remove logo">
+                                                        <i class="bi bi-x"></i>
+                                                    </button>
+                                                    <input type="file" accept="image/*" class="link-icon-upload"
+                                                           @change="handleLinkLogoUpload($event, index)"
+                                                           style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;">
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="link-inputs">
-                                            <input type="text" class="link-input" placeholder="Your link address"
-                                                   v-model="link.url">
-                                            <input type="text" class="link-input" placeholder="Title"
-                                                   v-model="link.title">
-                                        </div>
-                                        <button class="delete-btn" @click="deleteLink(index)">🗑️</button>
+                                            <div class="link-inputs">
+                                                <input type="text" class="link-input" placeholder="Your link address"
+                                                       v-model="link.url">
+                                                <input type="text" class="link-input" placeholder="Title"
+                                                       v-model="link.title">
+                                            </div>
+                                            <button class="delete-btn" @click="softDeleteLink(index)">🗑️</button>
+                                        </template>
+                                        <template v-else>
+                                            <div class="text-muted fst-italic d-flex align-items-center justify-content-between px-2 py-1 bg-light rounded">
+                                                <span>This link removed. It will be deleted after save.</span>
+                                                <button class="btn btn-sm btn-outline-secondary ms-2" @click="undoDelete(index)">Undo</button>
+                                            </div>
+                                        </template>
                                     </div>
                                 </div>
                                 <button class="save-btn" @click="saveChanges" :disabled="isSaving">
@@ -613,8 +620,8 @@
                 });
             }
 
-            function deleteLink(index) {
-                linkInBio.links.splice(index, 1);
+            function softDeleteLink(index) {
+                linkInBio.links[index].deleted = true;
             }
 
             function handleQRTagImageUpload(event) {
@@ -795,7 +802,8 @@
                             logoFile: null,
                             logoPreview: link.logoUrl || null,
                             logoUrl: link.logoUrl || null,
-                            removeLogo: false // Initialize flag for each link
+                            removeLogo: false,
+                            deleted: link.deleted || false
                         }));
                     } else {
                         // Reset to default if no links
@@ -806,7 +814,8 @@
                                 logoFile: null,
                                 logoPreview: null,
                                 logoUrl: null,
-                                removeLogo: false
+                                removeLogo: false,
+                                deleted: false
                             }
                         ];
                     }
@@ -851,19 +860,28 @@
                             formData.append(`links[${index}].title`, link.title);
                             formData.append(`links[${index}].url`, link.url);
 
-                            // Handle link logo
                             if (link.logoFile) {
-                                // New logo file uploaded
                                 formData.append(`links[${index}].logoFile`, link.logoFile);
-                            } else if (link.logoUrl && !link.removeLogo) {
-                                // Existing logo kept
-                                formData.append(`links[${index}].logoUrl`, link.logoUrl);
-                            } else if (link.removeLogo) {
-                                // Logo was removed
-                                formData.append(`links[${index}].removeLogo`, 'true');
+                            } else {
+                                if (link.removeLogo) {
+                                    formData.append(`links[${index}].removeLogo`, 'true');
+                                } else if (link.logoUrl) {
+                                    formData.append(`links[${index}].logoUrl`, link.logoUrl);
+                                }
+                            }
+                            if (link.deleted) {
+                                formData.append(`links[${index}].deleted`, 'true');
                             }
                         }
                     });
+                    linkInBio.links.forEach(link => {
+                        link.removeLogo = false;
+                        link.logoFile = null; // faylı reset et
+                    });
+
+                    for (const [key, value] of formData.entries()) {
+                        console.log('📝 FormData:', key, value);
+                    }
 
                     // Determine if this is an update or create
                     const method = selectedLinkId.value ? 'PUT' : 'POST';
@@ -1001,6 +1019,10 @@
                 checkUrlParameters();
             });
 
+            function undoDelete(index) {
+                linkInBio.links[index].deleted = false;
+            }
+
             return {
                 loggedInUser,
                 links,
@@ -1029,10 +1051,11 @@
                 handleLinkLogoUpload,
                 deleteLinkLogo,
                 addLink,
-                deleteLink,
+                softDeleteLink,
                 createNewLink,
                 saveChanges,
-                handleQRTagImageUpload
+                handleQRTagImageUpload,
+                undoDelete
             };
         }
     }).mount('#app');

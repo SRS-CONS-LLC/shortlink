@@ -36,12 +36,14 @@ public interface ShortLinkMapper {
             return null;
         }
         return links.stream()
+                .filter(link -> !link.isDeleted())
                 .map(link -> {
                     ShortLinkDto.LinkItemDto dto = new ShortLinkDto.LinkItemDto();
                     dto.setId(link.getId());
                     dto.setTitle(link.getTitle());
                     dto.setUrl(link.getUrl());
                     dto.setLogoUrl(link.getLogoUrl());
+                    dto.setDeleted(link.isDeleted());
                     return dto;
                 })
                 .collect(Collectors.toList());

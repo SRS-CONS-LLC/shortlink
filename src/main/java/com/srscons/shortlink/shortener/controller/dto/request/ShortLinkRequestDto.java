@@ -34,7 +34,7 @@ public class ShortLinkRequestDto {
     @Size(max = 7, message = "Theme color must be a valid hex color code (e.g., #RRGGBB)")
     private String themeColor;
 
-    @NotNull(message = "Link type is required")
+    
     private LinkType linkType;
 
     private List<LinkItemRequestDto> links;
@@ -50,5 +50,6 @@ public class ShortLinkRequestDto {
         private String url;
 
         private MultipartFile logoFile;
+        private Boolean deleted;
     }
 } 

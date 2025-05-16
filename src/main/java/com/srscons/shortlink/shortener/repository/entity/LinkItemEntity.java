@@ -36,5 +36,7 @@ public class LinkItemEntity {
     private ShortLinkEntity shortLink;
 
     @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
+    private boolean deleted;
+
+
 }

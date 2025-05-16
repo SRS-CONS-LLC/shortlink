@@ -20,7 +20,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 @RequiredArgsConstructor
 public class ShortLinkService {
@@ -29,7 +30,7 @@ public class ShortLinkService {
     private final ShortLinkMapper mapper;
     private final FileUploadService fileUploadService;
     private final Random random = new SecureRandom();
-
+    private static final Logger log = LoggerFactory.getLogger(ShortLinkService.class);
     private static final Pattern OS_VERSION_PATTERN = Pattern.compile("OS ([\\d_.]+)");
     private static final Pattern BROWSER_PATTERN = Pattern.compile("(Chrome|Firefox|Safari|Edge|Opera|MSIE|Trident)[/\\s]([\\d.]+)");
     private static final Pattern OS_PATTERN = Pattern.compile("(Windows|Mac OS X|Linux|Android|iOS)[/\\s]([\\d._]+)?");
@@ -55,14 +56,21 @@ public class ShortLinkService {
         }
 
         System.out.println("Saving ShortLink with linkType: " + entity.getLinkType());
+        System.out.println("Existing logo: " + entity.getLogoUrl());
+        System.out.println("DTO logo: " + dto.getLogoUrl());
         ShortLinkEntity saved = repository.save(entity);
         return mapper.fromEntityToBusiness(saved);
     }
 
     public ShortLinkDto findById(Long id) {
-        return repository.findByIdAndDeletedFalse(id)
-                .map(mapper::fromEntityToBusiness)
+        ShortLinkEntity entity = repository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ShortLinkNotFoundException(id));
+
+        List<LinkItemEntity> activeLinks = entity.getLinks().stream()
+                .filter(link -> !link.isDeleted())
+                .collect(Collectors.toList());
+
+        return mapper.fromEntityToBusiness(entity);
     }
 
     @Transactional
@@ -102,11 +110,14 @@ public class ShortLinkService {
         repository.save(shortLink);
     }
 
+
     @Transactional
     public ShortLinkDto update(ShortLinkDto dto) {
+
         ShortLinkEntity existing = repository.findById(dto.getId())
                 .orElseThrow(() -> new ShortLinkNotFoundException(dto.getId()));
 
+        // Update main fields
         existing.setTitle(dto.getTitle());
         existing.setOriginalUrl(dto.getOriginalUrl());
         existing.setDescription(dto.getDescription());
@@ -115,41 +126,59 @@ public class ShortLinkService {
         existing.setThemeColor(dto.getThemeColor());
         existing.setLinkType(dto.getLinkType());
 
-        // Handle main logo
+        log.info(" update() method was called for Smartlink ID: {}", dto.getId());
+
+        // Main logo logic
         if (dto.getLogoFile() != null && !dto.getLogoFile().isEmpty()) {
-            // New logo file uploaded
             uploadLogoIfPresent(dto.getLogoFile(), existing);
-        } else if (dto.getLogoUrl() != null) {
-            // Preserve existing logo URL
-            existing.setLogoUrl(dto.getLogoUrl());
-        } else {
-            // Remove logo
+        } else if (dto.isRemoveMainLogo()) {
             existing.setLogoUrl(null);
+        } else if (dto.getLogoUrl() != null && !dto.getLogoUrl().equals(existing.getLogoUrl())) {
+            existing.setLogoUrl(dto.getLogoUrl());
         }
 
-        // Remove old links and re-add new ones
-        existing.getLinks().clear();
-
+        // Update link items based on index (position)
         if (dto.getLinks() != null) {
-            for (ShortLinkDto.LinkItemDto itemDto : dto.getLinks()) {
-                LinkItemEntity item = new LinkItemEntity();
+            List<ShortLinkDto.LinkItemDto> incomingLinks = dto.getLinks();
+            log.info("📦 Incoming links:");
+            incomingLinks.forEach(l -> log.info("→ {} | deleted = {}", l.getTitle(), l.getDeleted()));
+
+            List<LinkItemEntity> existingLinks = existing.getLinks(); // <-- soft delete varsa filter çıxar
+            int count = Math.min(existingLinks.size(), incomingLinks.size());
+            log.info("🔁 Updating {} link items by position", count);
+
+            for (int i = 0; i < count; i++) {
+                LinkItemEntity item = existingLinks.get(i);
+                ShortLinkDto.LinkItemDto itemDto = incomingLinks.get(i);
+
+                log.info("🧹 Link #{} | title='{}' | url='{}' | deleted={}",
+                        i, itemDto.getTitle(), itemDto.getUrl(), itemDto.getDeleted());
+
+                if (Boolean.TRUE.equals(itemDto.getDeleted())) {
+                    item.setDeleted(true);
+                    log.info("🗑️ Marked link #{} as deleted", i);
+                    continue;
+                }
                 item.setTitle(itemDto.getTitle());
                 item.setUrl(itemDto.getUrl());
-                item.setShortLink(existing);
 
-                // Handle link logo
+                String newLogoUrl = itemDto.getLogoUrl();
+                String existingLogoUrl = item.getLogoUrl();
+
+                log.info(" Link #{} - Existing logo: {}, Incoming logo: {}", i, existingLogoUrl, newLogoUrl);
+
                 if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
-                    // New logo file uploaded
                     uploadLogoIfPresent(itemDto.getLogoFile(), item);
-                } else if (itemDto.getLogoUrl() != null) {
-                    // Preserve existing logo URL
-                    item.setLogoUrl(itemDto.getLogoUrl());
-                } else {
-                    // Remove logo
+                    log.info("→ Uploaded new logo for link #{}", i);
+                } else if (itemDto.isRemoveLogo()) {
                     item.setLogoUrl(null);
+                    log.info("→ Removed logo for link #{}", i);
+                } else if (newLogoUrl != null && !newLogoUrl.trim().isEmpty()) {
+                    item.setLogoUrl(newLogoUrl);
+                    log.info("→ Updated logoUrl for link #{} to {}", i, newLogoUrl);
+                } else {
+                    log.info("→ Logo unchanged for link #{}", i);
                 }
-
-                existing.getLinks().add(item);
             }
         }
 

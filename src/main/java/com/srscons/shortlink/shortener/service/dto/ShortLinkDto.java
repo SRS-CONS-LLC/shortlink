@@ -24,6 +24,7 @@ public class ShortLinkDto {
     private String originalUrl;
     private List<LinkItemDto> links;
     private boolean deleted = false;
+    private boolean removeMainLogo;
 
     @Data
     public static class LinkItemDto {
@@ -32,5 +33,7 @@ public class ShortLinkDto {
         private String url;
         private String logoUrl;
         private MultipartFile logoFile;
+        private boolean removeLogo;
+        private Boolean deleted;
     }
 } 
