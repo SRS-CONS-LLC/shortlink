@@ -38,5 +38,6 @@ public class LinkItemEntity {
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
 
+    private boolean removeLogo;
 
 }

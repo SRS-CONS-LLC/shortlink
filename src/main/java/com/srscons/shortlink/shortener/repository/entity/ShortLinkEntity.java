@@ -80,6 +80,8 @@ public class ShortLinkEntity {
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
+    @Column(name = "removeMainLogo")
+    private boolean removeMainLogo;
     public ShortLinkEntity() {
         this.links = new ArrayList<>();
         this.visitMetadata = new ArrayList<>();

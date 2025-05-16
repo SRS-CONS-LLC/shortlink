@@ -3,10 +3,7 @@ package com.srscons.shortlink.shortener.service.mapper;
 import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.repository.entity.LinkItemEntity;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,5 +44,24 @@ public interface ShortLinkMapper {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @AfterMapping
+    default void mapLinksAfterCreation(ShortLinkDto dto, @MappingTarget ShortLinkEntity entity) {
+        if (dto.getLinks() == null) return;
+
+        List<LinkItemEntity> links = dto.getLinks().stream()
+                .filter(l -> Boolean.FALSE.equals(l.getDeleted()))
+                .map(l -> {
+                    LinkItemEntity e = new LinkItemEntity();
+                    e.setTitle(l.getTitle());
+                    e.setUrl(l.getUrl());
+                    e.setLogoUrl(l.getLogoUrl());
+                    e.setDeleted(false);
+                    e.setShortLink(entity);
+                    return e;
+                }).collect(Collectors.toList());
+
+        entity.setLinks(links);
     }
 } 

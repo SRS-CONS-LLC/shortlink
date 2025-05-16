@@ -55,6 +55,31 @@ public class ShortLinkService {
             entity.setLinkType(dto.getLinkType());
         }
 
+        // Handle link items
+        if (dto.getLinks() != null) {
+            List<ShortLinkDto.LinkItemDto> incomingLinks = dto.getLinks();
+            log.info("📦 Creating new Smartlink with {} link items", incomingLinks.size());
+
+            for (ShortLinkDto.LinkItemDto itemDto : incomingLinks) {
+                if (itemDto.getUrl() != null && !itemDto.getUrl().trim().isEmpty()) {
+                    LinkItemEntity item = new LinkItemEntity();
+                    item.setTitle(itemDto.getTitle());
+                    item.setUrl(itemDto.getUrl());
+                    item.setShortLink(entity);
+                    item.setDeleted(false);
+
+                    if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
+                        uploadLogoIfPresent(itemDto.getLogoFile(), item);
+                    } else if (itemDto.getLogoUrl() != null && !itemDto.getLogoUrl().trim().isEmpty()) {
+                        item.setLogoUrl(itemDto.getLogoUrl());
+                    }
+
+                    entity.getLinks().add(item);
+                    log.info("→ Added link item: {} | url={}", itemDto.getTitle(), itemDto.getUrl());
+                }
+            }
+        }
+
         System.out.println("Saving ShortLink with linkType: " + entity.getLinkType());
         System.out.println("Existing logo: " + entity.getLogoUrl());
         System.out.println("DTO logo: " + dto.getLogoUrl());
@@ -143,10 +168,14 @@ public class ShortLinkService {
             log.info("📦 Incoming links:");
             incomingLinks.forEach(l -> log.info("→ {} | deleted = {}", l.getTitle(), l.getDeleted()));
 
-            List<LinkItemEntity> existingLinks = existing.getLinks(); // <-- soft delete varsa filter çıxar
+            List<LinkItemEntity> existingLinks = existing.getLinks();
+            log.info("📦 Existing links count: {}", existingLinks.size());
+            existingLinks.forEach(l -> log.info("→ {} | deleted = {}", l.getTitle(), l.isDeleted()));
+            
             int count = Math.min(existingLinks.size(), incomingLinks.size());
             log.info("🔁 Updating {} link items by position", count);
 
+            // First update existing links
             for (int i = 0; i < count; i++) {
                 LinkItemEntity item = existingLinks.get(i);
                 ShortLinkDto.LinkItemDto itemDto = incomingLinks.get(i);
@@ -178,6 +207,27 @@ public class ShortLinkService {
                     log.info("→ Updated logoUrl for link #{} to {}", i, newLogoUrl);
                 } else {
                     log.info("→ Logo unchanged for link #{}", i);
+                }
+            }
+
+            // Then add any new links
+            for (int i = count; i < incomingLinks.size(); i++) {
+                ShortLinkDto.LinkItemDto itemDto = incomingLinks.get(i);
+                if (itemDto.getUrl() != null && !itemDto.getUrl().trim().isEmpty() && !Boolean.TRUE.equals(itemDto.getDeleted())) {
+                    LinkItemEntity newItem = new LinkItemEntity();
+                    newItem.setTitle(itemDto.getTitle());
+                    newItem.setUrl(itemDto.getUrl());
+                    newItem.setShortLink(existing);
+                    newItem.setDeleted(false);
+
+                    if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
+                        uploadLogoIfPresent(itemDto.getLogoFile(), newItem);
+                    } else if (itemDto.getLogoUrl() != null && !itemDto.getLogoUrl().trim().isEmpty()) {
+                        newItem.setLogoUrl(itemDto.getLogoUrl());
+                    }
+
+                    existing.getLinks().add(newItem);
+                    log.info("➕ Added new link: {} | url={}", itemDto.getTitle(), itemDto.getUrl());
                 }
             }
         }
