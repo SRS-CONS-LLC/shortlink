@@ -386,14 +386,18 @@
                                             {{ linkInBio.description || 'CTOUT' }}
                                         </div>
                                         <div class="preview-links" :class="{ 'grid': linkInBio.layoutType === 'grid' }">
-                                            <div class="preview-link" v-for="(link, index) in linkInBio.links"
-                                                 :key="'preview-'+index">
+                                            <a class="preview-link"
+                                               v-for="(link, index) in linkInBio.links"
+                                               :key="'preview-'+index"
+                                               :href="formatUrl(link.url)"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
                                                 <div class="preview-link-icon">
                                                     <img v-if="link.logoPreview" :src="link.logoPreview"
                                                          :alt="link.title">
                                                 </div>
                                                 <span>{{ link.title }}</span>
-                                            </div>
+                                            </a>
                                         </div>
                                         <div class="preview-footer">Powered by CTOUT</div>
                                     </div>
@@ -986,6 +990,14 @@
                 window.open(`${url}`, '_blank');
             }
 
+            function formatUrl(url) {
+                if (!url) return '#';
+                if (!/^https?:\/\//i.test(url)) {
+                    return 'https://' + url;
+                }
+                return url;
+            }
+
             // Lifecycle hooks
             onMounted(() => {
                 loadLinks();
@@ -1023,7 +1035,8 @@
                 deleteLink,
                 createNewLink,
                 saveChanges,
-                handleQRTagImageUpload
+                handleQRTagImageUpload,
+                formatUrl
             };
         }
     }).mount('#app');
