@@ -28,5 +28,6 @@ public class ShortLinkResponseDto {
         private String title;
         private String url;
         private String logoUrl;
+        private boolean deleted;
     }
 } 

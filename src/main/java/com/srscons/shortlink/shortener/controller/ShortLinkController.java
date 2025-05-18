@@ -8,6 +8,9 @@ import com.srscons.shortlink.shortener.service.ShortLinkService;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +20,8 @@ import java.util.List;
 @RequestMapping("/api/short-links")
 @RequiredArgsConstructor
 public class ShortLinkController {
-
+    private static final Logger log = LoggerFactory.getLogger(ShortLinkController.class);
+    
     private final ShortLinkService shortLinkService;
     private final ShortLinkViewMapper shortLinkViewMapper;
 
@@ -47,11 +51,17 @@ public class ShortLinkController {
 
     @GetMapping
     public ResponseEntity<List<ShortLinkResponseDto>> getAllLinks() {
-        List<ShortLinkDto> links = shortLinkService.findAll();
-        List<ShortLinkResponseDto> responseDtos = links.stream()
-                .map(shortLinkViewMapper::fromBusinessToResponse)
-                .toList();
-        return ResponseEntity.ok(responseDtos);
+        try {
+            List<ShortLinkDto> links = shortLinkService.findAll();
+            List<ShortLinkResponseDto> responseDtos = links.stream()
+                    .map(shortLinkViewMapper::fromBusinessToResponse)
+                    .toList();
+            return ResponseEntity.ok(responseDtos);
+        } catch (Exception e) {
+            log.error("Error getting all links: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
     }
 
     @GetMapping("/{id}")

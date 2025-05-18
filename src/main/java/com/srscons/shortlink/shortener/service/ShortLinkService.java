@@ -39,9 +39,25 @@ public class ShortLinkService {
     private static final int MAX_ATTEMPTS = 10;
 
     public List<ShortLinkDto> findAll() {
-        return repository.findAllByDeletedFalse().stream()
-                .map(mapper::fromEntityToBusiness)
-                .collect(Collectors.toList());
+        try {
+            List<ShortLinkEntity> entities = repository.findAllByDeletedFalse();
+            log.info("Found {} non-deleted short links", entities.size());
+            
+            return entities.stream()
+                    .map(entity -> {
+                        try {
+                            return mapper.fromEntityToBusiness(entity);
+                        } catch (Exception e) {
+                            log.error("Error mapping entity to DTO: {}", e.getMessage(), e);
+                            return null;
+                        }
+                    })
+                    .filter(dto -> dto != null)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error in findAll: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Transactional

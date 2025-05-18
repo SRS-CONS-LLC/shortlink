@@ -589,9 +589,23 @@
             async function loadLinks() {
                 try {
                     const response = await fetch('/api/short-links');
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) {
+                            // Redirect to login page if unauthorized
+                            window.location.href = '/';
+                            return;
+                        }
+                        throw new Error('Failed to load links');
+                    }
                     links.value = await response.json();
                 } catch (error) {
                     console.error('Error loading links:', error);
+                    // Show error message to user
+                    alerts.error.show = true;
+                    alerts.error.message = 'Failed to load links. Please try again.';
+                    setTimeout(() => {
+                        alerts.error.show = false;
+                    }, 5000);
                 }
             }
 
