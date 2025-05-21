@@ -63,7 +63,7 @@ public class ShortLinkService {
     @Transactional
     public ShortLinkDto create(ShortLinkDto dto) {
         ShortLinkEntity entity = mapper.fromBusinessToEntity(dto);
-        entity.setOriginalUrl("https://www.ctout.com");
+        entity.setOriginalUrl("https://www.citout.me");
         entity.setShortCode(generateUniqueShortCode());
         if (dto.getLinkType() == null) {
             entity.setLinkType(LinkType.REDIRECT); // Default to REDIRECT if not specified

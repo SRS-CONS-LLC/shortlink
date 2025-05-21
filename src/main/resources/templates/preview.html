@@ -18,8 +18,8 @@
             <div class="preview-title" id="preview-title" th:text="${link.title}">MyTitle</div>
 
             <div class="preview-description" id="preview-description"
-                 th:text="${#strings.isEmpty(link.description) ? 'CTOUT' : link.description}">
-                CTOUT
+                 th:text="${#strings.isEmpty(link.description) ? 'CITOUT' : link.description}">
+                CITOUT
             </div>
 
             <div class="preview-links" th:classappend="${link.layoutType.name() == 'GRID'} ? ' grid'">
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <div class="preview-footer">Powered by CTOUT</div>
+            <div class="preview-footer">Powered by CITOUT</div>
         </div>
     </div>
 </div>

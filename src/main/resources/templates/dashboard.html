@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CTOUT Dashboard</title>
+    <title>CITOUT Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
@@ -120,7 +120,7 @@
                                 <div class="form-group">
                                     <label for="description">Description</label>
                                     <input type="text" id="description" class="form-control"
-                                           v-model="linkInBio.description" placeholder="CTOUT">
+                                           v-model="linkInBio.description" placeholder="CITOUT">
                                 </div>
 
                                 <!-- Updated Main Logo Upload Section with X Button -->
@@ -263,7 +263,7 @@
                                              class="preview-logo">
                                         <div class="preview-title" id="preview-title">{{ linkInBio.title }}</div>
                                         <div class="preview-description" id="preview-description">
-                                            {{ linkInBio.description || 'CTOUT' }}
+                                            {{ linkInBio.description || 'CITOUT' }}
                                         </div>
                                         <div class="preview-links" :class="{ 'grid': linkInBio.layoutType === 'grid' }">
                                             <div class="preview-link" v-for="(link, index) in linkInBio.links"
@@ -275,7 +275,7 @@
                                                 <span>{{ link.title }}</span>
                                             </div>
                                         </div>
-                                        <div class="preview-footer">Powered by CTOUT</div>
+                                        <div class="preview-footer">Powered by CITOUT</div>
                                     </div>
                                 </div>
                             </div>
@@ -359,7 +359,7 @@
 
             // URL shortener data
             const urlShortener = reactive({
-                url: 'https://CTOUT.me',
+                url: 'https://CITOUT.me',
                 passwordProtected: false
             });
 
@@ -377,7 +377,7 @@
 
             const linkInBio = reactive({
                 title: 'MyTitle',
-                description: 'CTOUT',
+                description: 'CITOUT',
                 logoFile: null,
                 logoPreview: null,
                 logoUrl: null,
@@ -398,8 +398,8 @@
 
             // QR Tag data
             const qrTag = reactive({
-                title: 'CTOUT Link',
-                description: 'CTOUT',
+                title: 'CITOUT Link',
+                description: 'CITOUT',
                 imageFile: null,
                 imagePreview: null,
                 themeColor: '#000000',
@@ -484,7 +484,7 @@
                     // Create empty link in database
                     const formData = new FormData();
                     formData.append('title', 'New Link');
-                    formData.append('description', 'CTOUT');
+                    formData.append('description', 'CITOUT');
                     formData.append('themeColor', '#000000');
                     formData.append('themeType', 'AUTO');
                     formData.append('layoutType', 'LIST');
