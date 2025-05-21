@@ -50,7 +50,7 @@ body {
     margin-bottom: 0.5rem;
 }
 
-.smartlink-type {
+.link-type {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
@@ -687,7 +687,7 @@ body {
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    /* Complete CSS solution for non-scrollable sidebar with scrollable Smartlinks section */
+    /* Complete CSS solution for non-scrollable sidebar with scrollable links section */
 
     * {
         margin: 0;
@@ -799,7 +799,7 @@ body {
     }
 
     /* CSS for the delete button in the top right corner */
-    .delete-smartlink-btn {
+    .delete-link-btn {
         position: absolute;
         top: 20px;
         right: 20px;
@@ -818,12 +818,12 @@ body {
         transition: all 0.2s ease;
     }
 
-    .delete-smartlink-btn:hover {
+    .delete-link-btn:hover {
         background-color: #dc3545;
         color: white;
     }
 
-    .delete-smartlink-btn i {
+    .delete-link-btn i {
         font-size: 16px;
     }
 
@@ -912,4 +912,12 @@ body {
         to {
             transform: rotate(360deg);
         }
+    }
+
+    .invisible {
+        display: none;
+    }
+
+    .visible {
+        display: block;
     }

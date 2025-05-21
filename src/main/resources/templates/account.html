@@ -17,7 +17,6 @@
             <h5 class="fw-bold ps-2">CTOUT</h5>
             <div class="section-title">Main</div>
             <a href="#" class="nav-link"><i class="bi bi-grid"></i> Summary</a>
-            <a href="/plan" class="nav-link"><i class="bi bi-currency-dollar"></i> Plan</a>
 
             <div class="section-title">Smartlinks</div>
             <div id="links-container">
@@ -48,7 +47,6 @@
             <a href="#" class="btn btn-outline w-100 mt-2" @click.prevent="createNewLink">+ Create New</a>
         </div>
         <div>
-            <div class="user-card mb-2">💡 Starter</div>
             <a href="/account" class="d-flex align-items-center gap-2 px-3 py-2 rounded-pill text-decoration-none"
                style="background: #f8fafd; border: 1px solid #dbe1ea;">
                 <img th:src="${loggedInUser.picture}" alt="User" referrerpolicy="no-referrer" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">

@@ -34,4 +34,10 @@ public class LinkItemEntity {
     @ManyToOne
     @JoinColumn(name = "short_link_id", nullable = false)
     private ShortLinkEntity shortLink;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted;
+
+    private boolean removeLogo;
+
 }

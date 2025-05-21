@@ -2,6 +2,7 @@ package com.srscons.shortlink.shortener.controller.dto.request;
 
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
 import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
+import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -33,6 +34,9 @@ public class ShortLinkRequestDto {
     @Size(max = 7, message = "Theme color must be a valid hex color code (e.g., #RRGGBB)")
     private String themeColor;
 
+    
+    private LinkType linkType;
+
     private List<LinkItemRequestDto> links;
 
     @Data
@@ -46,5 +50,6 @@ public class ShortLinkRequestDto {
         private String url;
 
         private MultipartFile logoFile;
+        private Boolean deleted;
     }
 } 

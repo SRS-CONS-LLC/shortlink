@@ -2,6 +2,7 @@ package com.srscons.shortlink.shortener.controller.dto.response;
 
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
 import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
+import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
 import lombok.Data;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class ShortLinkResponseDto {
     private String shortCode;
     private String shortUrl;
     private String originalUrl;
+    private LinkType linkType;
     private List<LinkItemResponseDto> links;
 
     @Data
@@ -26,5 +28,6 @@ public class ShortLinkResponseDto {
         private String title;
         private String url;
         private String logoUrl;
+        private boolean deleted;
     }
 } 
