@@ -1,539 +1,1543 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Relink Dashboard – Draft Smartlink</title>
+    <title>CTOUT Dashboard – Draft Smartlink</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <style>
-        body {
-       background-color: #f8f9fc;
-       font-family: 'Segoe UI', sans-serif;
-     }
-     .sidebar {
-       width: 250px;
-       height: 100vh;
-       background-color: #fff;
-       border-right: 1px solid #e2e8f0;
-       display: flex;
-       flex-direction: column;
-       justify-content: space-between;
-       padding: 1.5rem 1rem;
-     }
-     .sidebar .nav-link {
-       border-radius: 12px;
-       padding: 0.85rem 1.2rem;
-       font-weight: 500;
-       font-size: 0.95rem;
-       color: #1e293b;
-     }
-     .sidebar .nav-link.active {
-       background-color: #0f172a;
-       color: #fff;
-     }
-     .sidebar .section-title {
-       font-size: 0.75rem;
-       text-transform: uppercase;
-       color: #94a3b8;
-       margin-top: 2rem;
-       margin-bottom: 0.75rem;
-       padding-left: 0.5rem;
-     }
-     .btn-outline {
-       background-color: #f1f5f9;
-       border: none;
-       font-weight: 600;
-       border-radius: 10px;
-       padding: 0.6rem 1rem;
-     }
-     .user-card {
-       background-color: #fff7ed;
-       border-radius: 12px;
-       padding: 0.5rem 1rem;
-       font-size: 0.9rem;
-       font-weight: 500;
-       color: #d97706;
-     }
-     .main-content {
-       flex-grow: 1;
-       padding: 2rem 3rem;
-     }
-     .config-card {
-       background: #fff;
-       border: 1px solid #e2e8f0;
-       border-radius: 16px;
-       padding: 2.5rem;
-       box-shadow: 0 6px 20px rgba(0,0,0,0.04);
-     }
-     .btn-dark.active {
-       background-color: #0f172a;
-     }
-     .badge-orange {
-       background-color: #f97316;
-       color: #fff;
-       font-size: 0.75rem;
-       padding: 0.3rem 0.5rem;
-       border-radius: 5px;
-     }
-     .smartlink-type button {
-       margin: 0.3rem;
-       border-radius: 10px;
-       padding: 0.45rem 1rem;
-       font-size: 0.9rem;
-     }
-     .form-control {
-       padding: 0.5rem 0.75rem;
-       font-size: 0.95rem;
-       border-radius: 8px;
-     }
-     .form-control:disabled {
-       background-color: #f1f5f9;
-       color: #9ca3af;
-     }
-     .footer-logo {
-       font-size: 1.25rem;
-       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-     }
-     .input-group-text {
-       background-color: #f1f5f9;
-       border: 1px solid #e2e8f0;
-     }
-     .input-group .btn {
-       border-top-left-radius: 0;
-       border-bottom-left-radius: 0;
-     }
-     label.form-label {
-       font-size: 0.9rem;
-       color: #1e293b;
-       margin-bottom: 0.4rem;
-     }
-     small.text-muted {
-       font-size: 0.75rem;
-     }
-     h4.fw-bold.mb-3 {
-       font-size: 1.4rem;
-       margin-bottom: 2rem !important;
-     }
-     h5.fw-semibold {
-       font-size: 1.2rem;
-       margin-bottom: 1.25rem;
-     }
-     .btn-outline-secondary {
-       border-radius: 8px;
-       font-size: 0.9rem;
-       padding: 0.45rem 1rem;
-     }
-     .btn-outline-secondary:disabled {
-       opacity: 0.6;
-       background-color: #f8fafc;
-     }
-     .btn-group .btn {
-       font-weight: 500;
-     }
-     .btn-copy {
-       border: none;
-       background-color: transparent;
-       padding: 0 0.5rem;
-       font-size: 1.1rem;
-       color: #64748b;
-     }
-     .input-wrapper {
-       border: 1px solid #e2e8f0;
-       border-radius: 16px;
-       padding: 0.9rem 1.25rem;
-       background-color: #fff;
-       display: flex;
-       align-items: center;
-       gap: 0.75rem;
-       font-size: 1rem;
-     }
-     .readonly-input {
-       border: none;
-       outline: none;
-       background: transparent;
-       flex-grow: 1;
-       color: #334155;
-       font-weight: 500;
-     }
-     .custom-button {
-       background-color: #f1f5f9;
-       border: none;
-       border-radius: 16px;
-       font-weight: 600;
-       padding: 0.9rem 1.25rem;
-       font-size: 1rem;
-       color: #334155;
-     }
-     .custom-button.disabled, .custom-button:disabled {
-       background-color: #f1f5f9;
-       color: #cbd5e1;
-       opacity: 1;
-     }
-     .note-muted {
-       font-size: 0.9rem;
-       color: #64748b;
-       margin-top: 0.5rem;
-     }
-     .icon-btn {
-       background: none;
-       border: none;
-       font-size: 1.1rem;
-       color: #64748b;
-     }
-     .rounded-pill-input {
-       border: 1px solid #e2e8f0;
-       border-radius: 16px;
-       padding: 0.9rem 1.25rem;
-       font-size: 1rem;
-       color: #64748b;
-       width: 100%;
-     }
-     .toggle-pill {
-       display: flex;
-       background-color: #f8fafc;
-       border-radius: 16px;
-       overflow: hidden;
-     }
-     .toggle-pill button {
-       flex: 1;
-       padding: 0.35rem 1.25rem;
-       border: none;
-       background-color: transparent;
-       font-weight: 600;
-       color: #0f172a;
-       font-size: 1rem;
-     }
-     .toggle-pill .active {
-       background-color: #0f172a;
-       color: #ffffff;
-     }
-     .add-link-btn {
-       background-color: #ff5b00;
-       border-radius: 16px;
-       font-size: 1.1rem;
-       font-weight: 600;
-       color: white;
-       padding: 0.5rem;
-       border: none;
-       width: 100%;
-     }
-     .preview-box {
-       border: 1px solid #d1d5db;
-       border-radius: 20px;
-       background: #fff;
-       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
-       padding: 2rem;
-       text-align: center;
-       color: #0f172a;
-     }
-     .preview-box h5 {
-       font-weight: 700;
-     }
-     .preview-box .bi {
-       font-size: 2.5rem;
-       color: #cbd5e1;
-       margin: 1.25rem 0 0.5rem;
-     }
-     .preview-box small {
-       color: #94a3b8;
-       font-weight: 500;
-     }
 
-    </style>
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="/public/css/dashboard.css"/>
+
 </head>
 <body>
-<div class="d-flex">
+<div id="app" class="d-flex layout">
     <!-- Sidebar -->
     <div class="sidebar">
         <div>
-            <h5 class="fw-bold ps-2">relink</h5>
+            <h5 class="fw-bold ps-2">CTOUT</h5>
             <div class="section-title">Main</div>
             <a href="#" class="nav-link"><i class="bi bi-grid"></i> Summary</a>
-            <a href="#" class="nav-link"><i class="bi bi-currency-dollar"></i> Plan</a>
+            <a href="/plan" class="nav-link"><i class="bi bi-currency-dollar"></i> Plan</a>
 
             <div class="section-title">Smartlinks</div>
-            <a href="#" class="nav-link active"><i class="bi bi-file-earmark"></i> Draft Smartlink</a>
-            <a href="#" class="nav-link"><i class="bi bi-file-earmark"></i> Draft Smartlink</a>
-            <a href="#" class="btn btn-outline w-100 mt-2">+ Create New</a>
+            <div id="links-container">
+                <a
+                        v-for="link in links"
+                        :key="link.id"
+                        href="#"
+                        class="nav-link"
+                        :class="{ 'active-link': selectedLinkId === link.id }"
+                        @click.prevent="selectLink(link.id)"
+                >
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="link-icon"
+                             style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background: #f8f9fa;">
+                            <img v-if="link.logoFileName" :src="link.logoFileName" :alt="link.title"
+                                 style="width: 100%; height: 100%; object-fit: cover;">
+                            <i v-else class="bi bi-link" style="font-size: 16px; color: #6c757d;"></i>
+                        </div>
+                        <div class="link-info">
+                            <div class="link-title">{{ link.title }}</div>
+                            <div class="link-description" style="font-size: 12px; color: #6c757d;">
+                                {{ link.description || '' }}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <a href="#" class="btn btn-outline w-100 mt-2" @click.prevent="createNewLink">+ Create New</a>
         </div>
         <div>
             <div class="user-card mb-2">💡 Starter</div>
-            <div class="d-flex align-items-center gap-2">
-                <img src="https://relink.is/_next/image?url=https%3A%2F%2Flh3.googleusercontent.com%2Fa%2FACg8ocIvkQVofCoWmPYxYXl0J3yoJrnO_tjtuQ9Duh4mPtOENb-gTtI%3Ds96-c&w=32&q=75" class="rounded-circle" alt="User">
-                <span class="fw-medium">Sarkhan Rasullu</span>
-            </div>
+            <a href="/account" class="d-flex align-items-center gap-2 px-3 py-2 rounded-pill text-decoration-none"
+               style="background: #f8fafd; border: 1px solid #dbe1ea;">
+                <img th:src="${loggedInUser.picture}" alt="User" referrerpolicy="no-referrer" class="rounded-circle"
+                     style="width: 32px; height: 32px; object-fit: cover;">
+                <span class="fw-bold text-dark" th:text="${loggedInUser.name+' '+loggedInUser.surname}"></span>
+            </a>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div class="main-content container-fluid">
-        <h4 class="fw-bold mb-3"><i class="bi bi-link-45deg"></i> Draft Smartlink</h4>
+    <div class="main-content">
 
-        <div class="main-content container">
-            <div class="config-card">
-                <div class="d-flex justify-content-start mb-4 gap-3">
-                    <button class="btn btn-outline-dark">Analytics</button>
-                    <button class="btn btn-dark active">Configuration</button>
-                </div>
+        <div class="config-card">
+            <div class="position-relative">
+                <h4 class="fw-bold mb-3"><i class="bi bi-link-45deg"></i> Draft Smartlink</h4>
+                <!-- Delete button (only show if a Smartlink is selected) -->
+                <button
+                        v-if="selectedLinkId"
+                        class="delete-smartlink-btn"
+                        @click="showDeleteConfirmation = true"
+                        :disabled="isDeleting">
+                    <i class="bi bi-trash"></i>
+                    Delete Smartlink
+                </button>
+            </div>
+            <!-- Section düymələri -->
 
-                <h5 class="fw-semibold">General configuration</h5>
-                <div class="row mt-3">
-                    <div class="col-md-2 text-center">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?data=relink.is/s6l6wd&size=120x120" class="rounded shadow-sm p-2" alt="QR Code">
-                        <div class="text-muted small mt-2">Click for download</div>
+            <div class="d-flex justify-content-start mb-4 gap-3">
+                <button
+                        class="btn"
+                        :class="activeSection === 'configuration' ? 'btn-dark active' : 'btn-outline-dark'"
+                        @click="selectSection('configuration')"
+                >
+                    Configuration
+                </button>
+
+                <button
+                        class="btn"
+                        :class="activeSection === 'analytics' ? 'btn-dark active' : 'btn-outline-dark'"
+                        @click="selectSection('analytics')"
+                >
+                    Analytics
+                </button>
+
+            </div>
+
+            <!--            <div id="app" class="container py-5">-->
+
+            <div v-if="activeSection === 'analytics'">
+                <h5 class="fw-semibold">General Analytics</h5>
+
+                <div class="container-fluent">
+
+                    <div v-if="activeSection === 'analytics'">
+                        <div class="analytics-section">
+                            <div class="analytics-card" v-for="metric in summaryMetrics" :key="metric.title">
+                                <span class="card-info" @click="showInfo(metric.infoText)">ⓘ</span>
+                                <div class="card-header">
+                                    <img src="/api/placeholder/16/16" :alt="metric.icon + ' icon'">
+                                    <span class="card-title">{{ metric.title }}</span>
+                                </div>
+                                <div class="card-value">{{ metric.value }}</div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <span class="card-info"
+                                  @click="showInfo('This chart shows operating system usage over time.')">ⓘ</span>
+                            <div class="card-header">
+                                <img src="/api/placeholder/16/16" alt="chart icon">
+                                <span class="card-title">Operating Systems Chart</span>
+                            </div>
+
+                            <div class="legend">
+                                <div class="legend-item" v-for="os in osLegend" :key="os.name">
+                                    <div class="legend-color" :style="{ backgroundColor: os.color }"></div>
+                                    <span>{{ os.name }}</span>
+                                </div>
+                            </div>
+
+                            <div style="height: 300px; position: relative;">
+                                <div class="chart-watermark">{{ watermarkText }}</div>
+                                <svg width="100%" height="100%" viewBox="0 0 800 350">
+                                    <!-- Grid lines -->
+                                    <line v-for="(line, index) in gridLinesY" :key="'y-'+index"
+                                          :x1="0" :y1="line.y" :x2="800" :y2="line.y"
+                                          stroke="#e0e0e0" stroke-width="1" stroke-dasharray="3,3"/>
+
+                                    <line v-for="(line, index) in gridLinesX" :key="'x-'+index"
+                                          :x1="line.x" :y1="0" :x2="line.x" :y2="300"
+                                          stroke="#e0e0e0" stroke-width="1" stroke-dasharray="3,3"/>
+
+                                    <!-- Y-axis labels -->
+                                    <text v-for="label in yAxisLabels" :key="'label-'+label.value"
+                                          :x="10" :y="label.y" fill="#888" font-size="12">{{ label.value }}
+                                    </text>
+
+                                    <!-- X-axis dates -->
+                                    <text v-for="date in xAxisDates" :key="'date-'+date.value"
+                                          :x="date.x" :y="330" fill="#888" font-size="10"
+                                          :transform="`rotate(-90, ${date.x}, 330)`">{{ date.value }}
+                                    </text>
+
+                                    <!-- Lines for each OS -->
+                                    <path v-for="os in osData" :key="os.name"
+                                          :d="os.path" fill="none" :stroke="os.color" stroke-width="2"/>
+
+                                    <!-- Data points -->
+                                    <circle v-for="point in dataPoints" :key="'point-'+point.id"
+                                            :cx="point.cx" :cy="point.cy" r="4" :fill="point.fill"></circle>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div class="data-grid">
+                            <div class="data-card" v-for="card in dataCards" :key="card.title">
+                                <span class="card-info" @click="showInfo(card.infoText)">ⓘ</span>
+                                <div class="card-header">
+                                    <img src="/api/placeholder/16/16" :alt="card.icon + ' icon'">
+                                    <span class="card-title">{{ card.title }}</span>
+                                </div>
+
+                                <template v-if="card.data.length > 0">
+                                    <div v-for="(row, index) in card.data" :key="index"
+                                         class="data-row" :class="row.class">
+                                        <span class="data-label">{{ row.label }}</span>
+                                        <span class="data-value">{{ row.value }}</span>
+                                    </div>
+                                </template>
+
+                                <div v-else style="text-align: center; margin-top: 40px;">
+                                    <a href="#" class="pro-link">{{ card.proMessage || 'Visible only in paid plans'
+                                        }}</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="date-range">
+                            {{ dateRange }}
+                        </div>
                     </div>
-                    <div class="col-md-10">
 
+                    <div v-if="activeSection !== 'analytics'">
+                        <div class="general-analytics">
+                            <h3>{{ getSectionName(activeSection) }} Section</h3>
+                            <p>This section is not implemented yet. Please check the Analytics tab.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="activeSection === 'configuration'">
+                <h5 class="fw-semibold">General configuration</h5>
+
+                <div class="row mt-3">
+                    <!--                <div class="col-md-2 text-center">-->
+                    <!--                    <img src="https://api.qrserver.com/v1/create-qr-code/?data=CTOUT.me/s6l6wd&size=120x120"-->
+                    <!--                         class="rounded shadow-sm p-2" alt="QR Code">-->
+                    <!--                    <div class="text-muted small mt-2">Click for download</div>-->
+                    <!--                </div>-->
+                    <div class="col-md-10">
                         <div class="row mb-3">
                             <div class="container py-4">
                                 <div class="row g-4">
                                     <div class="col-md-6">
-                                        <div class="form-section-title">Smartlink Name <i class="bi bi-question-circle"></i></div>
+                                        <div class="form-section-title">Smartlink Name <i
+                                                class="bi bi-question-circle"></i>
+                                        </div>
                                         <div class="input-wrapper">
                                             <i class="bi bi-bookmark"></i>
-                                            <input type="text" class="readonly-input" value="Draft Smartlink" readonly>
+                                            <input type="text" class="readonly-input" value="Draft Smartlink"
+                                                   v-model="linkInBio.title">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="form-section-title">Open Graph Settings</div>
-                                        <button class="custom-button w-100"><i class="bi bi-window me-2"></i>Open Graph</button>
+                                        <div class="form-section-title">Redirect Url <i
+                                                class="bi bi-question-circle"></i>
+                                        </div>
+                                        <div class="input-wrapper">
+                                            <i class="bi bi-bookmark"></i>
+                                            <input type="text" class="readonly-input" v-model="linkInBio.originalUrl">
+                                        </div>
                                     </div>
+                                    <!--                                <div class="col-md-6">-->
+                                    <!--                                    <div class="form-section-title">Open Graph Settings</div>-->
+                                    <!--                                    <button class="custom-button w-100"><i class="bi bi-window me-2"></i>Open Graph-->
+                                    <!--                                    </button>-->
+                                    <!--                                </div>-->
 
                                     <div class="col-md-6">
-                                        <div class="form-section-title">Smartlink URL <i class="bi bi-question-circle"></i></div>
+                                        <div class="form-section-title">Smartlink URL <i
+                                                class="bi bi-question-circle"></i>
+                                        </div>
                                         <div class="input-wrapper">
                                             <i class="bi bi-link-45deg"></i>
-                                            <span class="readonly-input">relink.is/s6l6wd</span>
-                                            <span class="badge-orange">Professional</span>
-                                            <button class="icon-btn"><i class="bi bi-copy"></i></button>
-                                            <button class="icon-btn"><i class="bi bi-box-arrow-up-right"></i></button>
-                                        </div>
-                                        <div class="note-muted">
-                                            <i class="bi bi-info-circle me-1"></i> Custom URL available on premium plan
+                                            <span class="readonly-input">{{ linkInBio.shortUrl }}</span>
+                                            <button class="icon-btn" @click="copyToClipboard(`${linkInBio.shortUrl}`)">
+                                                <i class="bi bi-copy"></i></button>
+                                            <button class="icon-btn" @click="openSmartlink(`${linkInBio.shortUrl}`)"><i
+                                                    class="bi bi-box-arrow-up-right"></i></button>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-section-title">UTM Settings</div>
-                                        <button class="custom-button w-100"><i class="bi bi-graph-up-arrow me-2"></i>Generate UTM</button>
-                                    </div>
+                                    <!--                                <div class="col-md-6">-->
+                                    <!--                                    <div class="form-section-title">UTM Settings</div>-->
+                                    <!--                                    <button class="custom-button w-100"><i class="bi bi-graph-up-arrow me-2"></i>Generate-->
+                                    <!--                                        UTM-->
+                                    <!--                                    </button>-->
+                                    <!--                                </div>-->
 
-                                    <div class="col-md-6">
-                                        <div class="form-section-title">QR Settings</div>
-                                        <button class="custom-button w-100" disabled><i class="bi bi-qr-code me-2"></i>Edit QR</button>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-section-title">Script Injector</div>
-                                        <button class="custom-button w-100" disabled><i class="bi bi-code-slash me-2"></i>Insert Script</button>
-                                    </div>
+                                    <!--                                <div class="col-md-6">-->
+                                    <!--                                    <div class="form-section-title">QR Settings</div>-->
+                                    <!--                                    <button class="custom-button w-100" disabled><i class="bi bi-qr-code me-2"></i>Edit-->
+                                    <!--                                        QR-->
+                                    <!--                                    </button>-->
+                                    <!--                                </div>-->
+                                    <!--                                <div class="col-md-6">-->
+                                    <!--                                    <div class="form-section-title">Script Injector</div>-->
+                                    <!--                                    <button class="custom-button w-100" disabled><i class="bi bi-code-slash me-2"></i>Insert-->
+                                    <!--                                        Script-->
+                                    <!--                                    </button>-->
+                                    <!--                                </div>-->
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="mt-4">
-                            <label class="form-label fw-semibold">Select smartlink type</label>
-                            <div class="smartlink-type">
-                                <button type="tab-button" class="btn btn-dark" for="app-shortener">App shortener</button>
-                                <button type="tab-button" class="btn btn-outline-secondary" for="url-shortener">URL shortener</button>
-                                <button type="tab-button"class="btn btn-outline-secondary" for="link-in-bio">Link-in-Bio</button>
-                                <button type="tab-button"class="btn btn-outline-secondary" for="qr-tag">QR Tag</button>
-                            </div>
-                        </div>
-
-                        <div type="tab" id="app-shortener" class="mt-4">
-                            <label class="form-label fw-semibold">App download links</label>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">App Store (iOS) app URL <i class="bi bi-question-circle"></i></label>
-                                    <input type="text" class="form-control" placeholder="https://apps.apple.com/en/app/your-app-name/id123456789">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Google Play (Android) app URL <i class="bi bi-question-circle"></i></label>
-                                    <input type="text" class="form-control" placeholder="https://play.google.com/store/apps/details?id=com.example.app">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Windows app URL</label>
-                                    <input type="text" class="form-control" placeholder="https://example.com/windows/9NBLGGH4XXXX">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">MacOS app URL</label>
-                                    <input type="text" class="form-control" placeholder="https://apps.apple.com/us/app/your-macos-app/id123456789">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">iPad version App Store (iOS) app URL</label>
-                                    <input type="text" class="form-control" placeholder="https://apps.apple.com/app/ipad-app/id123456789">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">AppGallery app URL</label>
-                                    <input type="text" class="form-control" placeholder="https://appgallery.huawei.com/app/C123456">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Amazon Appstore app URL</label>
-                                    <input type="text" class="form-control" placeholder="https://www.amazon.com/gp/product/B00EXAMPLE">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div type="tab"  id="url-shortener" class="mt-4 container py-5">
-                            <div class="row g-4 align-items-center">
-                                <div class="col-md-6">
-                                    <label class="form-section-title">URL</label>
-                                    <input type="text" class="rounded-pill-input" placeholder="https://relink.is" readonly>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-section-title">Password Protection</label>
-                                    <div class="toggle-pill">
-                                        <button class="active">Off</button>
-                                        <button>On</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div type="tab"  id="link-in-bio">
-                            <div class="container py-5">
-                                <div class="row g-4 mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-section-title">Title</label>
-                                        <input type="text" class="form-control pill-input" value="Relink Smartlink">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-section-title">Description</label>
-                                        <input type="text" class="form-control pill-input" value="Relink">
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-section-title">Logo</label>
-                                        <input type="file" accept="image/*" class="form-control pill-input">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-section-title">Theme color</label>
-                                        <input type="color" class="form-control form-control-color pill-input" value="#000000">
-                                    </div>
-                                </div>
-
-                                <div class="row g-4 mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-section-title">Layout</label>
-                                        <div class="toggle-pill">
-                                            <button class="active">List</button>
-                                            <button>Grid</button>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-section-title">Theme</label>
-                                        <div class="toggle-pill">
-                                            <button class="active">Light</button>
-                                            <button>Auto</button>
-                                            <button>Dark</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row g-0">
-                                    <div class="col-md-6 p-4 bg-light">
-                                        <button class="add-link-btn"><i class="bi bi-plus-lg me-2"></i>Add Link</button>
-                                    </div>
-                                    <div class="col-md-6 p-4 bg-white d-flex align-items-center justify-content-center">
-                                        <div class="preview-box">
-                                            <h5 class="mb-3">Relink Smartlink</h5>
-                                            <small>Powered by <strong>relink</strong></small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div type="tab"  id="qr-tag">
-                            <div class="container py-5">
-                                <div class="row g-4 mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-section-title">Title</label>
-                                        <input type="text" class="form-control pill-input" placeholder="Enter title" value="Relink Smartlink">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-section-title">Description</label>
-                                        <input type="text" class="form-control pill-input" placeholder="Enter description" value="Relink">
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-section-title">Picture</label>
-                                        <input type="file" accept="image/*" class="form-control pill-input">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-section-title">Theme color</label>
-                                        <input type="color" class="form-control form-control-color pill-input" value="#000000">
-                                    </div>
-                                </div>
-
-                                <div class="row g-0">
-                                    <div class="col-md-6 bg-light p-4">
-                                        <label class="form-section-title">Select a preset</label>
-                                        <select class="form-select pill-input">
-                                            <option>Select a preset</option>
-                                            <option>Preset 1</option>
-                                            <option>Preset 2</option>
-                                            <option>Preset 3</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-4">
-                                        <div class="preview-box">
-                                            <h5>Relink Smartlink</h5>
-                                            <i class="bi bi-link-45deg"></i>
-                                            <div class="text-muted fw-semibold">Add link to preview</div>
-                                            <small class="mt-2 d-block">Powered by <strong>relink</strong></small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
+
+                    <div class="col-md-12">
+                        <div class="mt-4">
+                            <label class="form-label fw-semibold">Lin in Bio settings</label>
+                            <div class="smartlink-type">
+                                <button
+                                        v-for="tab in tabs"
+                                        :key="tab.id"
+                                        type="tab-button"
+                                        class="btn"
+                                        :class="activeTab === tab.id ? 'btn-dark' : 'btn-outline-secondary'"
+                                        @click="activeTab = tab.id"
+                                >
+                                    {{ tab.name }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- App Shortener Tab -->
+                        <!--                    <div type="tab" id="app-shortener" :class="{ active: activeTab === 'app-shortener' }" class="mt-4">-->
+                        <!--                        <label class="form-label fw-semibold">App download links</label>-->
+                        <!--                        <div class="row g-3">-->
+                        <!--                            <div class="col-md-6">-->
+                        <!--                                <label class="form-label">App Store (iOS) app URL <i class="bi bi-question-circle"></i></label>-->
+                        <!--                                <input type="text" class="form-control" v-model="appShortener.ios"-->
+                        <!--                                       placeholder="https://apps.apple.com/en/app/your-app-name/id123456789">-->
+                        <!--                            </div>-->
+                        <!--                            <div class="col-md-6">-->
+                        <!--                                <label class="form-label">Google Play (Android) app URL <i-->
+                        <!--                                        class="bi bi-question-circle"></i></label>-->
+                        <!--                                <input type="text" class="form-control" v-model="appShortener.android"-->
+                        <!--                                       placeholder="https://play.google.com/store/apps/details?id=com.example.app">-->
+                        <!--                            </div>-->
+
+                        <!--                            <div class="col-md-6">-->
+                        <!--                                <label class="form-label">Windows app URL</label>-->
+                        <!--                                <input type="text" class="form-control" v-model="appShortener.windows"-->
+                        <!--                                       placeholder="https://example.com/windows/9NBLGGH4XXXX">-->
+                        <!--                            </div>-->
+                        <!--                            <div class="col-md-6">-->
+                        <!--                                <label class="form-label">MacOS app URL</label>-->
+                        <!--                                <input type="text" class="form-control" v-model="appShortener.macos"-->
+                        <!--                                       placeholder="https://apps.apple.com/us/app/your-macos-app/id123456789">-->
+                        <!--                            </div>-->
+
+                        <!--                            <div class="col-md-6">-->
+                        <!--                                <label class="form-label">iPad version App Store (iOS) app URL</label>-->
+                        <!--                                <input type="text" class="form-control" v-model="appShortener.ipad"-->
+                        <!--                                       placeholder="https://apps.apple.com/app/ipad-app/id123456789">-->
+                        <!--                            </div>-->
+                        <!--                            <div class="col-md-6">-->
+                        <!--                                <label class="form-label">AppGallery app URL</label>-->
+                        <!--                                <input type="text" class="form-control" v-model="appShortener.appGallery"-->
+                        <!--                                       placeholder="https://appgallery.huawei.com/app/C123456">-->
+                        <!--                            </div>-->
+
+                        <!--                            <div class="col-md-6">-->
+                        <!--                                <label class="form-label">Amazon Appstore app URL</label>-->
+                        <!--                                <input type="text" class="form-control" v-model="appShortener.amazon"-->
+                        <!--                                       placeholder="https://www.amazon.com/gp/product/B00EXAMPLE">-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+                        <!--                    </div>-->
+
+                        <!-- URL Shortener Tab -->
+                        <!--                    <div type="tab" id="url-shortener" :class="{ active: activeTab === 'url-shortener' }"-->
+                        <!--                         class="mt-4 container py-5">-->
+                        <!--                        <div class="row g-4 align-items-center">-->
+                        <!--                            <div class="col-md-6">-->
+                        <!--                                <label class="form-section-title">URL</label>-->
+                        <!--                                <input type="text" class="rounded-pill-input" v-model="urlShortener.url"-->
+                        <!--                                       placeholder="https://CTOUT.me" readonly>-->
+                        <!--                            </div>-->
+                        <!--                            <div class="col-md-6">-->
+                        <!--                                <label class="form-section-title">Password Protection</label>-->
+                        <!--                                <div class="toggle-pill">-->
+                        <!--                                    <button-->
+                        <!--                                            :class="{ active: !urlShortener.passwordProtected }"-->
+                        <!--                                            @click="urlShortener.passwordProtected = false"-->
+                        <!--                                    >Off-->
+                        <!--                                    </button>-->
+                        <!--                                    <button-->
+                        <!--                                            :class="{ active: urlShortener.passwordProtected }"-->
+                        <!--                                            @click="urlShortener.passwordProtected = true"-->
+                        <!--                                    >On-->
+                        <!--                                    </button>-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+                        <!--                    </div>-->
+
+                        <!-- Link-in-Bio Tab -->
+                        <div type="tab" id="link-in-bio" :class="{ active: activeTab === 'link-in-bio' }">
+                            <div class="container">
+                                <div class="form-section">
+                                    <div class="alert alert-success" v-if="alerts.success.show">
+                                        {{ alerts.success.message
+                                        }}
+                                    </div>
+                                    <div class="alert alert-danger" v-if="alerts.error.show">{{ alerts.error.message }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="title">Title</label>
+                                        <input type="text" id="title" class="form-control" v-model="linkInBio.title">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="description">Description</label>
+                                        <input type="text" id="description" class="form-control"
+                                               v-model="linkInBio.description" placeholder="CTOUT">
+                                    </div>
+
+                                    <!-- Updated Main Logo Upload Section with X Button -->
+                                    <div class="form-group">
+                                        <label for="logo">Logo</label>
+                                        <div id="logo-upload-section" class="upload-btn" style="position:relative;">
+                                            <template v-if="!linkInBio.logoPreview">
+                                                <label id="upload-label"
+                                                       style="width:100%;display:flex;align-items:center;justify-content:center;cursor:pointer;margin:0;">
+                                                    <span class="upload-icon" style="margin-right:8px;">&#8679;</span>
+                                                    <span class="upload-text">Upload</span>
+                                                    <input type="file" id="logo-input" accept="image/*"
+                                                           style="display:none;" @change="handleLogoUpload">
+                                                </label>
+                                            </template>
+                                            <div v-else class="logo-file-row">
+                                                <div class="logo-container">
+                                                    <img :src="linkInBio.logoPreview" alt="logo"/>
+
+                                                </div>
+                                                <span class="file-name">{{ linkInBio.logoFile ? linkInBio.logoFile.name : 'Uploaded logo'}}</span>
+                                                <button class="logo-remove-btn logo-remove-btn-main" type="button"
+                                                        @click="deleteLogo"
+                                                        title="Remove logo">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="theme-color">Theme color</label>
+                                        <div class="color-picker">
+                                            <input type="color" id="theme-color" class="color-input"
+                                                   v-model="linkInBio.themeColor">
+                                            <div class="color-swatch"
+                                                 :style="{ backgroundColor: linkInBio.themeColor }"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Layout</label>
+                                        <div class="layout-options">
+                                            <button
+                                                    v-for="layout in layouts"
+                                                    :key="layout.value"
+                                                    class="option-btn"
+                                                    :class="{ active: linkInBio.layoutType === layout.value }"
+                                                    :data-layout="layout.value"
+                                                    @click="linkInBio.layoutType = layout.value"
+                                            >
+                                                {{ layout.name }}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Theme</label>
+                                        <div class="theme-options">
+                                            <button
+                                                    v-for="theme in themes"
+                                                    :key="theme.value"
+                                                    class="option-btn"
+                                                    :class="{
+                                                    'light-theme': theme.value === 'light',
+                                                    'dark-theme': theme.value !== 'light',
+                                                    'active': linkInBio.themeType === theme.value
+                                                }"
+                                                    :data-theme="theme.value"
+                                                    @click="linkInBio.themeType = theme.value"
+                                            >
+                                                {{ theme.name }}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <button class="add-link-btn" @click="addLink">
+                                        <span>+</span>
+                                        Add Link
+                                    </button>
+
+                                    <!-- Updated Link Item with X Button on Logo -->
+                                    <div class="links-container">
+                                        <div class="link-item" v-for="(link, index) in linkInBio.links" :key="index">
+                                            <div class="drag-handle">☰</div>
+                                            <div class="link-upload">
+                                                <template v-if="!link.logoPreview">
+                                                    <span>↑</span>
+                                                    <input type="file" accept="image/*" class="link-icon-upload"
+                                                           @change="handleLinkLogoUpload($event, index)">
+                                                </template>
+                                                <div v-else class="link-logo-wrapper">
+                                                    <img :src="link.logoPreview" :alt="link.title"
+                                                         style="width: 100%; height: 100%; object-fit: cover;">
+                                                    <button class="link-logo-delete-btn" @click="deleteLinkLogo(index)"
+                                                            title="Remove logo">
+                                                        <i class="bi bi-x"></i>
+                                                    </button>
+                                                    <input type="file" accept="image/*" class="link-icon-upload"
+                                                           @change="handleLinkLogoUpload($event, index)"
+                                                           style="position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer;">
+                                                </div>
+                                            </div>
+                                            <div class="link-inputs">
+                                                <input type="text" class="link-input" placeholder="Your link address"
+                                                       v-model="link.url">
+                                                <input type="text" class="link-input" placeholder="Title"
+                                                       v-model="link.title">
+                                            </div>
+                                            <button class="delete-btn" @click="deleteLink(index)">🗑️</button>
+                                        </div>
+                                    </div>
+                                    <button class="save-btn" @click="saveChanges" :disabled="isSaving">
+                                        {{ isSaving ? 'Saving...' : 'Save Changes' }}
+                                    </button>
+                                </div>
+
+                                <div class="preview-section">
+                                    <div class="preview-container">
+                                        <div
+                                                :class="linkInBio.themeType === 'light' ? 'preview-light' : 'preview-dark'"
+                                                id="preview-content"
+                                                :style="{ backgroundColor: linkInBio.themeType !== 'light' ? linkInBio.themeColor : '' }"
+                                        >
+                                            <img v-if="linkInBio.logoPreview" :src="linkInBio.logoPreview"
+                                                 class="preview-logo">
+                                            <div class="preview-title" id="preview-title">{{ linkInBio.title }}</div>
+                                            <div class="preview-description" id="preview-description">
+                                                {{ linkInBio.description || 'CTOUT' }}
+                                            </div>
+                                            <div class="preview-links"
+                                                 :class="{ 'grid': linkInBio.layoutType === 'grid' }">
+                                                <div class="preview-link" v-for="(link, index) in linkInBio.links"
+                                                     :key="'preview-'+index">
+                                                    <div class="preview-link-icon">
+                                                        <img v-if="link.logoPreview" :src="link.logoPreview"
+                                                             :alt="link.title">
+                                                    </div>
+                                                    <span>{{ link.title }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="preview-footer">Powered by CTOUT</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--                    &lt;!&ndash; QR Tag Tab &ndash;&gt;-->
+                        <!--                    <div type="tab" id="qr-tag" :class="{ active: activeTab === 'qr-tag' }">-->
+                        <!--                        <div class="container py-5">-->
+                        <!--                            <div class="row g-4 mb-4">-->
+                        <!--                                <div class="col-md-6">-->
+                        <!--                                    <label class="form-section-title">Title</label>-->
+                        <!--                                    <input type="text" class="form-control pill-input" v-model="qrTag.title"-->
+                        <!--                                           placeholder="Enter title">-->
+                        <!--                                </div>-->
+                        <!--                                <div class="col-md-6">-->
+                        <!--                                    <label class="form-section-title">Description</label>-->
+                        <!--                                    <input type="text" class="form-control pill-input" v-model="qrTag.description"-->
+                        <!--                                           placeholder="Enter description">-->
+                        <!--                                </div>-->
+
+                        <!--                                <div class="col-md-6">-->
+                        <!--                                    <label class="form-section-title">Picture</label>-->
+                        <!--                                    <input type="file" accept="image/*" class="form-control pill-input"-->
+                        <!--                                           @change="handleQRTagImageUpload">-->
+                        <!--                                </div>-->
+                        <!--                                <div class="col-md-6">-->
+                        <!--                                    <label class="form-section-title">Theme color</label>-->
+                        <!--                                    <input type="color" class="form-control form-control-color pill-input"-->
+                        <!--                                           v-model="qrTag.themeColor">-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+
+                        <!--                            <div class="row g-0">-->
+                        <!--                                <div class="col-md-6 bg-light p-4">-->
+                        <!--                                    <label class="form-section-title">Select a preset</label>-->
+                        <!--                                    <select class="form-select pill-input" v-model="qrTag.preset">-->
+                        <!--                                        <option>Select a preset</option>-->
+                        <!--                                        <option>Preset 1</option>-->
+                        <!--                                        <option>Preset 2</option>-->
+                        <!--                                        <option>Preset 3</option>-->
+                        <!--                                    </select>-->
+                        <!--                                </div>-->
+                        <!--                                <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-4">-->
+                        <!--                                    <div class="preview-box">-->
+                        <!--                                        <h5>{{ qrTag.title }}</h5>-->
+                        <!--                                        <i class="bi bi-link-45deg"></i>-->
+                        <!--                                        <div class="text-muted fw-semibold">Add link to preview</div>-->
+                        <!--                                        <small class="mt-2 d-block">Powered by <strong>CTOUT</strong></small>-->
+                        <!--                                    </div>-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+                        <!--                    </div>-->
+                    </div>
                 </div>
+            </div>
+            <!--        </div>-->
+        </div>
+    </div>
+
+    <!-- Delete confirmation modal -->
+    <div class="modal-backdrop" v-if="showDeleteConfirmation" @click.self="showDeleteConfirmation = false">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Smartlink</h5>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this Smartlink? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" @click="showDeleteConfirmation = false">Cancel</button>
+                <button class="btn-delete" @click="deleteSmartlink" :disabled="isDeleting">
+                    <div class="spinner" v-if="isDeleting"></div>
+                    {{ isDeleting ? 'Deleting...' : 'Delete' }}
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const buttons = document.querySelectorAll('[type="tab-button"]');
-      const tabs = document.querySelectorAll('[type="tab"]');
+    const {createApp, ref, reactive, computed, watch, onMounted} = Vue;
 
-      function activateTab(id) {
-        tabs.forEach(tab => {
-          tab.style.display = tab.id === id ? 'block' : 'none';
-        });
+    createApp({
 
-        buttons.forEach(btn => {
-          if (btn.getAttribute('for') === id) {
-            btn.classList.add('btn-dark');
-            btn.classList.remove('btn-outline-secondary');
-          } else {
-            btn.classList.remove('btn-dark');
-            btn.classList.add('btn-outline-secondary');
-          }
-        });
-      }
+        data() {
+            return {
+                activeSection: 'analytics',
+                shortlinkId: null, // URL-dən və ya route-dan əldə ediləcək
+                loading: false,
+                error: null,
+                infoText: null,
+                showInfoModal: false,
 
-      buttons.forEach(button => {
-        button.addEventListener('click', () => {
-          const targetId = button.getAttribute('for');
-          activateTab(targetId);
-        });
-      });
+                summaryMetrics: [
+                    {
+                        title: 'Total clicks',
+                        value: 0,
+                        icon: 'visits',
+                        infoText: 'Shows the total number of visits to your links.'
+                    },
+                    {
+                        title: 'Total QR code scans',
+                        value: 0,
+                        icon: '404',
+                        infoText: 'Shows the number of times users encountered a 404 error.'
+                    },
+                    {
+                        title: 'Total Referrals',
+                        value: 0,
+                        icon: 'referrals',
+                        infoText: 'Shows the number of visits from referral links.'
+                    }
+                ],
+                osLegend: [
+                    {name: 'iOS', color: '#ff6384'},
+                    {name: 'Bot/Crawler', color: '#36a2eb'},
+                    {name: 'macOS', color: '#ffcd56'},
+                    {name: 'Windows', color: '#789fff'},
+                    {name: 'Android', color: '#4bc0c0'},
+                    {name: 'Linux', color: '#ff9f40'}
+                ],
+                gridLinesY: [
+                    {y: 50}, {y: 100}, {y: 150}, {y: 200}, {y: 250}, {y: 300}
+                ],
+                gridLinesX: [
+                    {x: 100}, {x: 200}, {x: 300}, {x: 400}, {x: 500}, {x: 600}, {x: 700}
+                ],
+                yAxisLabels: [
+                    {value: 8, y: 50},
+                    {value: 6, y: 100},
+                    {value: 4, y: 150},
+                    {value: 2, y: 200},
+                    {value: 0, y: 250}
+                ],
+                xAxisDates: [
+                    {value: '05/05/2025', x: 40},
+                    {value: '06/05/2025', x: 140},
+                    {value: '06/05/2025', x: 240},
+                    {value: '07/05/2025', x: 340},
+                    {value: '08/05/2025', x: 440},
+                    {value: '09/05/2025', x: 540},
+                    {value: '10/05/2025', x: 640},
+                    {value: '11/05/2025', x: 740}
+                ],
+                osData: [
+                    {name: 'iOS', color: '#ff6384', path: 'M40,200 L140,150 L540,80 L640,220 L740,180'},
+                    {name: 'Bot/Crawler', color: '#36a2eb', path: 'M240,250 L340,160 L400,160 L540,200'},
+                    {name: 'macOS', color: '#ffcd56', path: 'M140,150 L640,220'},
+                    {name: 'Windows', color: '#789fff', path: ''},
+                    {name: 'Android', color: '#4bc0c0', path: 'M240,250 L540,130 L600,50'},
+                    {name: 'Linux', color: '#ff9f40', path: 'M540,230 L740,180'}
+                ],
+                dataPoints: [
+                    {id: 1, cx: 40, cy: 200, fill: '#ff6384'}, // iOS start
+                    {id: 2, cx: 140, cy: 150, fill: '#ff6384'}, // iOS point 2
+                    {id: 3, cx: 140, cy: 220, fill: '#888888'}, // Gray point
+                    {id: 4, cx: 240, cy: 250, fill: '#4bc0c0'}, // Android start
+                    {id: 5, cx: 340, cy: 160, fill: '#36a2eb'}, // Bot/Crawler point
+                    {id: 6, cx: 400, cy: 160, fill: '#36a2eb'}, // Bot/Crawler point
+                    {id: 7, cx: 540, cy: 130, fill: '#4bc0c0'}, // Android point
+                    {id: 8, cx: 540, cy: 200, fill: '#36a2eb'}, // Bot/Crawler end
+                    {id: 9, cx: 540, cy: 230, fill: '#ff9f40'}, // Linux point
+                    {id: 10, cx: 600, cy: 50, fill: '#4bc0c0'}, // Android peak
+                    {id: 11, cx: 540, cy: 80, fill: '#ff6384'}, // iOS peak
+                    {id: 12, cx: 640, cy: 220, fill: '#ff6384'}, // iOS dip
+                    {id: 13, cx: 640, cy: 220, fill: '#ffcd56'}, // macOS point
+                    {id: 14, cx: 740, cy: 180, fill: '#ff6384'}, // iOS end
+                    {id: 15, cx: 740, cy: 180, fill: '#ff9f40'}  // Linux end
+                ],
+                dataCards: [
+                    {
+                        title: 'Devices',
+                        icon: 'devices',
+                        infoText: 'Shows the distribution of devices used to access your links.',
+                        data: [
+                            {label: 'Mobile', value: 0, class: 'mobile-row'},
+                            {label: 'Desktop', value: 0, class: 'desktop-row'},
+                            {label: 'Bot/Crawler', value: 0, class: 'bot-crawler-row'}
+                        ]
+                    },
+                    {
+                        title: 'Countries',
+                        icon: 'countries',
+                        infoText: 'Shows the geographic distribution of your visitors.',
+                        data: []
+                    },
+                    {
+                        title: 'OS',
+                        icon: 'os',
+                        infoText: 'Shows the distribution of operating systems used by your visitors.',
+                        data: []
+                    },
+                    {
+                        title: 'Referrers',
+                        icon: 'referrers',
+                        infoText: 'Shows where your traffic is coming from.',
+                        data: [],
+                        proMessage: 'Visible only in paid plans'
+                    },
+                    {
+                        title: 'Redirects',
+                        icon: 'redirects',
+                        infoText: 'Shows information about redirects.',
+                        data: [],
+                        proMessage: 'Visible only in paid plans'
+                    },
+                    {
+                        title: 'UTM',
+                        icon: 'utm',
+                        infoText: 'Shows UTM parameter tracking information.',
+                        data: [],
+                        proMessage: 'Visible only in paid plans'
+                    },
+                    {
+                        title: 'Channels',
+                        icon: 'channels',
+                        infoText: 'Shows traffic distribution by channel.',
+                        data: [],
+                        proMessage: 'Visible only in paid plans'
+                    },
+                    {
+                        title: 'Timezones',
+                        icon: 'timezones',
+                        infoText: 'Shows visitor distribution by timezone.',
+                        data: [],
+                        proMessage: 'Visible only in paid plans'
+                    },
+                    {
+                        title: 'Languages',
+                        icon: 'languages',
+                        infoText: 'Shows language preferences of your visitors.',
+                        data: [],
+                        proMessage: 'Visible only in paid plans'
+                    },
+                    {
+                        title: 'Browsers',
+                        icon: 'browsers',
+                        infoText: 'Shows browser distribution of your visitors.',
+                        data: [],
+                        proMessage: 'Visible only in paid plans'
+                    },
+                    {
+                        title: 'Smartlink Type',
+                        icon: 'smartlink type',
+                        infoText: 'Shows distribution of smartlink types.',
+                        data: [],
+                        proMessage: 'Visible only in paid plans'
+                    },
+                    {
+                        title: 'Shortened URLs',
+                        icon: 'shortened',
+                        infoText: 'Shows screen shortened statistics of your visitors.',
+                        data: [],
+                        proMessage: 'Visible only in paid plans'
+                    }
+                ],
+                dateRange: '',
+                watermarkText: 'relink'
+            };
+        },
 
-      // Initialize first tab
-      if (tabs.length > 0) {
-        activateTab(tabs[0].id);
-      }
-    });
+        created() {
+// URL-dən shortlinkId əldə edilməsi
+            const urlParams = new URLSearchParams(window.location.search);
+            this.shortlinkId = urlParams.get('id') || this.$route?.params?.id;
+
+
+            if (this.shortlinkId) {
+                this.fetchMetaData();
+            } else {
+                this.error = 'No shortlink ID provided';
+            }
+        },
+
+        methods: {
+                    // Məlumat kartındakı info düyməsinə klikləndikdə, informasiya göstərilməsi
+            showInfo(text) {
+                this.infoText = text;
+                this.showInfoModal = true;
+
+                // 3 saniyə sonra info modalını bağlayaq
+                setTimeout(() => {
+                    this.showInfoModal = false;
+                }, 3000);
+            },
+            // API-dan məlumatların çəkilməsi
+            async fetchMetaData() {
+                this.loading = true;
+                this.error = null;
+
+                const id = this.shortlinkId || new URLSearchParams(window.location.search).get('id');
+
+                if (!id) {
+                    this.error = "Shortlink ID tapılmadı.";
+                    this.loading = false;
+                    return;
+                }
+
+                try {
+                    const shortlinkRes = await fetch(`/api/short-links/${id}`);
+                    if (!shortlinkRes.ok) throw new Error(`Shortlink fetch error: ${shortlinkRes.status}`);
+                    const shortlinkData = await shortlinkRes.json();
+                    console.log("Shortlink:", shortlinkData);
+
+                    const metaRes = await fetch(`/api/short-links/${id}/metadata`);
+                    if (!metaRes.ok) throw new Error(`Metadata fetch error: ${metaRes.status}`);
+                    const metadataData = await metaRes.json();
+                    console.log("Metadata:", metadataData);
+
+                    this.processMetaData(metadataData);
+                } catch (error) {
+                    console.error('Fetch error:', error);
+                    this.error = `Xəta baş verdi: ${error.message}`;
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+                 // API-dan alınan məlumatların emalı
+            processMetaData(metaData) {
+                        // Məlumat yoxdursa və ya array deyilsə
+                if (!metaData || !Array.isArray(metaData)) {
+                    this.error = 'Invalid data received from API';
+                    return;
+                }
+
+                     // Cihaz sayları üçün dəyişənlər
+                const deviceCounts = {
+                    Mobile: 0,
+                    Desktop: 0,
+                    'Bot/Crawler': 0
+                };
+
+                     // Əməliyyat sistemi və ölkə sayları üçün obyektlər
+                const osCounts = {};
+                const countryCounts = {};
+
+                    // Ümumi statistika rəqəmləri
+                let totalClicks = 0;
+                let totalQRScans = 0;
+                let totalReferrals = 0;
+
+                    // Tarix aralığı üçün başlanğıc və son tarixlər
+                let startDate = null;
+                let endDate = null;
+
+                     // Bütün metadata yazılarının emalı
+                metaData.forEach(entry => {
+                 // Toplam kliklərin sayılması
+                    totalClicks++;
+
+                    // Cihaz növünün emalı
+                    if (entry.deviceType) {
+                        if (entry.deviceType.toLowerCase() === 'mobile' || entry.deviceType.toLowerCase() === 'phone') {
+                            deviceCounts.Mobile++;
+                        } else if (entry.deviceType.toLowerCase() === 'desktop' || entry.deviceType.toLowerCase() === 'pc') {
+                            deviceCounts.Desktop++;
+                        } else if (entry.deviceType.toLowerCase().includes('bot') || entry.deviceType.toLowerCase().includes('crawler')) {
+                            deviceCounts['Bot/Crawler']++;
+                        }
+                    }
+
+                        // Əməliyyat sisteminin emalı
+                    if (entry.operatingSystem) {
+                        const os = entry.operatingSystem;
+                        osCounts[os] = (osCounts[os] || 0) + 1;
+                    }
+
+                        // Ölkə məlumatının emalı
+                    if (entry.country) {
+                        const country = entry.country;
+                        countryCounts[country] = (countryCounts[country] || 0) + 1;
+                    }
+
+                        // QR skanların emalı
+                    if (entry.isQRScan) {
+                        totalQRScans++;
+                    }
+
+                        // Referral sayının emalı
+                    if (entry.isReferral) {
+                        totalReferrals++;
+                    }
+
+                        // Tarix aralığının izlənməsi
+                    if (entry.timestamp) {
+                        const entryDate = new Date(entry.timestamp);
+                        if (!startDate || entryDate < startDate) {
+                            startDate = entryDate;
+                        }
+                        if (!endDate || entryDate > endDate) {
+                            endDate = entryDate;
+                        }
+                    }
+                });
+
+                        // Ümumi metrika məlumatlarının yenilənməsi
+                this.summaryMetrics[0].value = totalClicks;
+                this.summaryMetrics[1].value = totalQRScans;
+                this.summaryMetrics[2].value = totalReferrals;
+
+                            // Cihaz kartının yenilənməsi
+                this.dataCards[0].data = [
+                    {label: 'Mobile', value: deviceCounts.Mobile, class: 'mobile-row'},
+                    {label: 'Desktop', value: deviceCounts.Desktop, class: 'desktop-row'},
+                    {label: 'Bot/Crawler', value: deviceCounts['Bot/Crawler'], class: 'bot-crawler-row'}
+                ];
+
+                            // Ölkə kartının yenilənməsi
+                this.dataCards[1].data = Object.entries(countryCounts)
+                    .map(([label, value]) => ({label, value}))
+                    .sort((a, b) => b.value - a.value);
+
+                                // OS kartının yenilənməsi
+                this.dataCards[2].data = Object.entries(osCounts)
+                    .map(([label, value]) => ({label, value}))
+                    .sort((a, b) => b.value - a.value);
+
+                                // Tarix aralığının yenilənməsi
+                if (startDate && endDate) {
+                    const formatDate = (date) => {
+                        return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+                    };
+                    this.dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
+                }
+
+                        // Burda qrafiklər üçün məlumatların (osData, dataPoints, və s.) yenilənməsi
+                        // də həyata keçirilə bilər.
+                        // Bu funksionallıq daha mürəkkəbdir və nümunədə göstərilməmişdir
+            }
+        },
+        methods: {
+            showInfo(message) {
+                alert(message);
+            },
+            getSectionName(sectionId) {
+                const section = this.sections.find(s => s.id === sectionId);
+                return section ? section.name : 'Unknown';
+            }
+        },
+        methods: {
+            showInfo(message) {
+                alert(message);
+            },
+        },
+
+        // data() {
+        //     return {
+        //         activeSection: 'configuration',
+        //         form: {
+        //             name: '',
+        //             email: ''
+        //         }
+        //     };
+        // },
+        methods: {
+            selectSection(section) {
+                this.activeSection = section;
+            }
+        },
+        setup() {
+
+            const baseUrl = computed(() => {
+                // Get the current origin (protocol + hostname + port)
+                return window.location.origin;
+            });
+            // User information
+            const loggedInUser = reactive({
+                name: 'John',
+                surname: 'Doe',
+                picture: 'https://via.placeholder.com/32'
+            });
+
+            // Sidebar links
+            const links = ref([]);
+            const selectedLinkId = ref(null);
+
+            // Tabs configuration
+            const tabs = [
+                // {id: 'app-shortener', name: 'App shortener'},
+                // {id: 'url-shortener', name: 'URL shortener'},
+                {id: 'link-in-bio', name: 'Link-in-Bio'},
+                // {id: 'qr-tag', name: 'QR Tag'}
+            ];
+            const activeTab = ref('app-shortener');
+
+            // App shortener data
+            const appShortener = reactive({
+                ios: '',
+                android: '',
+                windows: '',
+                macos: '',
+                ipad: '',
+                appGallery: '',
+                amazon: ''
+            });
+
+            // URL shortener data
+            const urlShortener = reactive({
+                url: 'https://CTOUT.me',
+                passwordProtected: false
+            });
+
+            // Link-in-Bio data
+            const layouts = [
+                {name: 'List', value: 'list'},
+                {name: 'Grid', value: 'grid'}
+            ];
+
+            const themes = [
+                {name: 'Light', value: 'light'},
+                {name: 'Auto', value: 'auto'},
+                {name: 'Dark', value: 'dark'}
+            ];
+
+            const linkInBio = reactive({
+                title: 'MyTitle',
+                description: 'CTOUT',
+                logoFile: null,
+                logoPreview: null,
+                logoUrl: null,
+                removeMainLogo: false, // Add this flag
+                themeColor: '#101223',
+                layoutType: 'list',
+                themeType: 'dark',
+                shortCode: '',
+                shortUrl: '',
+                originalUrl: '',
+                links: [
+                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
+                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
+                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false}
+                ]
+            });
+
+            // QR Tag data
+            const qrTag = reactive({
+                title: 'CTOUT Smartlink',
+                description: 'CTOUT',
+                imageFile: null,
+                imagePreview: null,
+                themeColor: '#000000',
+                preset: 'Select a preset'
+            });
+
+            // Status flags
+            const isSaving = ref(false);
+            const alerts = reactive({
+                success: {show: false, message: 'Link in bio saved successfully!'},
+                error: {show: false, message: ''}
+            });
+
+            // Methods
+            async function loadLinks() {
+                try {
+                    const response = await fetch('/api/short-links');
+                    links.value = await response.json();
+                } catch (error) {
+                    console.error('Error loading links:', error);
+                }
+            }
+
+            function selectLink(linkId) {
+                selectedLinkId.value = linkId;
+                activeTab.value = 'link-in-bio';
+
+                // Update URL with both tab and id parameters
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('tab', 'link-in-bio');
+                newUrl.searchParams.set('id', linkId);
+                window.history.pushState({}, '', newUrl);
+
+                // Load link details
+                loadLinkDetails(linkId);
+            }
+
+
+            function addLink() {
+                linkInBio.links.push({
+                    title: 'New Link',
+                    url: '',
+                    logoFile: null,
+                    logoPreview: null,
+                    logoUrl: null
+                });
+            }
+
+            function deleteLink(index) {
+                linkInBio.links.splice(index, 1);
+            }
+
+            function handleQRTagImageUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    qrTag.imageFile = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        qrTag.imagePreview = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            async function createNewLink() {
+                try {
+                    // Create empty link in database
+                    const formData = new FormData();
+                    formData.append('title', 'New Link');
+                    formData.append('description', 'CTOUT');
+                    formData.append('themeColor', '#000000');
+                    formData.append('themeType', 'AUTO');
+                    formData.append('layoutType', 'LIST');
+
+                    // Add one empty link
+                    formData.append('links[0].title', 'New Link');
+                    formData.append('links[0].url', '');
+
+                    // Send to API
+                    const response = await fetch('/api/short-links', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to create new link');
+                    }
+
+                    const newLink = await response.json();
+
+                    // Update URL with the new ID
+                    const newUrl = new URL(window.location.href);
+                    newUrl.searchParams.set('tab', 'link-in-bio');
+                    newUrl.searchParams.set('id', newLink.id);
+                    window.history.pushState({}, '', newUrl);
+
+                    // Update UI
+                    await loadLinks();
+                    activeTab.value = 'link-in-bio';
+                    selectedLinkId.value = newLink.id;
+
+                    // Load the new link details
+                    await loadLinkDetails(newLink.id);
+                } catch (error) {
+                    console.error('Error creating new link:', error);
+                }
+            }
+
+            // Check URL parameters on page load
+            function checkUrlParameters() {
+                const url = new URL(window.location.href);
+                const tabParam = url.searchParams.get('tab');
+                const idParam = url.searchParams.get('id');
+
+                if (tabParam) {
+                    activeTab.value = tabParam;
+                }
+
+                if (tabParam === 'link-in-bio' && idParam) {
+                    selectedLinkId.value = idParam;
+                    loadLinkDetails(idParam);
+                }
+            }
+
+
+// Updated handleLogoUpload function
+            function handleLogoUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    linkInBio.logoFile = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        linkInBio.logoPreview = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+
+                    // Clear the existing logoUrl and reset remove flag
+                    linkInBio.logoUrl = null;
+                    linkInBio.removeMainLogo = false;
+                }
+            }
+
+// Updated deleteLogo function with no immediate DELETE request
+            function deleteLogo() {
+                // Flag that the logo should be removed when saving
+                linkInBio.removeMainLogo = true;
+
+                // Clear logo data for UI updates
+                linkInBio.logoFile = null;
+                linkInBio.logoPreview = null;
+                linkInBio.logoUrl = null;
+            }
+
+// Updated handleLinkLogoUpload function
+            function handleLinkLogoUpload(event, index) {
+                const file = event.target.files[0];
+                if (file) {
+                    linkInBio.links[index].logoFile = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        linkInBio.links[index].logoPreview = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+
+                    // Clear the existing logoUrl and reset remove flag
+                    linkInBio.links[index].logoUrl = null;
+                    linkInBio.links[index].removeLogo = false;
+                }
+            }
+
+// Updated deleteLinkLogo function with no immediate DELETE request
+            function deleteLinkLogo(index) {
+                // Flag this link's logo for removal when saving
+                linkInBio.links[index].removeLogo = true;
+
+                // Clear logo data for UI updates
+                linkInBio.links[index].logoFile = null;
+                linkInBio.links[index].logoPreview = null;
+                linkInBio.links[index].logoUrl = null;
+            }
+
+// Updated loadLinkDetails function to initialize removeLogo flags
+            async function loadLinkDetails(linkId) {
+                try {
+                    const response = await fetch(`/api/short-links/${linkId}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch link details');
+                    }
+                    const linkDetails = await response.json();
+
+                    // Update form fields
+                    linkInBio.title = linkDetails.title || '';
+                    linkInBio.description = linkDetails.description || '';
+                    linkInBio.removeMainLogo = false; // Reset flag when loading
+                    linkInBio.shortCode = linkDetails.shortCode || '';
+                    linkInBio.shortUrl = (baseUrl.value + '/' + linkDetails.shortCode) || '';
+                    linkInBio.originalUrl = linkDetails.originalUrl;
+                    // Update theme color
+                    if (linkDetails.themeColor) {
+                        linkInBio.themeColor = linkDetails.themeColor;
+                    } else {
+                        // Set default color based on theme type
+                        linkInBio.themeColor = linkDetails.themeType === 'LIGHT' ? '#FFFFFF' : '#101223';
+                    }
+
+                    // Update layout type and theme type
+                    linkInBio.layoutType = linkDetails.layoutType.toLowerCase();
+                    linkInBio.themeType = linkDetails.themeType.toLowerCase();
+
+                    // Update main logo
+                    if (linkDetails.logoUrl) {
+                        linkInBio.logoPreview = linkDetails.logoUrl;
+                        linkInBio.logoUrl = linkDetails.logoUrl;
+                        linkInBio.logoFile = null;
+                    } else {
+                        linkInBio.logoPreview = null;
+                        linkInBio.logoUrl = null;
+                        linkInBio.logoFile = null;
+                    }
+
+                    // Update links
+                    if (linkDetails.links && linkDetails.links.length > 0) {
+                        linkInBio.links = linkDetails.links.map(link => ({
+                            title: link.title || '',
+                            url: link.url || '',
+                            logoFile: null,
+                            logoPreview: link.logoUrl || null,
+                            logoUrl: link.logoUrl || null,
+                            removeLogo: false // Initialize flag for each link
+                        }));
+                    } else {
+                        // Reset to default if no links
+                        linkInBio.links = [
+                            {
+                                title: 'Title',
+                                url: '',
+                                logoFile: null,
+                                logoPreview: null,
+                                logoUrl: null,
+                                removeLogo: false
+                            }
+                        ];
+                    }
+                } catch (error) {
+                    console.error('Error loading link details:', error);
+                }
+            }
+
+// Updated saveChanges function to handle logo flags
+            async function saveChanges() {
+                try {
+                    // Show loading state
+                    isSaving.value = true;
+
+                    // Collect form data
+                    const formData = new FormData();
+                    formData.append('title', linkInBio.title);
+                    formData.append('description', linkInBio.description);
+                    formData.append('themeColor', linkInBio.themeColor);
+                    formData.append('originalUrl', linkInBio.originalUrl);
+
+                    // Handle main logo
+                    if (linkInBio.logoFile) {
+                        // New file uploaded
+                        formData.append('logoFile', linkInBio.logoFile);
+                    } else if (linkInBio.logoUrl && !linkInBio.removeMainLogo) {
+                        // Existing logo kept
+                        formData.append('logoUrl', linkInBio.logoUrl);
+                    } else if (linkInBio.removeMainLogo) {
+                        // Logo removed
+                        formData.append('removeMainLogo', 'true');
+                    }
+
+                    // Add theme and layout
+                    formData.append('themeType', linkInBio.themeType.toUpperCase());
+                    formData.append('layoutType', linkInBio.layoutType.toUpperCase());
+
+                    // Collect links
+                    linkInBio.links.forEach((link, index) => {
+                        if (link.url && link.title) {
+                            formData.append(`links[${index}].title`, link.title);
+                            formData.append(`links[${index}].url`, link.url);
+
+                            // Handle link logo
+                            if (link.logoFile) {
+                                // New logo file uploaded
+                                formData.append(`links[${index}].logoFile`, link.logoFile);
+                            } else if (link.logoUrl && !link.removeLogo) {
+                                // Existing logo kept
+                                formData.append(`links[${index}].logoUrl`, link.logoUrl);
+                            } else if (link.removeLogo) {
+                                // Logo was removed
+                                formData.append(`links[${index}].removeLogo`, 'true');
+                            }
+                        }
+                    });
+
+                    // Determine if this is an update or create
+                    const method = selectedLinkId.value ? 'PUT' : 'POST';
+                    const url = selectedLinkId.value ? `/api/short-links/${selectedLinkId.value}` : '/api/short-links';
+
+                    // Send to API
+                    const response = await fetch(url, {
+                        method: method,
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => null);
+                        throw new Error(errorData?.message || 'Failed to save link in bio');
+                    }
+
+                    // Reset remove flags after successful save
+                    linkInBio.removeMainLogo = false;
+                    linkInBio.links.forEach(link => {
+                        link.removeLogo = false;
+                    });
+
+                    // Show success message
+                    alerts.success.show = true;
+                    alerts.error.show = false;
+                    setTimeout(() => {
+                        alerts.success.show = false;
+                    }, 3000);
+
+                    // If this was a new creation, update the URL with the new ID
+                    if (!selectedLinkId.value) {
+                        const responseData = await response.json();
+                        if (responseData.id) {
+                            selectedLinkId.value = responseData.id;
+                            const newUrl = new URL(window.location.href);
+                            newUrl.searchParams.set('id', responseData.id);
+                            window.history.pushState({}, '', newUrl);
+                        }
+                    }
+
+                    // Reload the links list in the sidebar
+                    await loadLinks();
+
+                } catch (error) {
+                    // Show error message
+                    alerts.error.show = true;
+                    alerts.error.message = error.message;
+                    alerts.success.show = false;
+                } finally {
+                    // Reset button state
+                    isSaving.value = false;
+                }
+            }
+
+            // Delete functionality
+            const showDeleteConfirmation = ref(false);
+            const isDeleting = ref(false);
+
+            async function deleteSmartlink() {
+                if (!selectedLinkId.value) return;
+
+                try {
+                    isDeleting.value = true;
+
+                    // Call the delete endpoint
+                    const response = await fetch(`/api/short-links/${selectedLinkId.value}`, {
+                        method: 'DELETE',
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete Smartlink');
+                    }
+
+                    // Close the confirmation modal
+                    showDeleteConfirmation.value = false;
+
+                    // Show success message
+                    alerts.success.show = true;
+                    alerts.success.message = 'Smartlink deleted successfully!';
+                    setTimeout(() => {
+                        alerts.success.show = false;
+                    }, 3000);
+
+                    // Reset selected link and reload the sidebar links
+                    selectedLinkId.value = null;
+
+                    // Update URL parameters
+                    const newUrl = new URL(window.location.href);
+                    newUrl.searchParams.delete('id');
+                    window.history.pushState({}, '', newUrl);
+
+                    // Reload links in the sidebar
+                    await loadLinks();
+
+                    // Reset the active tab to the first tab
+                    activeTab.value = tabs[0].id;
+
+                } catch (error) {
+                    console.error('Error deleting Smartlink:', error);
+
+                    // Show error message
+                    alerts.error.show = true;
+                    alerts.error.message = error.message || 'Failed to delete Smartlink';
+                    setTimeout(() => {
+                        alerts.error.show = false;
+                    }, 5000);
+                } finally {
+                    isDeleting.value = false;
+                }
+            }
+
+
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        alerts.success.show = true;
+                        alerts.success.message = 'URL copied to clipboard!';
+                        setTimeout(() => {
+                            alerts.success.show = false;
+                        }, 3000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy URL: ', err);
+                    });
+            }
+
+            function openSmartlink(url) {
+                window.open(`${url}`, '_blank');
+            }
+
+            // Lifecycle hooks
+            onMounted(() => {
+                loadLinks();
+                checkUrlParameters();
+            });
+
+            return {
+                loggedInUser,
+                links,
+                selectedLinkId,
+                tabs,
+                activeTab,
+                appShortener,
+                urlShortener,
+                linkInBio,
+                qrTag,
+                layouts,
+                themes,
+                alerts,
+                isSaving,
+                showDeleteConfirmation,
+                isDeleting,
+
+                // Methods
+                baseUrl,
+                copyToClipboard,
+                openSmartlink,
+                deleteSmartlink,
+                selectLink,
+                handleLogoUpload,
+                deleteLogo,
+                handleLinkLogoUpload,
+                deleteLinkLogo,
+                addLink,
+                deleteLink,
+                createNewLink,
+                saveChanges,
+                handleQRTagImageUpload
+            };
+        }
+    }).mount('#app');
 </script>
 </body>
 </html>

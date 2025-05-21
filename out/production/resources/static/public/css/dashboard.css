@@ -1,0 +1,915 @@
+    /* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f7f8fa;
+}
+
+.layout {
+    display: flex;
+    width: 100%;
+}
+
+.section-title {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin: 1rem 0 0.5rem;
+}
+
+.user-card {
+    padding: 0.5rem;
+    background: #f8fafd;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.config-card {
+    background: #fff;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.form-section-title {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.smartlink-type {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f8fafd;
+    border: 1px solid #dbe1ea;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+}
+
+.readonly-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    margin: 0 0.5rem;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+.badge-orange {
+    background: #f8f4eb;
+    color: #e67e22;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+}
+
+.note-muted {
+    color: #6c757d;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.custom-button {
+    background: #f8fafd;
+    border: 1px solid #dbe1ea;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    color: #2c3e50;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Link-in-Bio Styles */
+.container {
+    display: flex;
+    width: 100%;
+    padding: 20px;
+    gap: 20px;
+}
+
+.form-section {
+    flex: 1;
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.preview-section {
+    flex: 1;
+    background-color: white;
+    border-radius: 8px;
+    padding-top: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.upload-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.color-picker {
+    display: flex;
+    align-items: center;
+}
+
+.color-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px 0 0 6px;
+    font-size: 16px;
+}
+
+.color-swatch {
+    width: 40px;
+    height: 38px;
+    border: 1px solid #ddd;
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+}
+
+.layout-options, .theme-options {
+    display: flex;
+    gap: 10px;
+}
+
+.option-btn {
+    flex: 1;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #101223;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.option-btn.active {
+    background-color: #101223;
+    color: white;
+}
+
+.option-btn.light-theme {
+    background-color: white;
+    color: #101223;
+    border: 1px solid #ddd;
+}
+
+.option-btn.light-theme.active {
+    border-color: #101223;
+}
+
+.option-btn.dark-theme {
+    background-color: #101223;
+    color: white;
+}
+
+.add-link-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #f06529;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.link-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.drag-handle {
+    color: #999;
+    cursor: grab;
+}
+
+.link-upload {
+    width: 36px;
+    height: 36px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.link-upload input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.link-upload img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.link-inputs {
+    flex: 1;
+}
+
+.link-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.delete-btn {
+    background-color: #f06529;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+
+/* Preview Styles */
+.preview-container {
+    width: 450px;
+    height: 350px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.preview-dark {
+    background-color: #101223;
+    color: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.preview-light {
+    background-color: #ffffff;
+    color: #101223;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.preview-title {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.preview-description {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.preview-light .preview-description {
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.preview-dark .preview-description {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.preview-links {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 10px;
+}
+
+.preview-links.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.preview-link {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    transition: background-color 0.3s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-light .preview-link {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.preview-link:hover {
+    background-color: #f06529;
+    color: white;
+}
+
+.preview-link-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-link-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.preview-footer {
+    text-align: center;
+    font-size: 12px;
+    margin-top: auto;
+    padding-top: 15px;
+}
+
+.preview-light .preview-footer {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.preview-dark .preview-footer {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.save-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.save-btn:hover {
+    background-color: #45a049;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+.alert-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+.logo-file-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    background: #f8f9fb;
+    border: 1px solid #dbe3ea;
+    border-radius: 12px;
+    padding: 8px 16px;
+    box-sizing: border-box;
+    margin-top: 4px;
+}
+
+.logo-file-row img {
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 12px;
+}
+
+.logo-file-row .file-name {
+    color: #222b45;
+    font-weight: 500;
+    margin-right: auto;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.logo-file-row .delete-btn {
+    color: #f06529;
+    background: none;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 16px;
+    margin-left: 12px;
+    padding: 0;
+    width: auto;
+    height: auto;
+}
+
+.logo-file-row .delete-btn .icon {
+    font-size: 18px;
+    margin-left: 2px;
+    color: #ff0000;
+}
+
+.link-logo-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.link-logo-delete-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(255,255,255,0.8);
+    border: none;
+    border-radius: 50%;
+    padding: 2px;
+    cursor: pointer;
+    z-index: 2;
+    transition: opacity 0.2s;
+}
+
+.preview-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Show the active tab content and hide others */
+[type="tab"] {
+    display: none;
+}
+
+[type="tab"].active {
+    display: block;
+}
+
+    /* CSS for the logo removal buttons */
+    .logo-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .logo-remove-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 20px;
+        height: 20px;
+        background-color: #ff3b30;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        z-index: 10;
+    }
+
+    .logo-remove-btn:hover {
+        background-color: #ff6b6b;
+    }
+
+    .link-logo-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .link-logo-delete-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 20px;
+        height: 20px;
+        background-color: #ff3b30;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 12px;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        z-index: 10;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* Prevent body scrolling */
+        background-color: #f7f8fa;
+        height: 100vh;
+    }
+
+    .layout {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden; /* Prevent layout scrolling */
+    }
+
+    /* Sidebar Styles - Fixed position */
+    .sidebar {
+        width: 280px;
+        height: 100vh;
+        background: #fff;
+        border-right: 1px solid #dbe1ea;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 1.5rem;
+        position: fixed; /* Fixed position */
+        top: 0;
+        left: 0;
+        bottom: 0;
+        overflow-y: auto; /* Allow sidebar to scroll if content is too tall */
+        z-index: 100;
+    }
+
+    /* Links container in sidebar needs fixed height with scrolling */
+    #links-container {
+        overflow-y: auto;
+        max-height: calc(100vh - 300px); /* Adjust based on other sidebar elements */
+    }
+
+    .sidebar .nav-link {
+        color: #6c757d;
+        text-decoration: none;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 0.25rem;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar .nav-link:hover {
+        background: #f8fafd;
+        color: #000;
+    }
+
+    .sidebar .nav-link.active-link {
+        background: #2f2f32;
+        color: #000;
+        font-weight: 500;
+    }
+
+    .section-title {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin: 1rem 0 0.5rem;
+    }
+
+    .user-card {
+        padding: 0.5rem;
+        background: #f8fafd;
+        border-radius: 0.5rem;
+        text-align: center;
+    }
+
+    /* Main Content Styles - Scrollable */
+    .main-content {
+        flex: 1;
+        padding: 2rem;
+        margin-left: 280px; /* Equal to sidebar width */
+        height: 100vh;
+        overflow-y: auto; /* Enable scrolling */
+        position: relative;
+        width: calc(100% - 280px); /* Calculate remaining width */
+    }
+
+    .config-card {
+        background: #fff;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Complete CSS solution for non-scrollable sidebar with scrollable Smartlinks section */
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* Prevent body scrolling */
+        background-color: #f7f8fa;
+        height: 100vh;
+    }
+
+    .layout {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden; /* Prevent layout scrolling */
+    }
+
+    /* Sidebar that scrolls as a whole */
+    .sidebar {
+        width: 280px;
+        height: 100vh;
+        background: #fff;
+        border-right: 1px solid #dbe1ea;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 1.5rem;
+        position: fixed; /* Fixed position */
+        top: 0;
+        left: 0;
+        bottom: 0;
+        overflow-y: auto; /* Make entire sidebar scrollable */
+        z-index: 100;
+    }
+
+    /* Prevent links container from having its own scrolling */
+    #links-container {
+        overflow: visible; /* Override any auto scrolling */
+        max-height: none; /* Remove height constraints */
+    }
+
+    /* Sidebar styling */
+    .sidebar .nav-link {
+        color: #6c757d;
+        text-decoration: none;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 0.25rem;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar .nav-link:hover {
+        background: #f8fafd;
+        color: #000;
+    }
+
+    .sidebar .nav-link.active-link {
+        background: #2f2f32;
+        color: #000;
+        font-weight: 500;
+    }
+
+    .section-title {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin: 1rem 0 0.5rem;
+    }
+
+    .user-card {
+        padding: 0.5rem;
+        background: #f8fafd;
+        border-radius: 0.5rem;
+        text-align: center;
+    }
+
+    /* Main content area */
+    .main-content {
+        flex: 1;
+        padding: 2rem;
+        margin-left: 280px; /* Equal to sidebar width */
+        height: 100vh;
+        overflow-y: auto; /* Enable scrolling */
+        position: relative;
+        width: calc(100% - 280px); /* Calculate remaining width */
+    }
+
+    /* Custom scrollbar for the entire sidebar */
+    .sidebar::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 10px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
+    }
+
+    /* CSS for the delete button in the top right corner */
+    .delete-smartlink-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 8px 16px;
+        background-color: #f8f9fa;
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .delete-smartlink-btn:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .delete-smartlink-btn i {
+        font-size: 16px;
+    }
+
+    /* Delete confirmation modal styling */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background-color: white;
+        border-radius: 8px;
+        width: 400px;
+        max-width: 90%;
+        padding: 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        margin-bottom: 16px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #dc3545;
+    }
+
+    .modal-body {
+        margin-bottom: 24px;
+        color: #495057;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .btn-cancel {
+        padding: 8px 16px;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-delete {
+        padding: 8px 16px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-cancel:hover {
+        background-color: #e9ecef;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+
+    /* Spinner for loading state */
+    .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 8px;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
