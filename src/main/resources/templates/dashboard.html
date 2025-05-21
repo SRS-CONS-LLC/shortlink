@@ -527,23 +527,27 @@
             // Check URL parameters on page load
             function checkUrlParameters() {
                 const url = new URL(window.location.href);
+                console.log('checkUrlParameters='+url);
                 var tabParam = url.searchParams.get('tab');
                 var idParam = url.searchParams.get('id');
+                console.log('checkUrlParameters idparam='+idParam);
+                console.log(JSON.stringify(links.value));
                 if (!idParam) {
                      if(links.value.length>0) {
-                        selectLink(links.value[0].id);
-                        return;
+                         idParam = links.value[0].id;
                      }
                 }
 
-                if (tabParam) {
-                    activeTab.value = tabParam;
+                if (!tabParam) {
+                    tabParam = 'link-in-bio';
+                }
+                console.log('checkUrlParameters idparam2='+idParam);
+
+                if (idParam) {
+                    selectLink(idParam);
                 }
 
-                if (tabParam === 'link-in-bio' && idParam) {
-                    selectedLinkId.value = idParam;
-                    loadLinkDetails(idParam);
-                }
+                activeTab.value = tabParam;
             }
 
 
@@ -866,7 +870,8 @@
 
             // Lifecycle hooks
              onMounted(() => {
-                loadLinks();
+                 console.log('on mounted');
+                 loadLinks();
             });
 
             function undoDelete(index) {
