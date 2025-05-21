@@ -107,23 +107,13 @@ public class ShortLinkService {
         ShortLinkEntity entity = repository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ShortLinkNotFoundException(id));
 
-        List<LinkItemEntity> activeLinks = entity.getLinks().stream()
-                .filter(link -> !link.isDeleted())
-                .collect(Collectors.toList());
-
         return mapper.fromEntityToBusiness(entity);
     }
 
     @Transactional
-    public ShortLinkEntity getShortLinkByCode(String shortCode) {
+    public ShortLinkDto getShortLinkByCode(String shortCode) {
         return repository.findByShortCode(shortCode)
-                .orElse(null);
-    }
-
-    @Transactional
-    public String getOriginalUrl(String shortCode) {
-        return repository.findByShortCode(shortCode)
-                .map(ShortLinkEntity::getOriginalUrl)
+                .map(mapper::fromEntityToBusiness)
                 .orElse(null);
     }
 
