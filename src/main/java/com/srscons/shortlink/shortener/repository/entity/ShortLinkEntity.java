@@ -1,18 +1,10 @@
 package com.srscons.shortlink.shortener.repository.entity;
 
+import com.srscons.shortlink.auth.entity.UserEntity;
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
 import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -82,6 +74,11 @@ public class ShortLinkEntity {
 
     @Column(name = "removeMainLogo")
     private boolean removeMainLogo;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
     public ShortLinkEntity() {
         this.links = new ArrayList<>();
         this.visitMetadata = new ArrayList<>();
@@ -106,4 +103,6 @@ public class ShortLinkEntity {
         links.remove(link);
         link.setShortLink(null);
     }
+
+
 }

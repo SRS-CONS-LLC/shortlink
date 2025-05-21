@@ -23,6 +23,7 @@ public class ShortLinkDto {
     private String shortCode;
     private String originalUrl;
     private List<LinkItemDto> links;
+    private UserDto user;
     private boolean deleted = false;
     private boolean removeMainLogo;
 

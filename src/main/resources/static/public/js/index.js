@@ -388,8 +388,13 @@ createApp({
                 formData.append('layoutType', linkInBio.layoutType.toUpperCase());
 
                 // Collect links
-                linkInBio.links.forEach((link, index) => {
+                for (let index = 0; index < linkInBio.links.length; index++) {
+                    const link = linkInBio.links[index];
+
                     if (link.url && link.title) {
+                        if(!validateUrl(link)) {
+                            throw new Error('Failed to save link in bio');
+                        }
                         formData.append(`links[${index}].title`, link.title);
                         formData.append(`links[${index}].url`, link.url);
 
@@ -405,8 +410,10 @@ createApp({
                         if (link.deleted) {
                             formData.append(`links[${index}].deleted`, 'true');
                         }
+                    }else {
+                        throw new Error('Failed to save link in bio');
                     }
-                });
+                }
                 linkInBio.links.forEach(link => {
                     link.removeLogo = false;
                     link.logoFile = null; // faylı reset et
@@ -574,7 +581,7 @@ createApp({
             link.url = testUrl;
 
             // Regex to validate public URLs with a domain (like .com, .net, etc.)
-            const urlRegex = /^https?:\/\/www\.[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/;
+            const urlRegex = /^https?:\/\/[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+(:\d+)?(\/[^\s]*)?$/;
 
             if (urlRegex.test(testUrl)) {
                 link.isValidUrl = true;

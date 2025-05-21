@@ -1,11 +1,15 @@
 package com.srscons.shortlink.shortener.controller;
 
+import com.srscons.shortlink.auth.entity.UserEntity;
+import com.srscons.shortlink.auth.util.CONSTANTS;
 import com.srscons.shortlink.shortener.controller.dto.request.ShortLinkRequestDto;
 import com.srscons.shortlink.shortener.controller.dto.response.ShortLinkResponseDto;
 import com.srscons.shortlink.shortener.controller.mapper.ShortLinkViewMapper;
 import com.srscons.shortlink.shortener.exception.ShortLinkNotFoundException;
 import com.srscons.shortlink.shortener.service.ShortLinkService;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
+import com.srscons.shortlink.shortener.service.dto.UserDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -27,8 +31,13 @@ public class ShortLinkController {
 
     @PostMapping
     public ResponseEntity<ShortLinkResponseDto> createShortLink(
-            @Valid @ModelAttribute ShortLinkRequestDto request) {
-        ShortLinkDto shortLinkDto = shortLinkViewMapper.fromRequestToBusiness(request);
+            @Valid @ModelAttribute ShortLinkRequestDto shortLinkRequestDto,
+            HttpServletRequest request) {
+        ShortLinkDto shortLinkDto = shortLinkViewMapper.fromRequestToBusiness(shortLinkRequestDto);
+
+        UserEntity loggedInUser = (UserEntity) request.getAttribute(CONSTANTS.LOGGED_IN_USER);
+        shortLinkDto.setUser(new UserDto(loggedInUser.getId()));
+
         ShortLinkDto createdDto = shortLinkService.create(shortLinkDto);
         ShortLinkResponseDto responseDto = shortLinkViewMapper.fromBusinessToResponse(createdDto);
         return ResponseEntity.ok(responseDto);
@@ -50,9 +59,10 @@ public class ShortLinkController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ShortLinkResponseDto>> getAllLinks() {
+    public ResponseEntity<List<ShortLinkResponseDto>> getAllLinks(HttpServletRequest request) {
         try {
-            List<ShortLinkDto> links = shortLinkService.findAll();
+            UserEntity loggedInUser = (UserEntity) request.getAttribute(CONSTANTS.LOGGED_IN_USER);
+            List<ShortLinkDto> links = shortLinkService.findAll(loggedInUser.getId());
             List<ShortLinkResponseDto> responseDtos = links.stream()
                     .map(shortLinkViewMapper::fromBusinessToResponse)
                     .toList();

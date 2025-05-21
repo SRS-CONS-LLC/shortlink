@@ -38,9 +38,9 @@ public class ShortLinkService {
     private static final int SHORT_CODE_LENGTH = 6;
     private static final int MAX_ATTEMPTS = 10;
 
-    public List<ShortLinkDto> findAll() {
+    public List<ShortLinkDto> findAll(Long userId) {
         try {
-            List<ShortLinkEntity> entities = repository.findAllByDeletedFalse();
+            List<ShortLinkEntity> entities = repository.findAllByDeletedFalseAndUserId(userId);
             log.info("Found {} non-deleted short links", entities.size());
             
             return entities.stream()
@@ -124,7 +124,6 @@ public class ShortLinkService {
 
         String userAgent = request.getHeader("User-Agent");
         String referer = request.getHeader("Referer");
-        String queryString = request.getQueryString();
 
         MetaDataEntity metadata = new MetaDataEntity();
         metadata.setShortLink(shortLink);

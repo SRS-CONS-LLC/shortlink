@@ -41,13 +41,17 @@ public class IndexController {
             return "error/404";
         }
 
-        if (shortLink.getLinkType() != LinkType.BIO) {
-            return "error/404";
-        }
-
         shortLinkService.saveVisitMetadata(shortCode, request);
 
-        model.addAttribute("link", shortLink);
-        return "preview";
+        if (shortLink.getLinkType() == LinkType.BIO) {
+            model.addAttribute("link", shortLink);
+            return "preview";
+        }
+
+        if (shortLink.getLinkType() == LinkType.REDIRECT) {
+            return "redirect:" + shortLink.getOriginalUrl();
+        }
+
+        return "error/404";
     }
 }
