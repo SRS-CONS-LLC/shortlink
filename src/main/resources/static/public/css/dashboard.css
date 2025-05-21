@@ -120,12 +120,11 @@ body {
 }
 
 .preview-section {
-    flex: 1;
+    height: auto;
     background-color: white;
     border-radius: 8px;
     padding-top: 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    display: flex;
     justify-content: center;
 }
 
@@ -301,7 +300,6 @@ body {
 /* Preview Styles */
 .preview-container {
     width: 450px;
-    height: 350px;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
