@@ -121,7 +121,6 @@ body {
 
 .preview-section {
     height: auto;
-    background-color: white;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     justify-content: center;
