@@ -123,7 +123,6 @@ body {
     height: auto;
     background-color: white;
     border-radius: 8px;
-    padding-top: 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     justify-content: center;
 }
@@ -354,7 +353,7 @@ body {
 }
 
 .preview-links.grid {
-    display: grid;
+    display: grid !important;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
 }
