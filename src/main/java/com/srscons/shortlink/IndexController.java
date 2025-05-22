@@ -5,7 +5,6 @@ import com.srscons.shortlink.shortener.service.ShortLinkService;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,8 +20,24 @@ public class IndexController {
 
     @RequestMapping(value = {"/index", "/"})
     public String indexPage() {
-        return "index";
+        return "landingpage/index";
     }
+
+    @RequestMapping(value = {"/privacy"})
+    public String privacyPage() {
+        return "landingpage/privacy";
+    }
+
+    @RequestMapping(value = {"/terms"})
+    public String termsPage() {
+        return "landingpage/terms";
+    }
+
+    @RequestMapping(value = {"/support"})
+    public String supportPage() {
+        return "landingpage/support";
+    }
+
 
     @RequestMapping("/dashboard")
     public String dashboardPage() {
