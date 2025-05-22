@@ -38,7 +38,6 @@ public class IndexController {
         return "landingpage/support";
     }
 
-
     @RequestMapping("/dashboard")
     public String dashboardPage() {
         return "dashboard";

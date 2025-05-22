@@ -44,13 +44,14 @@ public class PrepareFilter extends OncePerRequestFilter {
         try {
             boolean isLoggedIn = prepareUser(request, response);
             if (!isLoggedIn) {
-                if (UrlAntMatcher.of(request.getRequestURI())
-                        .notContainsAny("/public/**", "/login/**", "/oauth2/**", "/logout", "/index", "/",
-                                "/privacy", "/terms", "/support", "/plan")) {
+                if (UrlAntMatcher.of(request.getRequestURI()).containsAny(
+                        "/api/**",
+                        "/dashboard/**",
+                        "/account/**")) {
                     response.sendRedirect("/");
                     return;
                 }
-            }else {
+            } else {
                 if (UrlAntMatcher.of(request.getRequestURI()).containsAny("/index", "/")) {
                     response.sendRedirect("/dashboard");
                     return;
