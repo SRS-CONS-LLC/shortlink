@@ -224,14 +224,17 @@
                                                 </div>
                                             </div>
                                             <div class="link-inputs">
-                                                <input type="text"
-                                                       class="form-control link-input"
-                                                       placeholder="Your link address"
-                                                       v-model="link.url"
-                                                       @input="validateUrl(link)"
-                                                       :class="{ 'is-invalid': !link.isValidUrl, 'is-valid': link.isValidUrl}"
-                                                       required>
-                                                <div v-if="!link.isValidUrl" class="invalid-feedback">
+                                                <input
+                                                        type="text"
+                                                        class="form-control link-input"
+                                                        placeholder="Your link address"
+                                                        v-model="link.url"
+                                                        @input="link.touched = true; validateUrl(link)"
+                                                        @blur="link.touched = true; validateUrl(link)"
+                                                        :class="{ 'is-invalid': !link.isValidUrl && link.touched, 'is-valid': link.isValidUrl && link.touched }"
+                                                        required
+                                                >
+                                                <div v-if="!link.isValidUrl && link.touched" class="invalid-feedback">
                                                     Please enter a valid URL
                                                 </div>
                                                 <input type="text" class="link-input" placeholder="Title"
@@ -390,9 +393,9 @@
                 shortUrl:'',
                 originalUrl:'',
                 links: [
-                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
-                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
-                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false}
+                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false, touched: false},
+                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false, touched: false},
+                    {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false, touched: false}
                 ]
             });
 
@@ -496,7 +499,9 @@
                     url: '',
                     logoFile: null,
                     logoPreview: null,
-                    logoUrl: null
+                    logoUrl: null,
+                    removeLogo: false,
+                    touched: false
                 });
             }
 
@@ -690,7 +695,8 @@
                             logoUrl: link.logoUrl || null,
                             removeLogo: false,
                             deleted: link.deleted || false,
-                            isValidUrl: validateUrl(link)
+                            isValidUrl: validateUrl(link),
+                            touched: false
                         }));
                     } else {
                         // Reset to default if no links
@@ -703,7 +709,8 @@
                                 logoUrl: null,
                                 removeLogo: false,
                                 deleted: false,
-                                isValidUrl: false
+                                isValidUrl: false,
+                                touched: false
                             }
                         ];
                     }
