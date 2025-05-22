@@ -396,6 +396,43 @@
                 ]
             });
 
+            // Social media platform logos
+            const platformLogos = {
+                instagram: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/2048px-Instagram_icon.png',
+                youtube: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/2560px-YouTube_full-color_icon_%282017%29.svg.png',
+                tiktok: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/TikTok_logo.svg/2560px-TikTok_logo.svg.png',
+                linkedin: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/800px-LinkedIn_logo_initials.png'
+            };
+
+            // Function to detect platform and set logo
+            function detectPlatformAndSetLogo(url, link) {
+                if (!url) return;
+                
+                const urlLower = url.toLowerCase();
+                if (urlLower.includes('instagram.com')) {
+                    link.logoUrl = platformLogos.instagram;
+                    link.logoPreview = platformLogos.instagram;
+                } else if (urlLower.includes('youtube.com') || urlLower.includes('youtu.be')) {
+                    link.logoUrl = platformLogos.youtube;
+                    link.logoPreview = platformLogos.youtube;
+                } else if (urlLower.includes('tiktok.com')) {
+                    link.logoUrl = platformLogos.tiktok;
+                    link.logoPreview = platformLogos.tiktok;
+                } else if (urlLower.includes('linkedin.com')) {
+                    link.logoUrl = platformLogos.linkedin;
+                    link.logoPreview = platformLogos.linkedin;
+                }
+            }
+
+            // Watch for URL changes in links
+            watch(() => linkInBio.links, (newLinks) => {
+                newLinks.forEach(link => {
+                    if (link.url) {
+                        detectPlatformAndSetLogo(link.url, link);
+                    }
+                });
+            }, { deep: true });
+
             // QR Tag data
             const qrTag = reactive({
                 title: 'CTOUT Link',
