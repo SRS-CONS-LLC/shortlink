@@ -1,8 +1,8 @@
 package com.srscons.shortlink.shortener.controller.dto.request;
 
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
-import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
+import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
