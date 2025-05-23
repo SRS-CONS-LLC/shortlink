@@ -1,5 +1,6 @@
 package com.srscons.shortlink;
 
+import com.srscons.shortlink.util.UrlUtils;
 import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
 import com.srscons.shortlink.shortener.service.ShortLinkService;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
@@ -63,7 +64,19 @@ public class IndexController {
         }
 
         if (shortLink.getLinkType() == LinkType.REDIRECT) {
-            return "redirect:" + shortLink.getOriginalUrl();
+            String originalUrl = shortLink.getOriginalUrl();
+            
+            // Check if it's a supported app URL
+            if (UrlUtils.isAppDeepLinkable(originalUrl)) {
+                // For app URLs, redirect to a special page that handles deep linking
+                model.addAttribute("deepLinkUrl", UrlUtils.getDeepLinkUrl(originalUrl));
+                model.addAttribute("fallbackUrl", UrlUtils.getFallbackUrl(originalUrl));
+                model.addAttribute("appName", UrlUtils.getAppName(originalUrl));
+                return "deep-link-redirect";
+            }
+            
+            // For non-app URLs, redirect normally
+            return "redirect:" + originalUrl;
         }
 
         return "error/404";
