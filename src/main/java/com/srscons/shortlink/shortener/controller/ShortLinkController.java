@@ -1,10 +1,12 @@
 package com.srscons.shortlink.shortener.controller;
 
+import com.srscons.shortlink.shortener.analytics.ShortLinkAnalyticsService;
 import com.srscons.shortlink.shortener.controller.dto.request.ShortLinkRequestDto;
 import com.srscons.shortlink.shortener.controller.dto.response.ShortLinkResponseDto;
 import com.srscons.shortlink.shortener.controller.mapper.ShortLinkViewMapper;
 import com.srscons.shortlink.shortener.exception.ShortLinkNotFoundException;
 import com.srscons.shortlink.shortener.service.ShortLinkService;
+import com.srscons.shortlink.shortener.analytics.AnalyticsDTO;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

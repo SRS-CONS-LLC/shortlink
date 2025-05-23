@@ -1,5 +1,6 @@
-package com.srscons.shortlink.shortener.repository.entity;
+package com.srscons.shortlink.shortener.analytics;
 
+import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -619,7 +619,7 @@
         data() {
             return {
                 activeSection: 'analytics',
-                shortlinkId: null, // URL-dən və ya route-dan əldə ediləcək
+                shortlinkId: null,
                 loading: false,
                 error: null,
                 infoText: null,
@@ -794,20 +794,23 @@
         },
 
         created() {
-// URL-dən shortlinkId əldə edilməsi
+            // selectedLinkId-ni izlə
+            this.$watch('selectedLinkId', (newId) => {
+                if (newId) {
+                    this.shortlinkId = newId;
+                    this.fetchMetaData();
+                }
+            });
+
+            // URL-dən ID-ni yoxla
             const urlParams = new URLSearchParams(window.location.search);
-            this.shortlinkId = urlParams.get('id') || this.$route?.params?.id;
-
-
+            this.shortlinkId = urlParams.get('id');
             if (this.shortlinkId) {
                 this.fetchMetaData();
-            } else {
-                this.error = 'No shortlink ID provided';
             }
         },
 
         methods: {
-                    // Məlumat kartındakı info düyməsinə klikləndikdə, informasiya göstərilməsi
             showInfo(text) {
                 this.infoText = text;
                 this.showInfoModal = true;
@@ -817,26 +820,23 @@
                     this.showInfoModal = false;
                 }, 3000);
             },
-            // API-dan məlumatların çəkilməsi
             async fetchMetaData() {
                 this.loading = true;
                 this.error = null;
 
-                const id = this.shortlinkId || new URLSearchParams(window.location.search).get('id');
-
-                if (!id) {
+                if (!this.shortlinkId) {
                     this.error = "Shortlink ID tapılmadı.";
                     this.loading = false;
                     return;
                 }
 
                 try {
-                    const shortlinkRes = await fetch(`/api/short-links/${id}`);
+                    const shortlinkRes = await fetch(`/api/short-links/${this.shortlinkId}`);
                     if (!shortlinkRes.ok) throw new Error(`Shortlink fetch error: ${shortlinkRes.status}`);
                     const shortlinkData = await shortlinkRes.json();
                     console.log("Shortlink:", shortlinkData);
 
-                    const metaRes = await fetch(`/api/short-links/${id}/metadata`);
+                    const metaRes = await fetch(`/api/short-links/${this.shortlinkId}/metadata`);
                     if (!metaRes.ok) throw new Error(`Metadata fetch error: ${metaRes.status}`);
                     const metadataData = await metaRes.json();
                     console.log("Metadata:", metadataData);
@@ -849,41 +849,31 @@
                     this.loading = false;
                 }
             },
-
-                 // API-dan alınan məlumatların emalı
             processMetaData(metaData) {
-                        // Məlumat yoxdursa və ya array deyilsə
                 if (!metaData || !Array.isArray(metaData)) {
                     this.error = 'Invalid data received from API';
                     return;
                 }
 
-                     // Cihaz sayları üçün dəyişənlər
                 const deviceCounts = {
                     Mobile: 0,
                     Desktop: 0,
                     'Bot/Crawler': 0
                 };
 
-                     // Əməliyyat sistemi və ölkə sayları üçün obyektlər
                 const osCounts = {};
                 const countryCounts = {};
 
-                    // Ümumi statistika rəqəmləri
                 let totalClicks = 0;
                 let totalQRScans = 0;
                 let totalReferrals = 0;
 
-                    // Tarix aralığı üçün başlanğıc və son tarixlər
                 let startDate = null;
                 let endDate = null;
 
-                     // Bütün metadata yazılarının emalı
                 metaData.forEach(entry => {
-                 // Toplam kliklərin sayılması
                     totalClicks++;
 
-                    // Cihaz növünün emalı
                     if (entry.deviceType) {
                         if (entry.deviceType.toLowerCase() === 'mobile' || entry.deviceType.toLowerCase() === 'phone') {
                             deviceCounts.Mobile++;
@@ -894,29 +884,24 @@
                         }
                     }
 
-                        // Əməliyyat sisteminin emalı
                     if (entry.operatingSystem) {
                         const os = entry.operatingSystem;
                         osCounts[os] = (osCounts[os] || 0) + 1;
                     }
 
-                        // Ölkə məlumatının emalı
                     if (entry.country) {
                         const country = entry.country;
                         countryCounts[country] = (countryCounts[country] || 0) + 1;
                     }
 
-                        // QR skanların emalı
                     if (entry.isQRScan) {
                         totalQRScans++;
                     }
 
-                        // Referral sayının emalı
                     if (entry.isReferral) {
                         totalReferrals++;
                     }
 
-                        // Tarix aralığının izlənməsi
                     if (entry.timestamp) {
                         const entryDate = new Date(entry.timestamp);
                         if (!startDate || entryDate < startDate) {
@@ -928,72 +913,59 @@
                     }
                 });
 
-                        // Ümumi metrika məlumatlarının yenilənməsi
                 this.summaryMetrics[0].value = totalClicks;
                 this.summaryMetrics[1].value = totalQRScans;
                 this.summaryMetrics[2].value = totalReferrals;
 
-                            // Cihaz kartının yenilənməsi
                 this.dataCards[0].data = [
                     {label: 'Mobile', value: deviceCounts.Mobile, class: 'mobile-row'},
                     {label: 'Desktop', value: deviceCounts.Desktop, class: 'desktop-row'},
                     {label: 'Bot/Crawler', value: deviceCounts['Bot/Crawler'], class: 'bot-crawler-row'}
                 ];
 
-                            // Ölkə kartının yenilənməsi
                 this.dataCards[1].data = Object.entries(countryCounts)
                     .map(([label, value]) => ({label, value}))
                     .sort((a, b) => b.value - a.value);
 
-                                // OS kartının yenilənməsi
                 this.dataCards[2].data = Object.entries(osCounts)
                     .map(([label, value]) => ({label, value}))
                     .sort((a, b) => b.value - a.value);
 
-                                // Tarix aralığının yenilənməsi
                 if (startDate && endDate) {
                     const formatDate = (date) => {
                         return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
                     };
                     this.dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
                 }
-
-                        // Burda qrafiklər üçün məlumatların (osData, dataPoints, və s.) yenilənməsi
-                        // də həyata keçirilə bilər.
-                        // Bu funksionallıq daha mürəkkəbdir və nümunədə göstərilməmişdir
-            }
-        },
-        methods: {
-            showInfo(message) {
-                alert(message);
+            },
+            selectSection(section) {
+                this.activeSection = section;
             },
             getSectionName(sectionId) {
                 const section = this.sections.find(s => s.id === sectionId);
                 return section ? section.name : 'Unknown';
-            }
-        },
-        methods: {
+            },
+            selectLink(linkId) {
+                selectedLinkId.value = linkId;
+                activeTab.value = 'link-in-bio';
+
+                // URL-i yenilə
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('tab', 'link-in-bio');
+                newUrl.searchParams.set('id', linkId);
+                window.history.pushState({}, '', newUrl);
+
+                // Link məlumatlarını və analytics məlumatlarını yüklə
+                loadLinkDetails(linkId);
+            },
             showInfo(message) {
                 alert(message);
             },
-        },
-
-        // data() {
-        //     return {
-        //         activeSection: 'configuration',
-        //         form: {
-        //             name: '',
-        //             email: ''
-        //         }
-        //     };
-        // },
-        methods: {
             selectSection(section) {
                 this.activeSection = section;
             }
         },
         setup() {
-
             const baseUrl = computed(() => {
                 // Get the current origin (protocol + hostname + port)
                 return window.location.origin;
@@ -1096,18 +1068,16 @@
 
             function selectLink(linkId) {
                 selectedLinkId.value = linkId;
-                activeTab.value = 'link-in-bio';
-
-                // Update URL with both tab and id parameters
+                
+                // URL-i yenilə
                 const newUrl = new URL(window.location.href);
                 newUrl.searchParams.set('tab', 'link-in-bio');
                 newUrl.searchParams.set('id', linkId);
                 window.history.pushState({}, '', newUrl);
 
-                // Load link details
+                // Link məlumatlarını və analytics məlumatlarını yüklə
                 loadLinkDetails(linkId);
             }
-
 
             function addLink() {
                 linkInBio.links.push({
@@ -1195,8 +1165,6 @@
                 }
             }
 
-
-// Updated handleLogoUpload function
             function handleLogoUpload(event) {
                 const file = event.target.files[0];
                 if (file) {
@@ -1213,7 +1181,6 @@
                 }
             }
 
-// Updated deleteLogo function with no immediate DELETE request
             function deleteLogo() {
                 // Flag that the logo should be removed when saving
                 linkInBio.removeMainLogo = true;
@@ -1224,7 +1191,6 @@
                 linkInBio.logoUrl = null;
             }
 
-// Updated handleLinkLogoUpload function
             function handleLinkLogoUpload(event, index) {
                 const file = event.target.files[0];
                 if (file) {
@@ -1241,7 +1207,6 @@
                 }
             }
 
-// Updated deleteLinkLogo function with no immediate DELETE request
             function deleteLinkLogo(index) {
                 // Flag this link's logo for removal when saving
                 linkInBio.links[index].removeLogo = true;
@@ -1252,7 +1217,6 @@
                 linkInBio.links[index].logoUrl = null;
             }
 
-// Updated loadLinkDetails function to initialize removeLogo flags
             async function loadLinkDetails(linkId) {
                 try {
                     const response = await fetch(`/api/short-links/${linkId}`);
@@ -1319,7 +1283,6 @@
                 }
             }
 
-// Updated saveChanges function to handle logo flags
             async function saveChanges() {
                 try {
                     // Show loading state
@@ -1477,7 +1440,6 @@
                     isDeleting.value = false;
                 }
             }
-
 
             function copyToClipboard(text) {
                 navigator.clipboard.writeText(text)

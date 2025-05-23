@@ -1,11 +1,10 @@
 package com.srscons.shortlink.shortener.service;
 
 import com.srscons.shortlink.shortener.exception.ShortLinkNotFoundException;
-import com.srscons.shortlink.shortener.repository.MetaDataRepository;
 import com.srscons.shortlink.shortener.repository.ShortLinkRepository;
 import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.repository.entity.LinkItemEntity;
-import com.srscons.shortlink.shortener.repository.entity.MetaDataEntity;
+import com.srscons.shortlink.shortener.analytics.MetaDataEntity;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import com.srscons.shortlink.shortener.service.mapper.ShortLinkMapper;
 import com.srscons.shortlink.shortener.util.FileUploadService;
@@ -29,8 +28,6 @@ public class ShortLinkService {
     private final ShortLinkMapper mapper;
     private final FileUploadService fileUploadService;
 
-    private final MetaDataRepository metaDataRepository;
-
     private final Random random = new SecureRandom();
 
     private static final Pattern OS_VERSION_PATTERN = Pattern.compile("OS ([\\d_.]+)");
@@ -40,10 +37,6 @@ public class ShortLinkService {
     private static final int SHORT_CODE_LENGTH = 6;
     private static final int MAX_ATTEMPTS = 10;
 
-
-    public List<MetaDataEntity> getMetaDataByShortLinkId(Long shortLinkId) {
-        return metaDataRepository.findAllByShortLink_Id(shortLinkId);
-    }
     public List<ShortLinkDto> findAll() {
         return repository.findAll().stream()
                 .map(mapper::fromEntityToBusiness)
