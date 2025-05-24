@@ -300,8 +300,9 @@ createApp({
                 linkInBio.removeMainLogo = false;
                 linkInBio.shortCode = linkDetails.shortCode || '';
                 linkInBio.shortUrl = (baseUrl.value +'/'+linkDetails.shortCode) || '';
-                linkInBio.originalUrl = linkDetails.originalUrl;
+                linkInBio.originalUrl = linkDetails.originalUrl || '';
                 linkInBio.linkType = linkDetails.linkType || 'REDIRECT';
+
                 // Update theme color
                 if (linkDetails.themeColor) {
                     linkInBio.themeColor = linkDetails.themeColor;
@@ -325,32 +326,38 @@ createApp({
                     linkInBio.logoFile = null;
                 }
 
-                // Update links
-                if (linkDetails.links && linkDetails.links.length > 0) {
-                    linkInBio.links = linkDetails.links.map(link => ({
-                        title: link.title || '',
-                        url: link.url || '',
-                        logoFile: null,
-                        logoPreview: link.logoUrl || null,
-                        logoUrl: link.logoUrl || null,
-                        removeLogo: false,
-                        deleted: link.deleted || false,
-                        isValidUrl: validateUrl(link)
-                    }));
-                } else {
-                    // Reset to default if no links
-                    linkInBio.links = [
-                        {
-                            title: 'Title',
-                            url: '',
+                // Only update links if linkType is BIO
+                if (linkInBio.linkType === 'BIO') {
+                    // Update links
+                    if (linkDetails.links && linkDetails.links.length > 0) {
+                        linkInBio.links = linkDetails.links.map(link => ({
+                            title: link.title || '',
+                            url: link.url || '',
                             logoFile: null,
-                            logoPreview: null,
-                            logoUrl: null,
+                            logoPreview: link.logoUrl || null,
+                            logoUrl: link.logoUrl || null,
                             removeLogo: false,
-                            deleted: false,
-                            isValidUrl: false
-                        }
-                    ];
+                            deleted: link.deleted || false,
+                            isValidUrl: validateUrl(link)
+                        }));
+                    } else {
+                        // Reset to default if no links
+                        linkInBio.links = [
+                            {
+                                title: 'Title',
+                                url: '',
+                                logoFile: null,
+                                logoPreview: null,
+                                logoUrl: null,
+                                removeLogo: false,
+                                deleted: false,
+                                isValidUrl: false
+                            }
+                        ];
+                    }
+                } else {
+                    // For REDIRECT type, initialize with empty links array
+                    linkInBio.links = [];
                 }
             } catch (error) {
                 console.error('Error loading link details:', error);
@@ -363,61 +370,68 @@ createApp({
                 // Show loading state
                 isSaving.value = true;
 
-                // Collect form data
                 const formData = new FormData();
                 formData.append('title', linkInBio.title);
                 formData.append('description', linkInBio.description);
                 formData.append('themeColor', linkInBio.themeColor);
-                formData.append('originalUrl', linkInBio.originalUrl);
+                formData.append('themeType', linkInBio.themeType.toUpperCase());
+                formData.append('layoutType', linkInBio.layoutType.toUpperCase());
                 formData.append('linkType', linkInBio.linkType);
 
                 // Handle main logo
                 if (linkInBio.logoFile) {
-                    // New file uploaded
                     formData.append('logoFile', linkInBio.logoFile);
-                } else if (linkInBio.logoUrl && !linkInBio.removeMainLogo) {
-                    // Existing logo kept
-                    formData.append('logoUrl', linkInBio.logoUrl);
-                } else if (linkInBio.removeMainLogo) {
-                    // Logo removed
-                    formData.append('removeMainLogo', 'true');
-                }
-
-                // Add theme and layout
-                formData.append('themeType', linkInBio.themeType.toUpperCase());
-                formData.append('layoutType', linkInBio.layoutType.toUpperCase());
-
-                // Collect links
-                for (let index = 0; index < linkInBio.links.length; index++) {
-                    const link = linkInBio.links[index];
-
-                    if (link.url && link.title) {
-                        if(!validateUrl(link)) {
-                            throw new Error('Failed to save link in bio');
-                        }
-                        formData.append(`links[${index}].title`, link.title);
-                        formData.append(`links[${index}].url`, link.url);
-
-                        if (link.logoFile) {
-                            formData.append(`links[${index}].logoFile`, link.logoFile);
-                        } else {
-                            if (link.removeLogo) {
-                                formData.append(`links[${index}].removeLogo`, 'true');
-                            } else if (link.logoUrl) {
-                                formData.append(`links[${index}].logoUrl`, link.logoUrl);
-                            }
-                        }
-                        if (link.deleted) {
-                            formData.append(`links[${index}].deleted`, 'true');
-                        }
-                    }else {
-                        throw new Error('Failed to save link in bio');
+                } else {
+                    if (linkInBio.removeMainLogo) {
+                        formData.append('removeMainLogo', 'true');
+                    } else if (linkInBio.logoUrl) {
+                        formData.append('logoUrl', linkInBio.logoUrl);
                     }
                 }
-                linkInBio.links.forEach(link => {
-                    link.removeLogo = false;
-                    link.logoFile = null; // faylı reset et
-                });
+
+                // Validate and handle redirect URL if linkType is REDIRECT
+                if (linkInBio.linkType === 'REDIRECT') {
+                    if (!linkInBio.originalUrl) {
+                        throw new Error('Redirect URL is required for redirect links');
+                    }
+                    if (!validateUrl({ url: linkInBio.originalUrl })) {
+                        throw new Error('Invalid redirect URL');
+                    }
+                    formData.append('originalUrl', linkInBio.originalUrl);
+                }
+
+                // Only process links if linkType is BIO
+                if (linkInBio.linkType === 'BIO') {
+                    for (let index = 0; index < linkInBio.links.length; index++) {
+                        const link = linkInBio.links[index];
+                        if (link.url && link.title) {
+                            if(!validateUrl(link)) {
+                                throw new Error('Failed to save link in bio');
+                            }
+                            formData.append(`links[${index}].title`, link.title);
+                            formData.append(`links[${index}].url`, link.url);
+
+                            if (link.logoFile) {
+                                formData.append(`links[${index}].logoFile`, link.logoFile);
+                            } else {
+                                if (link.removeLogo) {
+                                    formData.append(`links[${index}].removeLogo`, 'true');
+                                } else if (link.logoUrl) {
+                                    formData.append(`links[${index}].logoUrl`, link.logoUrl);
+                                }
+                            }
+                            if (link.deleted) {
+                                formData.append(`links[${index}].deleted`, 'true');
+                            }
+                        } else {
+                            throw new Error('Failed to save link in bio');
+                        }
+                    }
+                    linkInBio.links.forEach(link => {
+                        link.removeLogo = false;
+                        link.logoFile = null;
+                    });
+                }
 
                 for (const [key, value] of formData.entries()) {
                     console.log('📝 FormData:', key, value);

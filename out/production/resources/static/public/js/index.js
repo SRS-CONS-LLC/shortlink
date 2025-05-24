@@ -301,7 +301,7 @@ createApp({
                 linkInBio.shortCode = linkDetails.shortCode || '';
                 linkInBio.shortUrl = (baseUrl.value +'/'+linkDetails.shortCode) || '';
                 linkInBio.originalUrl = linkDetails.originalUrl;
-                linkInBio.linkType = linkDetails.linkType || 'REDIRECT';
+                linkInBio.linkType = linkDetails.linkType || undefined;
                 // Update theme color
                 if (linkDetails.themeColor) {
                     linkInBio.themeColor = linkDetails.themeColor;
@@ -387,37 +387,38 @@ createApp({
                 formData.append('themeType', linkInBio.themeType.toUpperCase());
                 formData.append('layoutType', linkInBio.layoutType.toUpperCase());
 
-                // Collect links
-                for (let index = 0; index < linkInBio.links.length; index++) {
-                    const link = linkInBio.links[index];
+                // Only process links if linkType is BIO
+                if (linkInBio.linkType === 'BIO') {
+                    for (let index = 0; index < linkInBio.links.length; index++) {
+                        const link = linkInBio.links[index];
+                        if (link.url && link.title) {
+                            if(!validateUrl(link)) {
+                                throw new Error('Failed to save link in bio');
+                            }
+                            formData.append(`links[${index}].title`, link.title);
+                            formData.append(`links[${index}].url`, link.url);
 
-                    if (link.url && link.title) {
-                        if(!validateUrl(link)) {
+                            if (link.logoFile) {
+                                formData.append(`links[${index}].logoFile`, link.logoFile);
+                            } else {
+                                if (link.removeLogo) {
+                                    formData.append(`links[${index}].removeLogo`, 'true');
+                                } else if (link.logoUrl) {
+                                    formData.append(`links[${index}].logoUrl`, link.logoUrl);
+                                }
+                            }
+                            if (link.deleted) {
+                                formData.append(`links[${index}].deleted`, 'true');
+                            }
+                        } else {
                             throw new Error('Failed to save link in bio');
                         }
-                        formData.append(`links[${index}].title`, link.title);
-                        formData.append(`links[${index}].url`, link.url);
-
-                        if (link.logoFile) {
-                            formData.append(`links[${index}].logoFile`, link.logoFile);
-                        } else {
-                            if (link.removeLogo) {
-                                formData.append(`links[${index}].removeLogo`, 'true');
-                            } else if (link.logoUrl) {
-                                formData.append(`links[${index}].logoUrl`, link.logoUrl);
-                            }
-                        }
-                        if (link.deleted) {
-                            formData.append(`links[${index}].deleted`, 'true');
-                        }
-                    }else {
-                        throw new Error('Failed to save link in bio');
                     }
+                    linkInBio.links.forEach(link => {
+                        link.removeLogo = false;
+                        link.logoFile = null; // faylı reset et
+                    });
                 }
-                linkInBio.links.forEach(link => {
-                    link.removeLogo = false;
-                    link.logoFile = null; // faylı reset et
-                });
 
                 for (const [key, value] of formData.entries()) {
                     console.log('📝 FormData:', key, value);
@@ -565,11 +566,16 @@ createApp({
 
         // URL validation function
         function validateUrl(link) {
+            // Only validate if linkType is BIO
+            if (linkInBio.linkType !== 'BIO') {
+                link.isValidUrl = true;
+                return true;
+            }
             console.log('link=' + link.url);
 
             if (!link.url) {
                 link.isValidUrl = false;
-                return;
+                return false;
             }
 
             let testUrl = link.url.trim();
@@ -581,7 +587,7 @@ createApp({
             link.url = testUrl;
 
             // Regex to validate public URLs with a domain (like .com, .net, etc.)
-            const urlRegex = /^https?:\/\/[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+(:\d+)?(\/[^\s]*)?$/;
+            const urlRegex = /^https?:\/\/[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+(\:\d+)?(\/[^\s]*)?$/;
 
             if (urlRegex.test(testUrl)) {
                 link.isValidUrl = true;
