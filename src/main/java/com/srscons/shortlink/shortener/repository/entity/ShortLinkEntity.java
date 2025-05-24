@@ -34,6 +34,9 @@ public class ShortLinkEntity {
     @Column(name = "short_code", unique = true, nullable = false)
     private String shortCode;
 
+    @Column(name = "qr_code_svg", columnDefinition = "TEXT")
+    private String qrCodeSvg;
+
     @Column(name = "original_url", nullable = false)
     private String originalUrl;
 

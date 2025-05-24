@@ -21,6 +21,7 @@ public class ShortLinkDto {
     private LinkType linkType;
     private String themeColor;
     private String shortCode;
+    private String qrCodeSvg;
     private String originalUrl;
     private List<LinkItemDto> links;
     private UserDto user;

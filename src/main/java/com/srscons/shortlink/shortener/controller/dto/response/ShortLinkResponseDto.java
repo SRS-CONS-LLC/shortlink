@@ -17,6 +17,7 @@ public class ShortLinkResponseDto {
     private LayoutType layoutType;
     private String themeColor;
     private String shortCode;
+    private String qrCodeSvg;
     private String shortUrl;
     private String originalUrl;
     private LinkType linkType;

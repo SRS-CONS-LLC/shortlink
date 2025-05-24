@@ -73,6 +73,12 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // ZXing core for QR code generation
+    implementation 'com.google.zxing:core:3.5.3'
+    // ZXing JavaSE for image-related utilities
+    implementation 'com.google.zxing:javase:3.5.3'
+    implementation 'io.nayuki:qrcodegen:1.8.0'
 }
 
 tasks.named('test') {
