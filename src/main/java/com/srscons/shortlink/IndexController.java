@@ -52,7 +52,7 @@ public class IndexController {
     @GetMapping("/{shortCode}")
     public String previewPage(@PathVariable("shortCode") String shortCode, Model model, HttpServletRequest request) {
         ShortLinkDto shortLink = shortLinkService.getShortLinkByCode(shortCode);
-        if (shortLink == null) {
+        if (shortLink == null || shortLink.getLinkType() == null) {
             return "error/404";
         }
 

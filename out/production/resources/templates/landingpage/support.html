@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Center - CITOUT.ME</title>
+    <meta name="description" content="Get help with CITOUT.ME URL shortener. Find answers, contact support, and access helpful resources.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0 60px;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .support-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            height: 100%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .support-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .support-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .status-operational { background-color: #28a745; }
+        .status-maintenance { background-color: #ffc107; }
+        .status-issues { background-color: #dc3545; }
+
+        .quick-action-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            color: white;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .contact-form {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .resource-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            height: 100%;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .resource-card:hover {
+            background: #e9ecef;
+            transform: translateY(-3px);
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .tutorial-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3" href="/">
+            <i class="bi bi-link-45deg"></i> CITOUT.ME
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/terms">Terms</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/privacy">Privacy</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/support">Support</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-primary ms-2" href="/signup">Get Started</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-4">Support Center</h1>
+                <p class="lead">We're here to help! Find answers, get support, and learn how to make the most of CITOUT.ME.</p>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular FAQs -->
+<section class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h2 class="display-6 fw-bold mb-3">Frequently Asked Questions</h2>
+                <p class="lead text-muted">Quick answers to common questions</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    <!-- FAQ 1 -->
+                    <div class="faq-item">
+                        <div class="accordion-header">
+                            <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                How do I create a shortened URL?
+                            </button>
+                        </div>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Simply paste your long URL into the input field on our homepage and click "Generate." You can also customize your short link and add tracking parameters if you have a paid account.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="faq-item">
+                        <div class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                Can I track clicks on my shortened links?
+                            </button>
+                        </div>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes! All users get basic click tracking. Pro users get advanced analytics including geographic data, device information, referrer sources, and time-based analytics with detailed charts and export options.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="faq-item">
+                        <div class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                How do I set up a custom domain?
+                            </button>
+                        </div>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Custom domains are available for Pro and Enterprise users. Go to Settings > Custom Domain, add your domain, and follow the DNS configuration instructions. Our support team can help with setup if needed.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="faq-item">
+                        <div class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                Is there an API for developers?
+                            </button>
+                        </div>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Yes! We provide a comprehensive REST API for Pro and Enterprise users. You can programmatically create links, retrieve analytics, manage domains, and integrate with your applications. Full documentation is available in our developer portal.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 5 -->
+                    <div class="faq-item">
+                        <div class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                What happens if I exceed my plan limits?
+                            </button>
+                        </div>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We'll notify you before you reach your limits. You can upgrade your plan or purchase additional credits. Your existing links will always continue to work, but new link creation may be temporarily paused until you upgrade.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 6 -->
+                    <div class="faq-item">
+                        <div class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                How do I create QR codes for my links?
+                            </button>
+                        </div>
+                        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Every shortened link automatically has a QR code available. Just add "/qr" to the end of your short link, or use the QR code button in your dashboard. Pro users can customize QR code colors and add logos.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Form -->
+<section id="contact-form" class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="contact-form">
+                    <h2 class="mb-4">
+                        <i class="bi bi-envelope"></i> Contact Support
+                    </h2>
+                    <p class="mb-4">Can't find what you're looking for? Send us a message and we'll get back to you soon.</p>
+
+                    <p>support@srscons.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h5><i class="bi bi-link-45deg"></i> CITOUT.ME</h5>
+                <p class="text-muted">A service by SRSCONS LLC - Smart URL shortening and analytics platform</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="mb-2">
+                    <a href="/privacy" class="text-white me-3">Privacy Policy</a>
+                    <a href="/terms" class="text-white me-3">Terms of Service</a>
+                    <a href="/support" class="text-white">Support</a>
+                </div>
+                <div class="mb-2">
+                    <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="text-white me-3"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="text-white"><i class="bi bi-github"></i></a>
+                </div>
+                <p class="text-muted small">© 2025 SRSCONS LLC. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Search functionality simulation
+    document.querySelector('.search-box input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            alert('Search functionality would be implemented here');
+        }
+    });
+
+    // Live chat simulation
+    document.querySelectorAll('.quick-action-btn').forEach(btn => {
+        if (btn.textContent.includes('Start Chat')) {
+            btn.addEventListener('click', function() {
+                alert('Live chat would open here. For now, please email support@srscons.com');
+            });
+        }
+    });
+</script>

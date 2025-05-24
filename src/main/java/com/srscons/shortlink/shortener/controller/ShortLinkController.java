@@ -10,12 +10,12 @@ import com.srscons.shortlink.shortener.service.ShortLinkService;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import com.srscons.shortlink.shortener.service.dto.UserDto;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class ShortLinkController {
 
     @PostMapping
     public ResponseEntity<ShortLinkResponseDto> createShortLink(
-            @Valid @ModelAttribute ShortLinkRequestDto shortLinkRequestDto,
+            @Validated @ModelAttribute ShortLinkRequestDto shortLinkRequestDto,
             HttpServletRequest request) {
         ShortLinkDto shortLinkDto = shortLinkViewMapper.fromRequestToBusiness(shortLinkRequestDto);
 
@@ -46,7 +46,7 @@ public class ShortLinkController {
     @PutMapping("/{id}")
     public ResponseEntity<ShortLinkResponseDto> updateShortLink(
             @PathVariable("id") Long id,
-            @Valid @ModelAttribute ShortLinkRequestDto request) {
+            @Validated @ModelAttribute ShortLinkRequestDto request) {
         try {
             ShortLinkDto shortLinkDto = shortLinkViewMapper.fromRequestToBusiness(request);
             shortLinkDto.setId(id);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CTOUT Dashboard – Draft Smartlink</title>
+    <title>CITOUT Dashboard – Draft Smartlink</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="/public/css/dashboard.css" rel="stylesheet">
@@ -14,24 +14,9 @@
 <div class="d-flex layout">
 
 <!-- Sidebar -->
-    <div class="sidebar">
-        <div>
-            <h5 class="fw-bold ps-2">CTOUT</h5>
-            <div class="section-title">Main</div>
-            <a href="#" class="nav-link"><i class="bi bi-grid"></i> Summary</a>
-            <a href="/plan" class="nav-link"><i class="bi bi-currency-dollar"></i> Plan</a>
-        </div>
-        <div>
-            <div class="user-card mb-2">💡 Starter</div>
-            <a href="/account" class="d-flex align-items-center gap-2 px-3 py-2 rounded-pill text-decoration-none"
-               style="background: #f8fafd; border: 1px solid #dbe1ea;">
-                <img th:src="${loggedInUser.picture}" alt="User" referrerpolicy="no-referrer" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
-                <span class="fw-bold text-dark" th:text="${loggedInUser.name+' '+loggedInUser.surname}"></span>
-            </a>
-        </div>
-    </div>
+<template th:insert="sidebar.html"></template>
 
-<!-- Main Content -->
+    <!-- Main Content -->
 <div class="main-content">
     <h4 class="fw-bold mb-3"><i class="bi bi-link-45deg"></i> Pricing</h4>
 

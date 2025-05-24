@@ -66,7 +66,7 @@ public class ShortLinkService {
         entity.setOriginalUrl("https://www.citout.me");
         entity.setShortCode(generateUniqueShortCode());
         if (dto.getLinkType() == null) {
-            entity.setLinkType(LinkType.REDIRECT); // Default to REDIRECT if not specified
+            entity.setLinkType(null); // Allow undefined
         } else {
             entity.setLinkType(dto.getLinkType());
         }
