@@ -6,7 +6,7 @@
 
     <title>CITOUT Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Vue.js -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -49,18 +49,19 @@
                         <div class="form-section-title">Link Name <i class="bi bi-question-circle"></i>
                         </div>
                         <div class="input-wrapper">
-                            <i class="bi bi-bookmark"></i>
-                            <input type="text" class="readonly-input" v-model="linkInBio.title">
+                            <input type="text" class="form-control" v-model="linkInBio.title">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-section-title">Link URL <i class="bi bi-question-circle"></i>
                         </div>
-                        <div class="input-wrapper">
-                            <i class="bi bi-link-45deg"></i>
-                            <span class="readonly-input">{{ linkInBio.shortUrl }}</span>
-                            <button class="icon-btn" @click="copyToClipboard(`${linkInBio.shortUrl}`)"><i
-                                    class="bi bi-copy"></i></button>
+                        <div class="input-wrapper form-control readonly-input">
+                            <span>{{ linkInBio.shortUrl }}</span>
+                            <button class="icon-btn btn" @click="copyToClipboard(`${linkInBio.shortUrl}`)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+                                </svg>
+                            </button>
                             <button class="icon-btn" @click="openLink(`${linkInBio.shortUrl}`)"><i
                                     class="bi bi-box-arrow-up-right"></i></button>
                         </div>
@@ -70,7 +71,7 @@
                         </div>
                         <div class="input-wrapper">
                             <select class="form-control" v-model="linkInBio.linkType">
-                                <option value="">-- Choose Link Type --</option>
+                                <option value="-1">-- Choose Link Type --</option>
                                 <option value="REDIRECT">Redirect</option>
                                 <option value="BIO">Bio</option>
                             </select>
@@ -88,14 +89,6 @@
                         <div>
                             <div class="row">
                                 <div class="col-12 col-sm-12 col-md-6 form-section">
-
-                                    <div class="alert alert-success" v-if="alerts.success.show">
-                                        {{ alerts.success.message
-                                        }}
-                                    </div>
-                                    <div class="alert alert-danger" v-if="alerts.error.show">{{ alerts.error.message
-                                        }}
-                                    </div>
 
                                     <div class="form-group">
                                         <label for="title">Title</label>
@@ -240,9 +233,7 @@
                                             </template>
                                         </div>
                                     </div>
-                                    <button class="save-btn" @click="saveChanges" :disabled="isSaving">
-                                        {{ isSaving ? 'Saving...' : 'Save Changes' }}
-                                    </button>
+
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-6  preview-section">
                                     <div class="preview-container">
@@ -277,7 +268,7 @@
                         </div>
                     </div>
 
-                    <div v-if="linkInBio.linkType === 'REDIRECT'" id="redirect-url" class="col-12">
+                    <div v-if="linkInBio.linkType === 'REDIRECT'" id="redirect-url" class="col-6">
                         <div class="mt-4">
                             <label class="form-label fw-semibold">Redirect URL settings</label>
                         </div>
@@ -285,8 +276,22 @@
                         </div>
                         <div class="input-wrapper">
                             <i class="bi bi-bookmark"></i>
-                            <input type="text" class="readonly-input" v-model="linkInBio.originalUrl">
+                            <input type="text" class="form-control" v-model="linkInBio.originalUrl">
                         </div>
+                    </div>
+
+                    <div class="col-md-12 d-flex justify-content-center">
+                        <div class="position-fixed top-0 start-50 translate-middle-x mt-3 z-3" style="min-width: 300px;">
+                            <div class="alert alert-success" v-if="alerts.success.show">
+                                {{ alerts.success.message }}
+                            </div>
+                            <div class="alert alert-danger" v-if="alerts.error.show">
+                                {{ alerts.error.message }}
+                            </div>
+                        </div>
+                        <button class="save-btn" @click="saveChanges" :disabled="isSaving">
+                            {{ isSaving ? 'Saving...' : 'Save Changes' }}
+                        </button>
                     </div>
                 </div>
             </div>

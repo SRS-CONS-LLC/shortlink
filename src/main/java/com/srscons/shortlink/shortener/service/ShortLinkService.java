@@ -65,11 +65,6 @@ public class ShortLinkService {
         ShortLinkEntity entity = mapper.fromBusinessToEntity(dto);
         entity.setOriginalUrl("https://www.citout.me");
         entity.setShortCode(generateUniqueShortCode());
-        if (dto.getLinkType() == null) {
-            entity.setLinkType(LinkType.REDIRECT); // Default to REDIRECT if not specified
-        } else {
-            entity.setLinkType(dto.getLinkType());
-        }
 
         // Handle link items
         if (dto.getLinks() != null) {
@@ -168,7 +163,7 @@ public class ShortLinkService {
         }
 
         // Update link items based on index (position)
-        if (dto.getLinks() != null) {
+        if (dto.getLinks() != null && dto.getLinkType() == LinkType.BIO) {
             List<ShortLinkDto.LinkItemDto> incomingLinks = dto.getLinks();
             log.info("📦 Incoming links:");
             incomingLinks.forEach(l -> log.info("→ {} | deleted = {}", l.getTitle(), l.getDeleted()));

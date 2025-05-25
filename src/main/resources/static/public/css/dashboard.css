@@ -53,16 +53,12 @@
 .input-wrapper {
     display: flex;
     align-items: center;
-    background: #f8fafd;
-    border: 1px solid #dbe1ea;
-    border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
 }
 
 .readonly-input {
     flex: 1;
     border: none;
-    background: transparent;
+    background: #acacac82;
     margin: 0 0.5rem;
 }
 
@@ -403,7 +399,6 @@
 }
 
 .save-btn {
-    width: 100%;
     padding: 12px;
     background-color: #4CAF50;
     color: white;

@@ -166,7 +166,7 @@ createApp({
                 formData.append('themeColor', '#000000');
                 formData.append('themeType', 'AUTO');
                 formData.append('layoutType', 'LIST');
-                formData.append('linkType', 'REDIRECT');
+                formData.append('linkType', null);
 
                 // Add one empty link
                 formData.append('links[0].title', 'New Link');
@@ -301,7 +301,7 @@ createApp({
                 linkInBio.shortCode = linkDetails.shortCode || '';
                 linkInBio.shortUrl = (baseUrl.value +'/'+linkDetails.shortCode) || '';
                 linkInBio.originalUrl = linkDetails.originalUrl;
-                linkInBio.linkType = linkDetails.linkType || 'REDIRECT';
+                linkInBio.linkType = linkDetails.linkType || '-1';
                 // Update theme color
                 if (linkDetails.themeColor) {
                     linkInBio.themeColor = linkDetails.themeColor;
@@ -387,40 +387,38 @@ createApp({
                 formData.append('themeType', linkInBio.themeType.toUpperCase());
                 formData.append('layoutType', linkInBio.layoutType.toUpperCase());
 
-                // Collect links
-                for (let index = 0; index < linkInBio.links.length; index++) {
-                    const link = linkInBio.links[index];
+                if(linkInBio.linkType === 'BIO') {
+                    // Collect links
+                    for (let index = 0; index < linkInBio.links.length; index++) {
+                        const link = linkInBio.links[index];
 
-                    if (link.url && link.title) {
-                        if(!validateUrl(link)) {
+                        if (link.url && link.title) {
+                            if(!validateUrl(link)) {
+                                throw new Error('Failed to save link in bio');
+                            }
+                            formData.append(`links[${index}].title`, link.title);
+                            formData.append(`links[${index}].url`, link.url);
+
+                            if (link.logoFile) {
+                                formData.append(`links[${index}].logoFile`, link.logoFile);
+                            } else {
+                                if (link.removeLogo) {
+                                    formData.append(`links[${index}].removeLogo`, 'true');
+                                } else if (link.logoUrl) {
+                                    formData.append(`links[${index}].logoUrl`, link.logoUrl);
+                                }
+                            }
+                            if (link.deleted) {
+                                formData.append(`links[${index}].deleted`, 'true');
+                            }
+                        }else {
                             throw new Error('Failed to save link in bio');
                         }
-                        formData.append(`links[${index}].title`, link.title);
-                        formData.append(`links[${index}].url`, link.url);
-
-                        if (link.logoFile) {
-                            formData.append(`links[${index}].logoFile`, link.logoFile);
-                        } else {
-                            if (link.removeLogo) {
-                                formData.append(`links[${index}].removeLogo`, 'true');
-                            } else if (link.logoUrl) {
-                                formData.append(`links[${index}].logoUrl`, link.logoUrl);
-                            }
-                        }
-                        if (link.deleted) {
-                            formData.append(`links[${index}].deleted`, 'true');
-                        }
-                    }else {
-                        throw new Error('Failed to save link in bio');
                     }
-                }
-                linkInBio.links.forEach(link => {
-                    link.removeLogo = false;
-                    link.logoFile = null; // faylı reset et
-                });
-
-                for (const [key, value] of formData.entries()) {
-                    console.log('📝 FormData:', key, value);
+                    linkInBio.links.forEach(link => {
+                        link.removeLogo = false;
+                        link.logoFile = null;
+                    });
                 }
 
                 // Determine if this is an update or create
