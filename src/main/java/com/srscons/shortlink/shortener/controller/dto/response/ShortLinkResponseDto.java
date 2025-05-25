@@ -1,8 +1,8 @@
 package com.srscons.shortlink.shortener.controller.dto.response;
 
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
-import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
+import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import lombok.Data;
 
 import java.util.List;

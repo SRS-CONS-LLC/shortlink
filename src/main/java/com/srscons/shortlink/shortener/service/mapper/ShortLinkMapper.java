@@ -1,7 +1,7 @@
 package com.srscons.shortlink.shortener.service.mapper;
 
-import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.repository.entity.LinkItemEntity;
+import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import org.mapstruct.*;
 

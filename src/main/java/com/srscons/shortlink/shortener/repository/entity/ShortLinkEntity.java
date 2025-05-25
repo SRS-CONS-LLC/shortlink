@@ -2,8 +2,8 @@ package com.srscons.shortlink.shortener.repository.entity;
 
 import com.srscons.shortlink.auth.entity.UserEntity;
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
-import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
+import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;

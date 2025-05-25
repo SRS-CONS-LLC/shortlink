@@ -271,13 +271,12 @@ public class ShortLinkService {
 
     public String generateQrCodeSvg(String shortCode) {
         String fullUrl = baseUrl + shortCode;
-
         QrCode qr = QrCode.encodeText(fullUrl, QrCode.Ecc.LOW);
         return toSvgString(qr);
     }
 
     private String toSvgString(QrCode qr) {
-        int border = 1; // Əgər ətrafında boşluq istəsən 1-4 qoy
+        int border = 1;
         int size = qr.size;
 
         StringBuilder pathData = new StringBuilder();
