@@ -325,6 +325,6 @@ public class UrlUtils {
         if (isUberEatsUrl(url)) return "Uber Eats";
         if (isDoorDashUrl(url)) return "DoorDash";
         if (isGrubHubUrl(url)) return "GrubHub";
-        return null;
+        return "URL";
     }
 } 
