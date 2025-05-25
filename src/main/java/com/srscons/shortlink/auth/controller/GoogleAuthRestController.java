@@ -40,7 +40,7 @@ public class GoogleAuthRestController {
     }
 
     @GetMapping("/login/oauth2/code/google")
-    public void handleGoogleCallback(@RequestParam("code") String code, HttpServletResponse response) throws Exception {
+    public void handleGoogleCallback(@RequestParam("code") String code, HttpServletRequest request, HttpServletResponse response) throws Exception {
         final String accessToken = googleAuthService.getAccessToken(code);
         final GoogleAuthService.GoogleUserInfo googleUserInfo = googleAuthService.getGoogleUserInfo(accessToken);
 
@@ -63,7 +63,7 @@ public class GoogleAuthRestController {
 
         userRepository.save(user);
 
-        CookieUtil.setCookie(response, CONSTANTS.ACCESS_TOKEN, accessToken, 60 * 60 * 24 * 30);
+        CookieUtil.setCookie(request, response, CONSTANTS.ACCESS_TOKEN, accessToken, 60 * 60 * 24 * 30);
 
         response.sendRedirect("/dashboard");
     }

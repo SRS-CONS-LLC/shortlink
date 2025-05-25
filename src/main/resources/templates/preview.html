@@ -82,7 +82,7 @@
                                  >
                                 <a class="preview-link text-decoration-none text-reset"
                                    th:each="l, i : ${link.links}"
-                                   th:href="${l.url}"
+                                   th:href="${'/deep/'+link.shortCode+'/'+l.id}"
                                    target="_blank">
                                     <div class="preview-link-icon" th:if="${l.logoUrl != null}">
                                         <img th:src="${l.logoUrl}" th:alt="${l.title}" class="img-fluid">
