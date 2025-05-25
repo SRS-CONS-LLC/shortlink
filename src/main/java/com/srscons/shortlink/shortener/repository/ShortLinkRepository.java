@@ -9,8 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface ShortLinkRepository extends JpaRepository<ShortLinkEntity, Long> {
-    Optional<ShortLinkEntity> findByShortCode(String shortCode);
-    boolean existsByShortCode(String shortCode);
+    Optional<ShortLinkEntity> findByShortCodeIgnoreCase(String shortCode);
+    boolean existsByShortCodeIgnoreCase(String shortCode);
     List<ShortLinkEntity> findAllByDeletedFalseAndUserId(Long userId);
     Optional<ShortLinkEntity> findByIdAndDeletedFalse(Long id);
 } 

@@ -1,5 +1,6 @@
 package com.srscons.shortlink.shortener.service;
 
+import com.srscons.shortlink.shortener.exception.ShortLinkException;
 import com.srscons.shortlink.shortener.exception.ShortLinkNotFoundException;
 import com.srscons.shortlink.shortener.repository.ShortLinkRepository;
 import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
@@ -107,14 +108,14 @@ public class ShortLinkService {
 
     @Transactional
     public ShortLinkDto getShortLinkByCode(String shortCode) {
-        return repository.findByShortCode(shortCode)
+        return repository.findByShortCodeIgnoreCase(shortCode)
                 .map(mapper::fromEntityToBusiness)
                 .orElse(null);
     }
 
     @Transactional
     public void saveVisitMetadata(String shortCode, HttpServletRequest request) {
-        ShortLinkEntity shortLink = repository.findByShortCode(shortCode)
+        ShortLinkEntity shortLink = repository.findByShortCodeIgnoreCase(shortCode)
                 .orElseThrow(() -> new ShortLinkNotFoundException(shortCode));
 
         String userAgent = request.getHeader("User-Agent");
@@ -150,6 +151,14 @@ public class ShortLinkService {
         existing.setLayoutType(dto.getLayoutType());
         existing.setThemeColor(dto.getThemeColor());
         existing.setLinkType(dto.getLinkType());
+
+        if(!dto.getShortCode().equalsIgnoreCase(existing.getShortCode())) {
+            if(repository.existsByShortCodeIgnoreCase(dto.getShortCode())) {
+                throw new ShortLinkException("Short code already exists: " + dto.getShortCode());
+            }
+
+            existing.setShortCode(dto.getShortCode());
+        }
 
         log.info(" update() method was called for Smartlink ID: {}", dto.getId());
 
@@ -239,11 +248,11 @@ public class ShortLinkService {
     private String generateUniqueShortCode() {
         for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
             String shortCode = generateRandomShortCode();
-            if (!repository.existsByShortCode(shortCode)) {
+            if (!repository.existsByShortCodeIgnoreCase(shortCode)) {
                 return shortCode;
             }
         }
-        throw new IllegalStateException("Could not generate unique short code after " + MAX_ATTEMPTS + " attempts");
+        throw new ShortLinkException("Could not generate unique short code after " + MAX_ATTEMPTS + " attempts");
     }
 
     private String generateRandomShortCode() {

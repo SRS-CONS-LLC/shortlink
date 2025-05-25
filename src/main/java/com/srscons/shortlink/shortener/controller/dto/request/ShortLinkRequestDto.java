@@ -34,7 +34,9 @@ public class ShortLinkRequestDto {
     @Size(max = 7, message = "Theme color must be a valid hex color code (e.g., #RRGGBB)")
     private String themeColor;
 
-    
+    @Size(min=6, max = 20, message = "Short code must be between 6 and 20 characters")
+    private String shortCode;
+
     private LinkType linkType;
 
     private List<LinkItemRequestDto> links;

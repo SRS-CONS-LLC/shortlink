@@ -370,6 +370,7 @@ createApp({
                 formData.append('themeColor', linkInBio.themeColor);
                 formData.append('originalUrl', linkInBio.originalUrl);
                 formData.append('linkType', linkInBio.linkType);
+                formData.append('shortCode', linkInBio.shortCode);
 
                 // Handle main logo
                 if (linkInBio.logoFile) {

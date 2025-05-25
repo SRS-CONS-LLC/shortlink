@@ -11,6 +11,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.srscons.shortlink.auth.GoogleProperties;
 import com.srscons.shortlink.auth.exception.InvalidTokenException;
 import com.srscons.shortlink.auth.util.Resources;
+import com.srscons.shortlink.shortener.exception.ShortLinkException;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -104,24 +105,6 @@ public class GoogleAuthService {
             return null;
         }
 
-    }
-
-    public GoogleIdToken.Payload verifyToken(String token) {
-        try {
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
-                    new NetHttpTransport(), JSON_FACTORY)
-                    .setAudience(Collections.singletonList(googleCredentials.getDetails().getClientId()))
-                    .build();
-
-            final GoogleIdToken idToken = verifier.verify(token);
-            if (idToken == null) {
-                throw new InvalidTokenException("Invalid token:" + token);
-            }
-
-            return idToken.getPayload();
-        } catch (Exception e) {
-            throw new InvalidTokenException("Invalid token:" + token, e);
-        }
     }
 
     @Data

@@ -59,7 +59,6 @@
     flex: 1;
     border: none;
     background: #acacac82;
-    margin: 0 0.5rem;
 }
 
 .icon-btn {
@@ -124,14 +123,6 @@
     display: block;
     font-weight: 500;
     margin-bottom: 8px;
-}
-
-.form-control {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
 }
 
 .upload-btn {
