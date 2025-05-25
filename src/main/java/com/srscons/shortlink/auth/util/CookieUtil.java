@@ -23,7 +23,7 @@ public class CookieUtil {
         Cookie tokenCookie = new Cookie(name, value);
         tokenCookie.setHttpOnly(true);
         tokenCookie.setSecure(true); // Only over HTTPS
-        tokenCookie.setDomain(".citout.me"); // with dot to include subdomains
+        tokenCookie.setDomain("citout.me"); // with dot to include subdomains
         tokenCookie.setPath("/");
         tokenCookie.setMaxAge(interval); // 1 day
 
