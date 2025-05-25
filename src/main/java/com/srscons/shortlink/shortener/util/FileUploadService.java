@@ -2,7 +2,7 @@ package com.srscons.shortlink.shortener.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.srscons.shortlink.shortener.config.CloudflareProperties;
-import com.srscons.shortlink.shortener.exception.ShortLinkException;
+import com.srscons.shortlink.common.exception.ShortLinkException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

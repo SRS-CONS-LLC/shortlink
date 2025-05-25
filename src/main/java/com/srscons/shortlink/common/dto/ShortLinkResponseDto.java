@@ -1,4 +1,4 @@
-package com.srscons.shortlink.dto;
+package com.srscons.shortlink.common.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

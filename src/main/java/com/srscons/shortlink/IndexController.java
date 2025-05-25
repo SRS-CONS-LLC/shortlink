@@ -3,7 +3,7 @@ package com.srscons.shortlink;
 import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
 import com.srscons.shortlink.shortener.service.ShortLinkService;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
-import com.srscons.shortlink.util.UrlUtils;
+import com.srscons.shortlink.common.util.UrlUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;

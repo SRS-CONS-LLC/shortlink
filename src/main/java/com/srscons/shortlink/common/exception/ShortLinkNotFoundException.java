@@ -1,4 +1,4 @@
-package com.srscons.shortlink.shortener.exception;
+package com.srscons.shortlink.common.exception;
 
 public class ShortLinkNotFoundException extends ShortLinkException {
 

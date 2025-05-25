@@ -1,7 +1,7 @@
 package com.srscons.shortlink.shortener.service;
 
-import com.srscons.shortlink.shortener.exception.ShortLinkException;
-import com.srscons.shortlink.shortener.exception.ShortLinkNotFoundException;
+import com.srscons.shortlink.common.exception.ShortLinkException;
+import com.srscons.shortlink.common.exception.ShortLinkNotFoundException;
 import com.srscons.shortlink.shortener.repository.ShortLinkRepository;
 import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.repository.entity.LinkItemEntity;
