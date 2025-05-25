@@ -130,7 +130,7 @@ public class MetaDataEntity {
     @Column(name = "request_path")
     private String requestPath;
 
-    @Column(name = "query_string")
+    @Column(name = "query_string", length = 2000)
     private String queryString;
 
     @Column(name = "click_time")
