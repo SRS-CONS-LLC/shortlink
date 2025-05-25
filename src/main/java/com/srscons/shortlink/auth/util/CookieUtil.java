@@ -23,6 +23,7 @@ public class CookieUtil {
         Cookie tokenCookie = new Cookie(name, value);
         tokenCookie.setHttpOnly(true);
         tokenCookie.setSecure(true); // Only over HTTPS
+        tokenCookie.setDomain("citout.me"); // with dot to include subdomains
         tokenCookie.setPath("/");
         tokenCookie.setMaxAge(interval); // 1 day
 
@@ -36,6 +37,7 @@ public class CookieUtil {
             for (Cookie cookie : cookies) {
                 Cookie deletedCookie = new Cookie(cookie.getName(), null);
                 deletedCookie.setPath("/"); // make sure path matches original
+                deletedCookie.setDomain("citout.me"); // with dot to include subdomains
                 deletedCookie.setMaxAge(0); // deletes the cookie
                 deletedCookie.setHttpOnly(cookie.isHttpOnly());
                 deletedCookie.setSecure(cookie.getSecure());
