@@ -7,6 +7,8 @@ import com.srscons.shortlink.common.util.UrlUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.List;
 
 @Controller
 @RequestMapping
@@ -74,9 +78,7 @@ public class IndexController {
         }
 
         if (shortLink.getLinkType() == LinkType.REDIRECT) {
-            String deepLinkUrl = UrlUtils.getDeepLinkUrl(shortLink.getOriginalUrl());
-
-            return redirect(deepLinkUrl);
+            return redirect(shortLink.getOriginalUrl(), request.getHeader("User-Agent"));
         }
 
         return "error/404"; // ✅ Fallback
@@ -99,14 +101,85 @@ public class IndexController {
                 .findFirst()
                 .orElse(null);
 
-        return redirect(UrlUtils.getDeepLinkUrl(linkItem.getUrl()));
+        return redirect(linkItem.getUrl(), request.getHeader("User-Agent"));
     }
 
-    private static Object redirect(String deepLinkUrl) {
+    private static Object redirect(String deepLinkUrl, String userAgent) {
         HttpHeaders headers = new HttpHeaders();
         headers.put("Vary", Collections.singletonList("User-Agent"));
-        headers.setLocation(URI.create(deepLinkUrl));
+        headers.setLocation(URI.create(getRedirectUrl(deepLinkUrl, userAgent)));
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
+
+
+    public static String getRedirectUrl(String originalUrl, String userAgent) {
+        if (originalUrl == null || userAgent == null) {
+            return originalUrl;
+        }
+
+        String fallbackUrl = originalUrl;
+        String videoId = null;
+        String channelHandle = null;
+
+        try {
+            URI uri = new URI(originalUrl);
+            String host = uri.getHost();
+            String path = uri.getPath();
+
+            // Check if it's a video URL
+            if (originalUrl.contains("watch?v=")) {
+                videoId = getQueryParam(originalUrl, "v");
+
+            } else if (host != null && host.contains("youtu.be")) {
+                videoId = path.substring(1); // /d2P8sVU5ydM -> d2P8sVU5ydM
+
+            } else if (path.equals("/watch") && originalUrl.contains("v=")) {
+                videoId = getQueryParam(originalUrl, "v");
+
+            } else if (path.matches("^/@[\\w\\-]+$") ||
+                    path.startsWith("/c/") ||
+                    path.startsWith("/user/") ||
+                    path.startsWith("/channel/")) {
+                channelHandle = path.substring(1); // remove leading /
+            }
+
+        } catch (Exception e) {
+            return fallbackUrl;
+        }
+
+        boolean isIOS = userAgent.contains("iPhone") || userAgent.contains("iPad") || userAgent.contains("iOS");
+        boolean isAndroid = userAgent.contains("Android");
+
+        if (videoId != null) {
+            String iosUrl = "youtube://watch?v=" + videoId;
+            String androidUrl = "intent://scan/#Intent;" +
+                    "scheme=vnd.youtube://watch?v=" + videoId + ";" +
+                    "package=com.google.android.youtube;" +
+                    "S.browser_fallback_url=" + fallbackUrl + ";" +
+                    "end;";
+            return isIOS ? iosUrl : isAndroid ? androidUrl : fallbackUrl;
+
+        } else if (channelHandle != null) {
+            String iosUrl = "youtube://youtube.com/" + channelHandle;
+            String androidUrl = "vnd.youtube://" + channelHandle;
+            return isIOS ? iosUrl : isAndroid ? androidUrl : fallbackUrl;
+        }
+
+        return fallbackUrl; // fallback if format not matched
+    }
+
+    private static String getQueryParam(String url, String key) {
+        try {
+            List<NameValuePair> params = URLEncodedUtils.parse(new URI(url), Charset.forName("UTF-8"));
+            for (NameValuePair param : params) {
+                if (param.getName().equals(key)) {
+                    return param.getValue();
+                }
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
+
+
 
 }
