@@ -81,7 +81,9 @@ public class ShortLinkService {
 
                     if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
                         uploadLogoIfPresent(itemDto.getLogoFile(), item);
-                    } else if (itemDto.getLogoUrl() != null && !itemDto.getLogoUrl().trim().isEmpty()) {
+                    }
+                    // Always set logoUrl if present (for default icons)
+                    if (itemDto.getLogoUrl() != null && !itemDto.getLogoUrl().trim().isEmpty()) {
                         item.setLogoUrl(itemDto.getLogoUrl());
                     }
 
@@ -172,57 +174,45 @@ public class ShortLinkService {
             log.info("📦 Existing links count: {}", existingLinks.size());
             existingLinks.forEach(l -> log.info("→ {} | deleted = {}", l.getTitle(), l.isDeleted()));
             
-            int count = Math.min(existingLinks.size(), incomingLinks.size());
-            log.info("🔁 Updating {} link items by position", count);
+            // Build a map of incoming links by id (or by title+url if no id)
+            Map<Long, ShortLinkDto.LinkItemDto> incomingById = incomingLinks.stream()
+                .filter(l -> l.getId() != null)
+                .collect(Collectors.toMap(ShortLinkDto.LinkItemDto::getId, l -> l));
 
-            // First update existing links
-            for (int i = 0; i < count; i++) {
-                LinkItemEntity item = existingLinks.get(i);
-                ShortLinkDto.LinkItemDto itemDto = incomingLinks.get(i);
-
-                log.info("🧹 Link #{} | title='{}' | url='{}' | deleted={}",
-                        i, itemDto.getTitle(), itemDto.getUrl(), itemDto.getDeleted());
-
-                if (Boolean.TRUE.equals(itemDto.getDeleted())) {
+            // Mark as deleted any existing link not present in the incoming list
+            for (LinkItemEntity item : existingLinks) {
+                if (!incomingById.containsKey(item.getId())) {
                     item.setDeleted(true);
-                    log.info("🗑️ Marked link #{} as deleted", i);
-                    continue;
-                }
-                item.setTitle(itemDto.getTitle());
-                item.setUrl(itemDto.getUrl());
-
-                String newLogoUrl = itemDto.getLogoUrl();
-                String existingLogoUrl = item.getLogoUrl();
-
-                log.info(" Link #{} - Existing logo: {}, Incoming logo: {}", i, existingLogoUrl, newLogoUrl);
-
-                if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
-                    uploadLogoIfPresent(itemDto.getLogoFile(), item);
-                    log.info("→ Uploaded new logo for link #{}", i);
-                } else if (itemDto.isRemoveLogo()) {
-                    item.setLogoUrl(null);
-                    log.info("→ Removed logo for link #{}", i);
-                } else if (newLogoUrl != null && !newLogoUrl.trim().isEmpty()) {
-                    item.setLogoUrl(newLogoUrl);
-                    log.info("→ Updated logoUrl for link #{} to {}", i, newLogoUrl);
-                } else {
-                    log.info("→ Logo unchanged for link #{}", i);
+                    log.info("🗑️ Marked link as deleted (not present in incoming): {}", item.getId());
                 }
             }
 
-            // Then add any new links
-            for (int i = count; i < incomingLinks.size(); i++) {
-                ShortLinkDto.LinkItemDto itemDto = incomingLinks.get(i);
-                if (itemDto.getUrl() != null && !itemDto.getUrl().trim().isEmpty() && !Boolean.TRUE.equals(itemDto.getDeleted())) {
+            // Update or add links
+            for (ShortLinkDto.LinkItemDto itemDto : incomingLinks) {
+                if (itemDto.getId() != null) {
+                    // Update existing
+                    LinkItemEntity item = existingLinks.stream()
+                        .filter(e -> e.getId() != null && e.getId().equals(itemDto.getId()))
+                        .findFirst().orElse(null);
+                    if (item != null) {
+                        item.setTitle(itemDto.getTitle());
+                        item.setUrl(itemDto.getUrl());
+                        item.setDeleted(itemDto.getDeleted() != null && itemDto.getDeleted());
+                        item.setLogoUrl(itemDto.getLogoUrl());
+                    }
+                } else {
+                    // Add new link
                     LinkItemEntity newItem = new LinkItemEntity();
                     newItem.setTitle(itemDto.getTitle());
                     newItem.setUrl(itemDto.getUrl());
                     newItem.setShortLink(existing);
-                    newItem.setDeleted(false);
+                    newItem.setDeleted(itemDto.getDeleted() != null && itemDto.getDeleted());
 
                     if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
                         uploadLogoIfPresent(itemDto.getLogoFile(), newItem);
-                    } else if (itemDto.getLogoUrl() != null && !itemDto.getLogoUrl().trim().isEmpty()) {
+                    }
+                    // Always set logoUrl if present (for default icons)
+                    if (itemDto.getLogoUrl() != null && !itemDto.getLogoUrl().trim().isEmpty()) {
                         newItem.setLogoUrl(itemDto.getLogoUrl());
                     }
 

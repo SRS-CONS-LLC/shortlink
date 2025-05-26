@@ -221,10 +221,11 @@
 }
 
 .link-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-    gap: 10px;
+    margin-bottom: 1em;
+    background: #fff;
+    border-radius: 16px;
+    padding: 0.5em 1em;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
 }
 
 .drag-handle {
@@ -273,16 +274,21 @@
 }
 
 .delete-btn {
-    background-color: #f06529;
-    color: white;
-    border: none;
-    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.delete-btn:hover {
+    background: #d90000;
+}
+
+.link-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
+}
+
+.form-control {
+    border-radius: 12px;
 }
 
 /* Preview Styles */

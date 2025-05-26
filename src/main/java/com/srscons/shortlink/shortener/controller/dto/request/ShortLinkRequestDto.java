@@ -50,6 +50,7 @@ public class ShortLinkRequestDto {
         private String url;
 
         private MultipartFile logoFile;
+        private String logoUrl;
         private Boolean deleted;
     }
 } 

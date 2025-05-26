@@ -1,3 +1,5 @@
+import { presets } from './presets.js';
+
 const {createApp, ref, reactive, computed, watch, onMounted} = Vue;
 
 createApp({
@@ -67,11 +69,7 @@ createApp({
             shortCode: '',
             shortUrl:'',
             originalUrl:'',
-            links: [
-                {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
-                {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false},
-                {title: 'Title', url: '', logoFile: null, logoPreview: null, logoUrl: null, removeLogo: false}
-            ]
+            links: []
         });
 
         // QR Tag data
@@ -90,6 +88,12 @@ createApp({
             success: {show: false, message: 'Link in bio saved successfully!'},
             error: {show: false, message: ''}
         });
+
+        const presetOptions = presets;
+        const selectedPreset = ref("");
+
+        const showPresetDropdown = ref(false);
+        const selectedPresetObj = ref(null);
 
         // Methods
         async function loadLinks() {
@@ -142,7 +146,7 @@ createApp({
         }
 
         function softDeleteLink(index) {
-            linkInBio.links[index].deleted = true;
+            linkInBio.links.splice(index, 1);
         }
 
         function handleQRTagImageUpload(event) {
@@ -327,30 +331,24 @@ createApp({
 
                 // Update links
                 if (linkDetails.links && linkDetails.links.length > 0) {
-                    linkInBio.links = linkDetails.links.map(link => ({
-                        title: link.title || '',
-                        url: link.url || '',
-                        logoFile: null,
-                        logoPreview: link.logoUrl || null,
-                        logoUrl: link.logoUrl || null,
-                        removeLogo: false,
-                        deleted: link.deleted || false,
-                        isValidUrl: validateUrl(link)
-                    }));
-                } else {
-                    // Reset to default if no links
-                    linkInBio.links = [
-                        {
-                            title: 'Title',
-                            url: '',
+                    linkInBio.links = linkDetails.links.map(link => {
+                        // Find the preset for this link title
+                        const preset = presets.find(p => p.label.toLowerCase() === (link.title || '').toLowerCase());
+                        return {
+                            title: link.title || '',
+                            url: link.url || '',
+                            icon: preset ? preset.icon : null, // <-- assign icon from preset
                             logoFile: null,
-                            logoPreview: null,
-                            logoUrl: null,
+                            logoPreview: link.logoUrl || null,
+                            logoUrl: link.logoUrl || null,
                             removeLogo: false,
-                            deleted: false,
-                            isValidUrl: false
-                        }
-                    ];
+                            deleted: link.deleted || false,
+                            isValidUrl: validateUrl(link)
+                        };
+                    });
+                } else {
+                    // Set to empty array if no links
+                    linkInBio.links = [];
                 }
             } catch (error) {
                 console.error('Error loading link details:', error);
@@ -389,27 +387,28 @@ createApp({
 
                 if(linkInBio.linkType === 'BIO') {
                     // Collect links
-                    for (let index = 0; index < linkInBio.links.length; index++) {
-                        const link = linkInBio.links[index];
-
+                    const linksToSave = linkInBio.links.filter(link => !link.deleted);
+                    for (let index = 0; index < linksToSave.length; index++) {
+                        const link = linksToSave[index];
+                        // If url is empty, try to set it from the preset
+                        if (!link.url) {
+                            const preset = presets.find(p => p.label === link.title);
+                            if (preset && preset.sample) {
+                                link.url = preset.sample;
+                            }
+                        }
                         if (link.url && link.title) {
                             if(!validateUrl(link)) {
                                 throw new Error('Failed to save link in bio');
                             }
                             formData.append(`links[${index}].title`, link.title);
                             formData.append(`links[${index}].url`, link.url);
-
                             if (link.logoFile) {
                                 formData.append(`links[${index}].logoFile`, link.logoFile);
-                            } else {
-                                if (link.removeLogo) {
-                                    formData.append(`links[${index}].removeLogo`, 'true');
-                                } else if (link.logoUrl) {
-                                    formData.append(`links[${index}].logoUrl`, link.logoUrl);
-                                }
-                            }
-                            if (link.deleted) {
-                                formData.append(`links[${index}].deleted`, 'true');
+                            } else if (link.logoUrl) {
+                                formData.append(`links[${index}].logoUrl`, link.logoUrl);
+                            } else if (link.removeLogo) {
+                                formData.append(`links[${index}].removeLogo`, 'true');
                             }
                         }else {
                             throw new Error('Failed to save link in bio');
@@ -563,33 +562,96 @@ createApp({
 
         // URL validation function
         function validateUrl(link) {
-            console.log('link=' + link.url);
+            const type = (link.title || '').toLowerCase();
 
+            // Email validation
+            if (type === "email") {
+                const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/;
+                link.isValidUrl = emailRegex.test(link.url.trim());
+                return link.isValidUrl;
+            }
+
+            // Telegram validation (username must start with @ and be at least 5 chars)
+            if (type === "telegram") {
+                link.isValidUrl = /^@[\w\d_]{5,}$/.test(link.url.trim());
+                return link.isValidUrl;
+            }
+
+            // Phone/WhatsApp validation (simple, you can improve)
+            if (type === "phone" || type === "whatsapp") {
+                link.isValidUrl = /^\+?\d{7,15}$/.test(link.url.trim());
+                return link.isValidUrl;
+            }
+
+            // For all other types, treat as URL
             if (!link.url) {
                 link.isValidUrl = false;
-                return;
+                return false;
             }
 
             let testUrl = link.url.trim();
 
-            // Add https:// if missing
-            if (!/^https?:\/\//i.test(testUrl)) {
+            // Only add https:// for certain types
+            const urlTypes = [
+                "url link", "youtube", "github", "linkedin", "twitter", "facebook", "tiktok", "spotify", "reddit", "pinterest", "medium", "behance", "dribbble", "snapchat", "location"
+            ];
+            if (urlTypes.includes(type) && !/^https?:\/\//i.test(testUrl)) {
                 testUrl = 'https://' + testUrl;
+                link.url = testUrl;
             }
-            link.url = testUrl;
 
             // Regex to validate public URLs with a domain (like .com, .net, etc.)
-            const urlRegex = /^https?:\/\/[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+(:\d+)?(\/[^\s]*)?$/;
+            const urlRegex = /^https?:\/\/[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+(\:\d+)?(\/[^\s]*)?$/;
 
-            if (urlRegex.test(testUrl)) {
-                link.isValidUrl = true;
-            } else {
-                link.isValidUrl = false;
-            }
-
+            link.isValidUrl = urlRegex.test(testUrl);
             return link.isValidUrl;
         }
 
+        function applyPresetToLink(index, presetLabel) {
+            const preset = presetOptions.find(p => p.label === presetLabel);
+            if (preset) {
+                linkInBio.links[index].title = preset.label;
+                linkInBio.links[index].url = preset.sample;
+                // Optionally, set an icon property if you want to use it in the UI
+                linkInBio.links[index].icon = preset.icon;
+            }
+        }
+
+        function addLinkFromPreset(presetLabel) {
+            const preset = presetOptions.find(p => p.label === presetLabel);
+            if (preset) {
+                linkInBio.links.push({
+                    title: preset.label,
+                    url: preset.sample,
+                    logoFile: null,
+                    logoPreview: preset.logoUrl,
+                    logoUrl: preset.logoUrl,
+                    removeLogo: false
+                });
+                selectedPreset.value = ""; // reset dropdown after adding
+            }
+        }
+
+        function selectPreset(preset) {
+            linkInBio.links.push({
+                title: preset.label,
+                url: preset.sample,
+                logoFile: null,
+                logoPreview: preset.logoUrl,
+                logoUrl: preset.logoUrl,
+                removeLogo: false
+            });
+            selectedPresetObj.value = null;
+            showPresetDropdown.value = false;
+        }
+
+        function removeLogo(index) {
+            const link = linkInBio.links[index];
+            link.logoUrl = null;
+            link.logoPreview = null;
+            link.logoFile = null;
+            link.removeLogo = true;
+        }
 
         return {
             loggedInUser,
@@ -607,6 +669,10 @@ createApp({
             isSaving,
             showDeleteConfirmation,
             isDeleting,
+            presetOptions,
+            selectedPreset,
+            showPresetDropdown,
+            selectedPresetObj,
 
             // Methods
             validateUrl,
@@ -624,7 +690,11 @@ createApp({
             createNewLink,
             saveChanges,
             handleQRTagImageUpload,
-            undoDelete
+            undoDelete,
+            applyPresetToLink,
+            addLinkFromPreset,
+            selectPreset,
+            removeLogo
         };
     }
 }).mount('#app');
