@@ -126,6 +126,11 @@ public class IndexController {
             String host = uri.getHost();
             String path = uri.getPath();
 
+            if (host == null || !(host.contains("youtube.com") || host.contains("youtu.be"))) {
+                // Not a YouTube domain — don't try to deep link
+                return fallbackUrl;
+            }
+
             // Check if it's a video URL
             if (originalUrl.contains("watch?v=")) {
                 videoId = getQueryParam(originalUrl, "v");
