@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 
 @Controller
 @RequestMapping
@@ -74,9 +75,8 @@ public class IndexController {
 
         if (shortLink.getLinkType() == LinkType.REDIRECT) {
             String deepLinkUrl = UrlUtils.getDeepLinkUrl(shortLink.getOriginalUrl());
-            HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(URI.create(deepLinkUrl));
-            return new ResponseEntity<>(headers, HttpStatus.FOUND); // ✅ Manual 302 Found redirect
+
+            return redirect(deepLinkUrl);
         }
 
         return "error/404"; // ✅ Fallback
@@ -84,7 +84,7 @@ public class IndexController {
 
 
     @GetMapping("/deep/{shortCode}/{linkId}")
-    public String redirectToDeepLink(@PathVariable("shortCode") String shortCode,
+    public Object redirectToDeepLink(@PathVariable("shortCode") String shortCode,
                                      @PathVariable("linkId") Long linkId,
                                      Model model,
                                      HttpServletRequest request) {
@@ -99,13 +99,14 @@ public class IndexController {
                 .findFirst()
                 .orElse(null);
 
-        String originalUrl = linkItem.getUrl();
+        return redirect(UrlUtils.getDeepLinkUrl(linkItem.getUrl()));
+    }
 
-        model.addAttribute("deepLinkUrl", UrlUtils.getDeepLinkUrl(originalUrl));
-        model.addAttribute("fallbackUrl", UrlUtils.getFallbackUrl(originalUrl));
-        model.addAttribute("appName", UrlUtils.getAppName(originalUrl));
-
-        return "deep-link-redirect";
+    private static Object redirect(String deepLinkUrl) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Vary", Collections.singletonList("User-Agent"));
+        headers.setLocation(URI.create(deepLinkUrl));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
 }
