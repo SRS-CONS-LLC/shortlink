@@ -5,12 +5,15 @@ import com.srscons.shortlink.shortener.service.ShortLinkService;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import com.srscons.shortlink.common.util.UrlUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.io.IOException;
 
 @Controller
 @RequestMapping
@@ -50,7 +53,9 @@ public class IndexController {
     }
 
     @GetMapping("/{shortCode}")
-    public String previewPage(@PathVariable("shortCode") String shortCode, Model model, HttpServletRequest request) {
+    public String previewPage(@PathVariable("shortCode") String shortCode, Model model,
+                              HttpServletResponse response,
+                              HttpServletRequest request) throws IOException {
         ShortLinkDto shortLink = shortLinkService.getShortLinkByCode(shortCode);
         if (shortLink == null) {
             return "error/404";
@@ -66,13 +71,14 @@ public class IndexController {
         if (shortLink.getLinkType() == LinkType.REDIRECT) {
             String originalUrl = shortLink.getOriginalUrl();
 
-            // Check if it's a supported app URL
-            // For app URLs, redirect to a special page that handles deep linking
-            model.addAttribute("deepLinkUrl", UrlUtils.getDeepLinkUrl(originalUrl));
-            model.addAttribute("fallbackUrl", UrlUtils.getFallbackUrl(originalUrl));
-            model.addAttribute("appName", UrlUtils.getAppName(originalUrl));
-
-            return "deep-link-redirect";
+//            // Check if it's a supported app URL
+//            // For app URLs, redirect to a special page that handles deep linking
+//            model.addAttribute("deepLinkUrl", UrlUtils.getDeepLinkUrl(originalUrl));
+//            model.addAttribute("fallbackUrl", UrlUtils.getFallbackUrl(originalUrl));
+//            model.addAttribute("appName", UrlUtils.getAppName(originalUrl));
+//
+//            return "deep-link-redirect";
+            response.sendRedirect(UrlUtils.getDeepLinkUrl(originalUrl));
         }
 
         return "error/404";
