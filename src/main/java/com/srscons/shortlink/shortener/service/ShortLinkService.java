@@ -43,8 +43,6 @@ public class ShortLinkService {
     private static final String ALPHABET = "23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ";
     private static final int SHORT_CODE_LENGTH = 6;
     private static final int MAX_ATTEMPTS = 10;
-    @Value("${app.base-url}")
-    private String baseUrl;
 
     public List<ShortLinkDto> findAll(Long userId) {
         try {
@@ -69,11 +67,11 @@ public class ShortLinkService {
     }
 
     @Transactional
-    public ShortLinkDto create(ShortLinkDto dto) {
+    public ShortLinkDto create(ShortLinkDto dto, HttpServletRequest request) {
         ShortLinkEntity entity = mapper.fromBusinessToEntity(dto);
         entity.setOriginalUrl("https://www.citout.me");
         entity.setShortCode(generateUniqueShortCode());
-        entity.setQrCodeSvg(generateQrCodeSvg(entity.getShortCode()));
+        entity.setQrCodeSvg(generateQrCodeSvg(entity.getShortCode(), request));
         if (dto.getLinkType() == null) {
             entity.setLinkType(LinkType.REDIRECT); // Default to REDIRECT if not specified
         } else {
@@ -269,8 +267,8 @@ public class ShortLinkService {
         return shortCode.toString();
     }
 
-    public String generateQrCodeSvg(String shortCode) {
-        String fullUrl = baseUrl + shortCode;
+    public String generateQrCodeSvg(String shortCode, HttpServletRequest request) {
+        String fullUrl = getBaseUrl(request) + "/" + shortCode;
         QrCode qr = QrCode.encodeText(fullUrl, QrCode.Ecc.LOW);
         return toSvgString(qr);
     }
@@ -303,6 +301,21 @@ public class ShortLinkService {
                 + "<rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n"
                 + "<path d=\"" + pathData + "\" stroke=\"black\"/>\n"
                 + "</svg>\n";
+    }
+
+    private String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        int serverPort = request.getServerPort();
+
+        StringBuilder baseUrl = new StringBuilder();
+        baseUrl.append(scheme).append("://").append(serverName);
+
+        if ((scheme.equals("http") && serverPort != 80) ||
+                (scheme.equals("https") && serverPort != 443)) {
+            baseUrl.append(":").append(serverPort);
+        }
+        return baseUrl.toString();
     }
 
     private void uploadLogoIfPresent(MultipartFile logoFile, ShortLinkEntity entity) {

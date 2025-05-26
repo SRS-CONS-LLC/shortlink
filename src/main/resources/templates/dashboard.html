@@ -18,10 +18,10 @@
     <template th:replace="sidebar.html"></template>
 
     <!-- Main Content -->
-    <div class="main-content" >
+    <div class="main-content">
         <div v-if="selectedLinkId" class="config-card">
             <div class="position-relative">
-                <h4 class="fw-bold mb-3" ><i class="bi bi-link-45deg"></i> <span v-text="linkInBio.title"></span></h4>
+                <h4 class="fw-bold mb-3"><i class="bi bi-link-45deg"></i> <span v-text="linkInBio.title"></span></h4>
                 <!-- Delete button (only show if a Link is selected) -->
                 <button
                         v-if="selectedLinkId"
@@ -39,52 +39,79 @@
             <h5 class="fw-semibold">General configuration</h5>
             <div class="row mt-3">
 
+
                 <div class="col-md-10">
                     <div class="row mb-3">
                         <div class="container py-4">
                             <div class="row g-4">
-                                <div class="col-md-6">
-                                    <div class="form-section-title">Link Name <i class="bi bi-question-circle"></i>
-                                    </div>
-                                    <div class="input-wrapper">
-                                        <i class="bi bi-bookmark"></i>
-                                        <input type="text" class="readonly-input" v-model="linkInBio.title">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-section-title">Redirect Url <i class="bi bi-question-circle"></i>
-                                    </div>
-                                    <div class="input-wrapper">
-                                        <i class="bi bi-bookmark"></i>
-                                        <input type="text" class="readonly-input" v-model="linkInBio.originalUrl">
+
+                                <!-- QR kod üçün əlavə olunmuş hissə -->
+                                <div class="col-md-3 d-flex align-items-center justify-content-center">
+                                    <div class="qr-code-box border rounded p-2">
+                                        <div v-if="linkInBio.qrCodeSvg" v-html="linkInBio.qrCodeSvg"></div>
+                                        <span v-else>No QR Code available</span>
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <div class="form-section-title">Link Type <i class="bi bi-question-circle"></i>
-                                    </div>
-                                    <div class="input-wrapper">
-                                        <select class="form-control" v-model="linkInBio.linkType">
-                                            <option value="REDIRECT">Redirect</option>
-                                            <option value="BIO">Bio</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                <!-- Qalan form sahələri -->
+                                <div class="col-md-9">
+                                    <div class="row g-4">
 
-                                <div class="col-md-6">
-                                    <div class="form-section-title">Link URL <i class="bi bi-question-circle"></i>
-                                    </div>
-                                    <div class="input-wrapper">
-                                        <i class="bi bi-link-45deg"></i>
-                                        <span class="readonly-input">{{ linkInBio.shortUrl }}</span>
-                                        <button class="icon-btn" @click="copyToClipboard(`${linkInBio.shortUrl}`)"><i class="bi bi-copy"></i></button>
-                                        <button class="icon-btn" @click="openLink(`${linkInBio.shortUrl}`)"><i class="bi bi-box-arrow-up-right"></i></button>
+                                        <div class="col-md-6">
+                                            <div class="form-section-title">Link Name <i
+                                                    class="bi bi-question-circle"></i>
+                                            </div>
+                                            <div class="input-wrapper">
+                                                <i class="bi bi-bookmark"></i>
+                                                <input type="text" class="readonly-input" v-model="linkInBio.title">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-section-title">Redirect Url <i
+                                                    class="bi bi-question-circle"></i>
+                                            </div>
+                                            <div class="input-wrapper">
+                                                <i class="bi bi-bookmark"></i>
+                                                <input type="text" class="readonly-input"
+                                                       v-model="linkInBio.originalUrl">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-section-title">Link Type <i
+                                                    class="bi bi-question-circle"></i>
+                                            </div>
+                                            <div class="input-wrapper">
+                                                <select class="form-control" v-model="linkInBio.linkType">
+                                                    <option value="REDIRECT">Redirect</option>
+                                                    <option value="BIO">Bio</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-section-title">Link URL <i
+                                                    class="bi bi-question-circle"></i>
+                                            </div>
+                                            <div class="input-wrapper">
+                                                <i class="bi bi-link-45deg"></i>
+                                                <span class="readonly-input">{{ linkInBio.shortUrl }}</span>
+                                                <button class="icon-btn"
+                                                        @click="copyToClipboard(`${linkInBio.shortUrl}`)"><i
+                                                        class="bi bi-copy"></i></button>
+                                                <button class="icon-btn" @click="openLink(`${linkInBio.shortUrl}`)"><i
+                                                        class="bi bi-box-arrow-up-right"></i></button>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
 
                 <div class="col-md-12">
                     <div class="mt-4">
@@ -143,7 +170,8 @@
 
                                             </div>
                                             <span class="file-name">{{ linkInBio.logoFile ? linkInBio.logoFile.name : 'Uploaded logo'}}</span>
-                                            <button class="logo-remove-btn logo-remove-btn-main" type="button" @click="deleteLogo"
+                                            <button class="logo-remove-btn logo-remove-btn-main" type="button"
+                                                    @click="deleteLogo"
                                                     title="Remove logo">
                                                 <i class="bi bi-x"></i>
                                             </button>
@@ -216,7 +244,8 @@
                                                 <div v-else class="link-logo-wrapper">
                                                     <img :src="link.logoPreview" :alt="link.title"
                                                          style="width: 100%; height: 100%; object-fit: cover;">
-                                                    <button class="link-logo-delete-btn" @click="deleteLinkLogo(index)" title="Remove logo">
+                                                    <button class="link-logo-delete-btn" @click="deleteLinkLogo(index)"
+                                                            title="Remove logo">
                                                         <i class="bi bi-x"></i>
                                                     </button>
                                                     <input type="file" accept="image/*" class="link-icon-upload"
@@ -243,7 +272,9 @@
                                         <template v-else>
                                             <div class="text-muted fst-italic d-flex align-items-center justify-content-between px-2 py-1 bg-light rounded">
                                                 <span>This link removed. It will be deleted after save.</span>
-                                                <button class="btn btn-sm btn-outline-secondary ms-2" @click="undoDelete(index)">Undo</button>
+                                                <button class="btn btn-sm btn-outline-secondary ms-2"
+                                                        @click="undoDelete(index)">Undo
+                                                </button>
                                             </div>
                                         </template>
                                     </div>
@@ -270,7 +301,7 @@
                                             <div class="preview-link" v-for="(link, index) in linkInBio.links"
                                                  :key="'preview-'+index">
                                                 <div class="preview-link-icon" v-if="link.logoPreview">
-                                                    <img  :src="link.logoPreview"
+                                                    <img :src="link.logoPreview"
                                                          :alt="link.title">
                                                 </div>
                                                 <span>{{ link.title }}</span>
@@ -293,7 +324,8 @@
                     <div class="card-body text-center p-5">
                         <h1 class="display-5 fw-bold mb-4">Create Your First Link</h1>
                         <p class="text-muted mb-4">Get started by creating your first hyperlink</p>
-                        <a href="#" class="btn btn-primary btn-lg px-4 py-2" @click.prevent="createNewLink">Create Link</a>
+                        <a href="#" class="btn btn-primary btn-lg px-4 py-2" @click.prevent="createNewLink">Create
+                            Link</a>
                     </div>
                 </div>
             </div>

@@ -65,6 +65,7 @@ createApp({
             themeType: 'dark',
             linkType: 'REDIRECT',
             shortCode: '',
+            qrCodeSvg: '',
             shortUrl:'',
             originalUrl:'',
             links: [
@@ -299,6 +300,7 @@ createApp({
                 linkInBio.description = linkDetails.description || '';
                 linkInBio.removeMainLogo = false;
                 linkInBio.shortCode = linkDetails.shortCode || '';
+                linkInBio.qrCodeSvg = linkDetails.qrCodeSvg || '';
                 linkInBio.shortUrl = (baseUrl.value +'/'+linkDetails.shortCode) || '';
                 linkInBio.originalUrl = linkDetails.originalUrl;
                 linkInBio.linkType = linkDetails.linkType || 'REDIRECT';
