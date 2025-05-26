@@ -22,7 +22,6 @@ createApp({
         const tabs = [
             {id: 'link-in-bio', name: 'Link-in-Bio'},
         ];
-        const activeTab = ref('app-shortener');
 
         // App shortener data
         const appShortener = reactive({
@@ -116,15 +115,24 @@ createApp({
             }
         }
 
-        function selectLink(linkId) {
+        function selectLink(linkId, noRedirect) {
             selectedLinkId.value = linkId;
-            activeTab.value = 'link-in-bio';
 
-            // Update URL with both tab and id parameters
-            const newUrl = new URL(window.location.href);
-            newUrl.searchParams.set('tab', 'link-in-bio');
-            newUrl.searchParams.set('id', linkId);
-            window.history.pushState({}, '', newUrl);
+            const newPath = "/dashboard";
+
+            const newParams = new URLSearchParams({
+                id: linkId
+            });
+
+            const newUrl_ = `${newPath}?${newParams.toString()}`;
+
+            if(!noRedirect) {
+                if (window.location.pathname.includes("dashboard")) {
+                    window.history.pushState({}, '', newUrl_);
+                } else {
+                    window.location.href = newUrl_;
+                }
+            }
 
             // Load link details
             loadLinkDetails(linkId);
@@ -192,7 +200,6 @@ createApp({
 
                 // Update UI
                 await loadLinks();
-                activeTab.value = 'link-in-bio';
                 selectedLinkId.value = newLink.id;
 
                 // Load the new link details
@@ -205,27 +212,16 @@ createApp({
         // Check URL parameters on page load
         function checkUrlParameters() {
             const url = new URL(window.location.href);
-            console.log('checkUrlParameters='+url);
-            var tabParam = url.searchParams.get('tab');
             var idParam = url.searchParams.get('id');
-            console.log('checkUrlParameters idparam='+idParam);
-            console.log(JSON.stringify(links.value));
             if (!idParam) {
                 if(links.value.length>0) {
                     idParam = links.value[0].id;
                 }
             }
 
-            if (!tabParam) {
-                tabParam = 'link-in-bio';
-            }
-            console.log('checkUrlParameters idparam2='+idParam);
-
             if (idParam) {
-                selectLink(idParam);
+                selectLink(idParam, true);
             }
-
-            activeTab.value = tabParam;
         }
 
 
@@ -514,10 +510,6 @@ createApp({
 
                 // Reload links in the sidebar
                 await loadLinks();
-
-                // Reset the active tab to the first tab
-                activeTab.value = tabs[0].id;
-
             } catch (error) {
                 console.error('Error deleting Link:', error);
 
@@ -597,7 +589,6 @@ createApp({
             links,
             selectedLinkId,
             tabs,
-            activeTab,
             appShortener,
             urlShortener,
             linkInBio,

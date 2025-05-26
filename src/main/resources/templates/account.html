@@ -8,108 +8,75 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="/public/css/dashboard.css" rel="stylesheet">
     <link href="/public/css/account.css" rel="stylesheet">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
-<body>
-<div class="d-flex layout">
+<body id="app">
+<div class="d-flex">
 
-    <div class="sidebar">
-        <div>
-            <h5 class="fw-bold ps-2">CITOUT</h5>
-            <div class="section-title">Main</div>
-            <a href="#" class="nav-link"><i class="bi bi-grid"></i> Summary</a>
+    <div id="sidebar" class="sidebar invisible bg-light border-end p-3" style="width: 280px;">
+        <template th:replace="sidebar.html"></template>
+    </div>
 
-            <div class="section-title">Smartlinks</div>
-            <div id="links-container">
-                <a
-                        v-for="link in links"
-                        :key="link.id"
-                        href="#"
-                        class="nav-link"
-                        :class="{ 'active-link': selectedLinkId === link.id }"
-                        @click.prevent="selectLink(link.id)"
-                >
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="link-icon"
-                             style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background: #f8f9fa;">
-                            <img v-if="link.logoFileName" :src="link.logoFileName" :alt="link.title"
-                                 style="width: 100%; height: 100%; object-fit: cover;">
-                            <i v-else class="bi bi-link" style="font-size: 16px; color: #6c757d;"></i>
+    <div class="flex-grow-1 p-3">
+        <!-- Add this mobile toggle button anywhere in your page -->
+        <button class="btn btn-primary mobile-toggle m-3" type="button" onclick="toggleSidebar()">
+            <i class="bi bi-list"></i>
+        </button>
+        <!-- Main Content -->
+        <form class="main-content" action="/account" method="POST">
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <h4><i class="bi bi-person-circle"></i> Account</h4>
+                    <a href="/logout" class="btn btn-outline-secondary">Sign out <i class="bi bi-box-arrow-right"></i></a>
+                </div>
+
+                <div class="config-card account-box mt-4" >
+                    <div class="mb-3">
+                        <button class="tab-btn active"><i class="bi bi-gear"></i> Account details</button>
+                    </div>
+
+                    <h5 class="fw-bold mt-4">General informations</h5>
+                    <h5 class="fw-bold mt-4" th:text="${message}" style="color: forestgreen"></h5>
+
+                    <div class="row g-3 mt-2" >
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input id="email" name="email" placeholder="Email"
+                                        th:value="${loggedInUser.email}"
+                                        type="email" class="form-control" value="" disabled>
+                            </div>
                         </div>
-                        <div class="link-info">
-                            <div class="link-title">{{ link.title }}</div>
-                            <div class="link-description" style="font-size: 12px; color: #6c757d;">
-                                {{ link.description || '' }}
+                        <div class="col-md-6">
+                            <label class="form-label">Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control"
+                                          id="fullName" name="fullName" placeholder="Full name"
+                                       th:value="${loggedInUser.fullName}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                <input type="text" class="form-control"
+                                       id="phone" name="phone" placeholder="phone"
+                                       th:value="${loggedInUser.phone}">
                             </div>
                         </div>
                     </div>
-                </a>
-            </div>
-            <a href="#" class="btn btn-outline w-100 mt-2" @click.prevent="createNewLink">+ Create New</a>
-        </div>
-        <div>
-            <a href="/account" class="d-flex align-items-center gap-2 px-3 py-2 rounded-pill text-decoration-none"
-               style="background: #f8fafd; border: 1px solid #dbe1ea;">
-                <img th:src="${loggedInUser.picture}" alt="User" referrerpolicy="no-referrer" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
-                <span class="fw-bold text-dark" th:text="${loggedInUser.name+' '+loggedInUser.surname}"></span>
-            </a>
-        </div>
+
+                </div>
+
+                <div class="d-flex justify-content-center mt-4">
+                    <button type="submit" class="btn btn-orange fw-semibold rounded-pill px-5 py-2">
+                        Save Changes
+                    </button>
+                </div>
+        </form>
     </div>
-
-    <!-- Main Content -->
-    <form class="main-content" action="/account" method="POST">
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <h4><i class="bi bi-person-circle"></i> Account</h4>
-                <a href="/logout" class="btn btn-outline-secondary">Sign out <i class="bi bi-box-arrow-right"></i></a>
-            </div>
-
-            <div class="config-card account-box mt-4" >
-                <div class="mb-3">
-                    <button class="tab-btn active"><i class="bi bi-gear"></i> Account details</button>
-                </div>
-
-                <h5 class="fw-bold mt-4">General informations</h5>
-                <h5 class="fw-bold mt-4" th:text="${message}" style="color: forestgreen"></h5>
-
-                <div class="row g-3 mt-2" >
-                    <div class="col-md-6">
-                        <label class="form-label">Email</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                            <input id="email" name="email" placeholder="Email"
-                                    th:value="${loggedInUser.email}"
-                                    type="email" class="form-control" value="" disabled>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Name</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <input type="text" class="form-control"
-                                      id="fullName" name="fullName" placeholder="Full name"
-                                   th:value="${loggedInUser.fullName}">
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">Phone Number</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                            <input type="text" class="form-control"
-                                   id="phone" name="phone" placeholder="phone"
-                                   th:value="${loggedInUser.phone}">
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="d-flex justify-content-center mt-4">
-                <button type="submit" class="btn btn-orange fw-semibold rounded-pill px-5 py-2">
-                    Save Changes
-                </button>
-            </div>
-    </form>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
