@@ -5,7 +5,7 @@ import com.srscons.shortlink.auth.util.CONSTANTS;
 import com.srscons.shortlink.shortener.controller.dto.request.ShortLinkRequestDto;
 import com.srscons.shortlink.shortener.controller.dto.response.ShortLinkResponseDto;
 import com.srscons.shortlink.shortener.controller.mapper.ShortLinkViewMapper;
-import com.srscons.shortlink.shortener.exception.ShortLinkNotFoundException;
+import com.srscons.shortlink.common.exception.ShortLinkNotFoundException;
 import com.srscons.shortlink.shortener.service.ShortLinkService;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import com.srscons.shortlink.shortener.service.dto.UserDto;

@@ -1,6 +1,7 @@
-package com.srscons.shortlink.shortener.exception;
+package com.srscons.shortlink.common.exception;
 
-public class ShortLinkNotFoundException extends RuntimeException {
+public class ShortLinkNotFoundException extends ShortLinkException {
+
     public ShortLinkNotFoundException(Long id) {
         super("Short link not found with id: " + id);
     }

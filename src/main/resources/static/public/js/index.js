@@ -22,7 +22,6 @@ createApp({
         const tabs = [
             {id: 'link-in-bio', name: 'Link-in-Bio'},
         ];
-        const activeTab = ref('app-shortener');
 
         // App shortener data
         const appShortener = reactive({
@@ -117,15 +116,24 @@ createApp({
             }
         }
 
-        function selectLink(linkId) {
+        function selectLink(linkId, noRedirect) {
             selectedLinkId.value = linkId;
-            activeTab.value = 'link-in-bio';
 
-            // Update URL with both tab and id parameters
-            const newUrl = new URL(window.location.href);
-            newUrl.searchParams.set('tab', 'link-in-bio');
-            newUrl.searchParams.set('id', linkId);
-            window.history.pushState({}, '', newUrl);
+            const newPath = "/dashboard";
+
+            const newParams = new URLSearchParams({
+                id: linkId
+            });
+
+            const newUrl_ = `${newPath}?${newParams.toString()}`;
+
+            if(!noRedirect) {
+                if (window.location.pathname.includes("dashboard")) {
+                    window.history.pushState({}, '', newUrl_);
+                } else {
+                    window.location.href = newUrl_;
+                }
+            }
 
             // Load link details
             loadLinkDetails(linkId);
@@ -167,7 +175,7 @@ createApp({
                 formData.append('themeColor', '#000000');
                 formData.append('themeType', 'AUTO');
                 formData.append('layoutType', 'LIST');
-                formData.append('linkType', 'REDIRECT');
+                formData.append('linkType', null);
 
                 // Add one empty link
                 formData.append('links[0].title', 'New Link');
@@ -193,7 +201,6 @@ createApp({
 
                 // Update UI
                 await loadLinks();
-                activeTab.value = 'link-in-bio';
                 selectedLinkId.value = newLink.id;
 
                 // Load the new link details
@@ -206,27 +213,16 @@ createApp({
         // Check URL parameters on page load
         function checkUrlParameters() {
             const url = new URL(window.location.href);
-            console.log('checkUrlParameters='+url);
-            var tabParam = url.searchParams.get('tab');
             var idParam = url.searchParams.get('id');
-            console.log('checkUrlParameters idparam='+idParam);
-            console.log(JSON.stringify(links.value));
             if (!idParam) {
                 if(links.value.length>0) {
                     idParam = links.value[0].id;
                 }
             }
 
-            if (!tabParam) {
-                tabParam = 'link-in-bio';
-            }
-            console.log('checkUrlParameters idparam2='+idParam);
-
             if (idParam) {
-                selectLink(idParam);
+                selectLink(idParam, true);
             }
-
-            activeTab.value = tabParam;
         }
 
 
@@ -303,7 +299,7 @@ createApp({
                 linkInBio.qrCodeSvg = linkDetails.qrCodeSvg || '';
                 linkInBio.shortUrl = (baseUrl.value +'/'+linkDetails.shortCode) || '';
                 linkInBio.originalUrl = linkDetails.originalUrl;
-                linkInBio.linkType = linkDetails.linkType || 'REDIRECT';
+                linkInBio.linkType = linkDetails.linkType || '-1';
                 // Update theme color
                 if (linkDetails.themeColor) {
                     linkInBio.themeColor = linkDetails.themeColor;
@@ -372,6 +368,7 @@ createApp({
                 formData.append('themeColor', linkInBio.themeColor);
                 formData.append('originalUrl', linkInBio.originalUrl);
                 formData.append('linkType', linkInBio.linkType);
+                formData.append('shortCode', linkInBio.shortCode);
 
                 // Handle main logo
                 if (linkInBio.logoFile) {
@@ -389,40 +386,38 @@ createApp({
                 formData.append('themeType', linkInBio.themeType.toUpperCase());
                 formData.append('layoutType', linkInBio.layoutType.toUpperCase());
 
-                // Collect links
-                for (let index = 0; index < linkInBio.links.length; index++) {
-                    const link = linkInBio.links[index];
+                if(linkInBio.linkType === 'BIO') {
+                    // Collect links
+                    for (let index = 0; index < linkInBio.links.length; index++) {
+                        const link = linkInBio.links[index];
 
-                    if (link.url && link.title) {
-                        if(!validateUrl(link)) {
+                        if (link.url && link.title) {
+                            if(!validateUrl(link)) {
+                                throw new Error('Failed to save link in bio');
+                            }
+                            formData.append(`links[${index}].title`, link.title);
+                            formData.append(`links[${index}].url`, link.url);
+
+                            if (link.logoFile) {
+                                formData.append(`links[${index}].logoFile`, link.logoFile);
+                            } else {
+                                if (link.removeLogo) {
+                                    formData.append(`links[${index}].removeLogo`, 'true');
+                                } else if (link.logoUrl) {
+                                    formData.append(`links[${index}].logoUrl`, link.logoUrl);
+                                }
+                            }
+                            if (link.deleted) {
+                                formData.append(`links[${index}].deleted`, 'true');
+                            }
+                        }else {
                             throw new Error('Failed to save link in bio');
                         }
-                        formData.append(`links[${index}].title`, link.title);
-                        formData.append(`links[${index}].url`, link.url);
-
-                        if (link.logoFile) {
-                            formData.append(`links[${index}].logoFile`, link.logoFile);
-                        } else {
-                            if (link.removeLogo) {
-                                formData.append(`links[${index}].removeLogo`, 'true');
-                            } else if (link.logoUrl) {
-                                formData.append(`links[${index}].logoUrl`, link.logoUrl);
-                            }
-                        }
-                        if (link.deleted) {
-                            formData.append(`links[${index}].deleted`, 'true');
-                        }
-                    }else {
-                        throw new Error('Failed to save link in bio');
                     }
-                }
-                linkInBio.links.forEach(link => {
-                    link.removeLogo = false;
-                    link.logoFile = null; // faylı reset et
-                });
-
-                for (const [key, value] of formData.entries()) {
-                    console.log('📝 FormData:', key, value);
+                    linkInBio.links.forEach(link => {
+                        link.removeLogo = false;
+                        link.logoFile = null;
+                    });
                 }
 
                 // Determine if this is an update or create
@@ -517,10 +512,6 @@ createApp({
 
                 // Reload links in the sidebar
                 await loadLinks();
-
-                // Reset the active tab to the first tab
-                activeTab.value = tabs[0].id;
-
             } catch (error) {
                 console.error('Error deleting Link:', error);
 
@@ -600,7 +591,6 @@ createApp({
             links,
             selectedLinkId,
             tabs,
-            activeTab,
             appShortener,
             urlShortener,
             linkInBio,

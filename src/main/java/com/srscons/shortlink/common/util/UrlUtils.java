@@ -1,4 +1,4 @@
-package com.srscons.shortlink.util;
+package com.srscons.shortlink.common.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

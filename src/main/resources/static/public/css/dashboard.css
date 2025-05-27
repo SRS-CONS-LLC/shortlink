@@ -6,12 +6,6 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-body {
-    display: flex;
-    min-height: 100vh;
-    background-color: #f7f8fa;
-}
-
 .layout {
     display: flex;
     width: 100%;
@@ -80,17 +74,12 @@ body {
 .input-wrapper {
     display: flex;
     align-items: center;
-    background: #f8fafd;
-    border: 1px solid #dbe1ea;
-    border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
 }
 
 .readonly-input {
     flex: 1;
     border: none;
-    background: transparent;
-    margin: 0 0.5rem;
+    background: #acacac82;
 }
 
 .icon-btn {
@@ -136,7 +125,6 @@ body {
     flex: 1;
     background-color: white;
     border-radius: 8px;
-    padding: 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
@@ -145,6 +133,7 @@ body {
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     justify-content: center;
+    margin-top:10px;
 }
 
 .form-group {
@@ -155,14 +144,6 @@ body {
     display: block;
     font-weight: 500;
     margin-bottom: 8px;
-}
-
-.form-control {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
 }
 
 .upload-btn {
@@ -430,7 +411,6 @@ body {
 }
 
 .save-btn {
-    width: 100%;
     padding: 12px;
     background-color: #4CAF50;
     color: white;
@@ -614,13 +594,7 @@ body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     }
 
-    body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden; /* Prevent body scrolling */
-        background-color: #f7f8fa;
-        height: 100vh;
-    }
+
 
     .layout {
         display: flex;
@@ -629,23 +603,7 @@ body {
         overflow: hidden; /* Prevent layout scrolling */
     }
 
-    /* Sidebar Styles - Fixed position */
-    .sidebar {
-        width: 280px;
-        height: 100vh;
-        background: #fff;
-        border-right: 1px solid #dbe1ea;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 1.5rem;
-        position: fixed; /* Fixed position */
-        top: 0;
-        left: 0;
-        bottom: 0;
-        overflow-y: auto; /* Allow sidebar to scroll if content is too tall */
-        z-index: 100;
-    }
+
 
     /* Links container in sidebar needs fixed height with scrolling */
     #links-container {
@@ -653,25 +611,6 @@ body {
         max-height: calc(100vh - 300px); /* Adjust based on other sidebar elements */
     }
 
-    .sidebar .nav-link {
-        color: #6c757d;
-        text-decoration: none;
-        padding: 0.5rem;
-        border-radius: 0.5rem;
-        margin-bottom: 0.25rem;
-        transition: all 0.2s ease;
-    }
-
-    .sidebar .nav-link:hover {
-        background: #f8fafd;
-        color: #000;
-    }
-
-    .sidebar .nav-link.active-link {
-        background: #2f2f32;
-        color: #000;
-        font-weight: 500;
-    }
 
     .section-title {
         font-size: 0.8rem;
@@ -690,7 +629,6 @@ body {
     .main-content {
         flex: 1;
         padding: 2rem;
-        margin-left: 280px; /* Equal to sidebar width */
         height: 100vh;
         overflow-y: auto; /* Enable scrolling */
         position: relative;
@@ -713,14 +651,6 @@ body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     }
 
-    body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden; /* Prevent body scrolling */
-        background-color: #f7f8fa;
-        height: 100vh;
-    }
-
     .layout {
         display: flex;
         width: 100%;
@@ -728,23 +658,6 @@ body {
         overflow: hidden; /* Prevent layout scrolling */
     }
 
-    /* Sidebar that scrolls as a whole */
-    .sidebar {
-        width: 280px;
-        height: 100vh;
-        background: #fff;
-        border-right: 1px solid #dbe1ea;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 1.5rem;
-        position: fixed; /* Fixed position */
-        top: 0;
-        left: 0;
-        bottom: 0;
-        overflow-y: auto; /* Make entire sidebar scrollable */
-        z-index: 100;
-    }
 
     /* Prevent links container from having its own scrolling */
     #links-container {
@@ -752,26 +665,7 @@ body {
         max-height: none; /* Remove height constraints */
     }
 
-    /* Sidebar styling */
-    .sidebar .nav-link {
-        color: #6c757d;
-        text-decoration: none;
-        padding: 0.5rem;
-        border-radius: 0.5rem;
-        margin-bottom: 0.25rem;
-        transition: all 0.2s ease;
-    }
 
-    .sidebar .nav-link:hover {
-        background: #f8fafd;
-        color: #000;
-    }
-
-    .sidebar .nav-link.active-link {
-        background: #2f2f32;
-        color: #000;
-        font-weight: 500;
-    }
 
     .section-title {
         font-size: 0.8rem;
@@ -790,30 +684,14 @@ body {
     .main-content {
         flex: 1;
         padding: 2rem;
-        margin-left: 280px; /* Equal to sidebar width */
         height: 100vh;
         overflow-y: auto; /* Enable scrolling */
         position: relative;
         width: calc(100% - 280px); /* Calculate remaining width */
     }
 
-    /* Custom scrollbar for the entire sidebar */
-    .sidebar::-webkit-scrollbar {
-        width: 5px;
-    }
 
-    .sidebar::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
 
-    .sidebar::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 10px;
-    }
-
-    .sidebar::-webkit-scrollbar-thumb:hover {
-        background: #a1a1a1;
-    }
 
     /* CSS for the delete button in the top right corner */
     .delete-link-btn {
@@ -937,4 +815,61 @@ body {
 
     .visible {
         display: block;
+    }
+
+    /* Sidebar Styles - Scrollable and Fixed */
+    .sidebar {
+        background: #fff;
+        /*width: 280px;*/
+        /*height: 100vh;*/
+        /*border-right: 1px solid #dbe1ea;*/
+        /*display: flex;*/
+        /*flex-direction: column;*/
+        /*justify-content: space-between;*/
+        /*padding: 1.5rem;*/
+        /*position: fixed;*/
+        /*top: 0;*/
+        /*left: 0;*/
+        /*bottom: 0;*/
+        /*overflow-y: auto;*/
+        /*z-index: 100;*/
+    }
+
+    /* Sidebar Navigation Links */
+    .sidebar .nav-link {
+        color: #6c757d;
+        text-decoration: none;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 0.25rem;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar .nav-link:hover {
+        background: #f8fafd;
+        color: #000;
+    }
+
+    .sidebar .nav-link.active-link {
+        background: #2f2f32;
+        color: #000;
+        font-weight: 500;
+    }
+
+    /* Custom Scrollbar for Sidebar */
+    .sidebar::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 10px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
     }
