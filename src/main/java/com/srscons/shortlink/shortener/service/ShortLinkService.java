@@ -10,6 +10,7 @@ import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import com.srscons.shortlink.shortener.service.mapper.ShortLinkMapper;
 import com.srscons.shortlink.shortener.util.FileUploadService;
+import io.nayuki.qrcodegen.QrCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -62,10 +63,11 @@ public class ShortLinkService {
     }
 
     @Transactional
-    public ShortLinkDto create(ShortLinkDto dto) {
+    public ShortLinkDto create(ShortLinkDto dto, HttpServletRequest request) {
         ShortLinkEntity entity = mapper.fromBusinessToEntity(dto);
         entity.setOriginalUrl("https://www.citout.me");
         entity.setShortCode(generateUniqueShortCode());
+        entity.setQrCodeSvg(generateQrCodeSvg(entity.getShortCode(), request));
 
         // Handle link items
         if (dto.getLinks() != null) {
@@ -262,6 +264,57 @@ public class ShortLinkService {
             shortCode.append(ALPHABET.charAt(index));
         }
         return shortCode.toString();
+    }
+
+    public String generateQrCodeSvg(String shortCode, HttpServletRequest request) {
+        String fullUrl = getBaseUrl(request) + "/" + shortCode;
+        QrCode qr = QrCode.encodeText(fullUrl, QrCode.Ecc.LOW);
+        return toSvgString(qr);
+    }
+
+    private String toSvgString(QrCode qr) {
+        int border = 1;
+        int size = qr.size;
+
+        StringBuilder pathData = new StringBuilder();
+        for (int y = 0; y < size; y++) {
+            boolean inLine = false;
+            for (int x = 0; x < size; x++) {
+                if (qr.getModule(x, y)) {
+                    if (!inLine) {
+                        pathData.append("M").append(x + border).append(",").append(y + border).append("h1");
+                        inLine = true;
+                    } else {
+                        pathData.append("h1");
+                    }
+                } else {
+                    inLine = false;
+                }
+            }
+        }
+
+        int fullSize = size + border * 2;
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 "
+                + fullSize + " " + fullSize + "\" shape-rendering=\"crispEdges\">\n"
+                + "<rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n"
+                + "<path d=\"" + pathData + "\" stroke=\"black\"/>\n"
+                + "</svg>\n";
+    }
+
+    private String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        int serverPort = request.getServerPort();
+
+        StringBuilder baseUrl = new StringBuilder();
+        baseUrl.append(scheme).append("://").append(serverName);
+
+        if ((scheme.equals("http") && serverPort != 80) ||
+                (scheme.equals("https") && serverPort != 443)) {
+            baseUrl.append(":").append(serverPort);
+        }
+        return baseUrl.toString();
     }
 
     private void uploadLogoIfPresent(MultipartFile logoFile, ShortLinkEntity entity) {
