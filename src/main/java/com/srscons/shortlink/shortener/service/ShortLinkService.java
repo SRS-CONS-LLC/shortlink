@@ -138,110 +138,64 @@ public class ShortLinkService {
 
 
     @Transactional
-    public ShortLinkDto update(ShortLinkDto dto) {
-
-        ShortLinkEntity existing = repository.findById(dto.getId())
-                .orElseThrow(() -> new ShortLinkNotFoundException(dto.getId()));
+    public ShortLinkDto update(ShortLinkDto shortLinkDto) {
+        ShortLinkEntity foundShortLink = repository.findById(shortLinkDto.getId())
+                .orElseThrow(() -> new ShortLinkNotFoundException(shortLinkDto.getId()));
 
         // Update main fields
-        existing.setTitle(dto.getTitle());
-        existing.setOriginalUrl(dto.getOriginalUrl());
-        existing.setDescription(dto.getDescription());
-        existing.setThemeType(dto.getThemeType());
-        existing.setLayoutType(dto.getLayoutType());
-        existing.setThemeColor(dto.getThemeColor());
-        existing.setLinkType(dto.getLinkType());
+        foundShortLink.setTitle(shortLinkDto.getTitle());
+        foundShortLink.setOriginalUrl(shortLinkDto.getOriginalUrl());
+        foundShortLink.setDescription(shortLinkDto.getDescription());
+        foundShortLink.setThemeType(shortLinkDto.getThemeType());
+        foundShortLink.setLayoutType(shortLinkDto.getLayoutType());
+        foundShortLink.setThemeColor(shortLinkDto.getThemeColor());
+        foundShortLink.setLinkType(shortLinkDto.getLinkType());
 
-        if(!dto.getShortCode().equalsIgnoreCase(existing.getShortCode())) {
-            if(repository.existsByShortCodeIgnoreCase(dto.getShortCode())) {
-                throw new ShortLinkException("Short code already exists: " + dto.getShortCode());
+        if(!shortLinkDto.getShortCode().equalsIgnoreCase(foundShortLink.getShortCode())) {
+            if(repository.existsByShortCodeIgnoreCase(shortLinkDto.getShortCode())) {
+                throw new ShortLinkException("Short code already exists: " + shortLinkDto.getShortCode());
             }
 
-            existing.setShortCode(dto.getShortCode());
+            foundShortLink.setShortCode(shortLinkDto.getShortCode());
         }
-
-        log.info(" update() method was called for Smartlink ID: {}", dto.getId());
 
         // Main logo logic
-        if (dto.getLogoFile() != null && !dto.getLogoFile().isEmpty()) {
-            uploadLogoIfPresent(dto.getLogoFile(), existing);
-        } else if (dto.isRemoveMainLogo()) {
-            existing.setLogoUrl(null);
-        } else if (dto.getLogoUrl() != null && !dto.getLogoUrl().equals(existing.getLogoUrl())) {
-            existing.setLogoUrl(dto.getLogoUrl());
+        if (shortLinkDto.getLogoFile() != null && !shortLinkDto.getLogoFile().isEmpty()) {
+            uploadLogoIfPresent(shortLinkDto.getLogoFile(), foundShortLink);
+        } else if (shortLinkDto.isRemoveMainLogo()) {
+            foundShortLink.setLogoUrl(null);
+        } else if (shortLinkDto.getLogoUrl() != null && !shortLinkDto.getLogoUrl().equals(foundShortLink.getLogoUrl())) {
+            foundShortLink.setLogoUrl(shortLinkDto.getLogoUrl());
         }
 
+        List<LinkItemEntity> existingLinks = foundShortLink.getLinks();
+        existingLinks.clear();
         // Update link items based on index (position)
-        if (dto.getLinks() != null && dto.getLinkType() == LinkType.BIO) {
-            List<ShortLinkDto.LinkItemDto> incomingLinks = dto.getLinks();
-            log.info("📦 Incoming links:");
-            incomingLinks.forEach(l -> log.info("→ {} | deleted = {}", l.getTitle(), l.getDeleted()));
-
-            List<LinkItemEntity> existingLinks = existing.getLinks();
-            log.info("📦 Existing links count: {}", existingLinks.size());
-            existingLinks.forEach(l -> log.info("→ {} | deleted = {}", l.getTitle(), l.isDeleted()));
-            
-            int count = Math.min(existingLinks.size(), incomingLinks.size());
-            log.info("🔁 Updating {} link items by position", count);
-
-            // First update existing links
-            for (int i = 0; i < count; i++) {
-                LinkItemEntity item = existingLinks.get(i);
-                ShortLinkDto.LinkItemDto itemDto = incomingLinks.get(i);
-
-                log.info("🧹 Link #{} | title='{}' | url='{}' | deleted={}",
-                        i, itemDto.getTitle(), itemDto.getUrl(), itemDto.getDeleted());
-
-                if (Boolean.TRUE.equals(itemDto.getDeleted())) {
-                    item.setDeleted(true);
-                    log.info("🗑️ Marked link #{} as deleted", i);
-                    continue;
-                }
-                item.setTitle(itemDto.getTitle());
-                item.setUrl(itemDto.getUrl());
-
-                String newLogoUrl = itemDto.getLogoUrl();
-                String existingLogoUrl = item.getLogoUrl();
-
-                log.info(" Link #{} - Existing logo: {}, Incoming logo: {}", i, existingLogoUrl, newLogoUrl);
-
-                if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
-                    uploadLogoIfPresent(itemDto.getLogoFile(), item);
-                    log.info("→ Uploaded new logo for link #{}", i);
-                } else if (itemDto.isRemoveLogo()) {
-                    item.setLogoUrl(null);
-                    log.info("→ Removed logo for link #{}", i);
-                } else if (newLogoUrl != null && !newLogoUrl.trim().isEmpty()) {
-                    item.setLogoUrl(newLogoUrl);
-                    log.info("→ Updated logoUrl for link #{} to {}", i, newLogoUrl);
-                } else {
-                    log.info("→ Logo unchanged for link #{}", i);
-                }
-            }
-
-            // Then add any new links
-            for (int i = count; i < incomingLinks.size(); i++) {
-                ShortLinkDto.LinkItemDto itemDto = incomingLinks.get(i);
-                if (itemDto.getUrl() != null && !itemDto.getUrl().trim().isEmpty() && !Boolean.TRUE.equals(itemDto.getDeleted())) {
-                    LinkItemEntity newItem = new LinkItemEntity();
-                    newItem.setTitle(itemDto.getTitle());
-                    newItem.setUrl(itemDto.getUrl());
-                    newItem.setShortLink(existing);
-                    newItem.setDeleted(false);
+        if (shortLinkDto.getLinks() != null && shortLinkDto.getLinkType() == LinkType.BIO) {
+            for (int i = 0; i < shortLinkDto.getLinks().size(); i++) {
+                ShortLinkDto.LinkItemDto itemDto = shortLinkDto.getLinks().get(i);
+                if (itemDto.getUrl() != null && !itemDto.getUrl().isBlank()) {
+                    LinkItemEntity linkEntity = new LinkItemEntity();
+                    linkEntity.setTitle(itemDto.getTitle());
+                    linkEntity.setUrl(itemDto.getUrl());
+                    linkEntity.setShortLink(foundShortLink);
+                    linkEntity.setDeleted(false);
 
                     if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
-                        uploadLogoIfPresent(itemDto.getLogoFile(), newItem);
-                    } else if (itemDto.getLogoUrl() != null && !itemDto.getLogoUrl().trim().isEmpty()) {
-                        newItem.setLogoUrl(itemDto.getLogoUrl());
+                        uploadLogoIfPresent(itemDto.getLogoFile(), linkEntity);
+                    } else if (itemDto.getLogoUrl() != null && !itemDto.getLogoUrl().isBlank()) {
+                        linkEntity.setLogoUrl(itemDto.getLogoUrl());
                     }
 
-                    existing.getLinks().add(newItem);
-                    log.info("➕ Added new link: {} | url={}", itemDto.getTitle(), itemDto.getUrl());
+                    existingLinks.add(linkEntity);
                 }
             }
+
+            foundShortLink.setLinks(existingLinks);
         }
 
-        ShortLinkEntity updated = repository.save(existing);
+        ShortLinkEntity updated = repository.save(foundShortLink);
+
         return mapper.fromEntityToBusiness(updated);
     }
 

@@ -55,7 +55,7 @@ public class ShortLinkEntity {
     @Column(name = "logo_url")
     private String logoUrl;
 
-    @OneToMany(mappedBy = "shortLink", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "shortLink", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LinkItemEntity> links;
 
     @OneToMany(mappedBy = "shortLink", cascade = CascadeType.ALL, orphanRemoval = true)
