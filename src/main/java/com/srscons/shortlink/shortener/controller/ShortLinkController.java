@@ -38,7 +38,7 @@ public class ShortLinkController {
         UserEntity loggedInUser = (UserEntity) request.getAttribute(CONSTANTS.LOGGED_IN_USER);
         shortLinkDto.setUser(new UserDto(loggedInUser.getId()));
 
-        ShortLinkDto createdDto = shortLinkService.create(shortLinkDto, request);
+        ShortLinkDto createdDto = shortLinkService.create(shortLinkDto);
         ShortLinkResponseDto responseDto = shortLinkViewMapper.fromBusinessToResponse(createdDto);
         return ResponseEntity.ok(responseDto);
     }

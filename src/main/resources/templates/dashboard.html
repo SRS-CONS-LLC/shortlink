@@ -47,10 +47,17 @@
             <div class=" mt-3">
                 <div class="row g-4">
 
-                    <div class="col-md-3 d-flex align-items-center justify-content-center">
-                        <div class="qr-code-box border rounded p-2">
-                            <div v-if="linkInBio.qrCodeSvg" v-html="linkInBio.qrCodeSvg"></div>
+                    <div class="col-md-3 d-flex flex-column align-items-center justify-content-center">
+                        <div class="qr-code-box" @click="downloadQRCode">
+                            <div v-if="linkInBio.qrCodeSvg" v-html="linkInBio.qrCodeSvg" class="qr-code-svg"></div>
                             <span v-else>No QR Code available</span>
+                            <div class="qr-hover-overlay">
+                                <span>Download QR</span>
+                            </div>
+                        </div>
+                        <div class="qr-download-info">
+                            <i class="bi bi-arrow-down-circle"></i>
+                            <span>Click for download</span>
                         </div>
                     </div>
 

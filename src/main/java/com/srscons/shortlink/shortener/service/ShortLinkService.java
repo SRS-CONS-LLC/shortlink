@@ -3,9 +3,9 @@ package com.srscons.shortlink.shortener.service;
 import com.srscons.shortlink.common.exception.ShortLinkException;
 import com.srscons.shortlink.common.exception.ShortLinkNotFoundException;
 import com.srscons.shortlink.shortener.repository.ShortLinkRepository;
-import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.repository.entity.LinkItemEntity;
 import com.srscons.shortlink.shortener.repository.entity.MetaDataEntity;
+import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import com.srscons.shortlink.shortener.service.mapper.ShortLinkMapper;
@@ -14,16 +14,21 @@ import io.nayuki.qrcodegen.QrCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 @Service
 @RequiredArgsConstructor
 public class ShortLinkService {
@@ -39,12 +44,14 @@ public class ShortLinkService {
     private static final String ALPHABET = "23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ";
     private static final int SHORT_CODE_LENGTH = 6;
     private static final int MAX_ATTEMPTS = 10;
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     public List<ShortLinkDto> findAll(Long userId) {
         try {
             List<ShortLinkEntity> entities = repository.findAllByDeletedFalseAndUserId(userId);
             log.info("Found {} non-deleted short links", entities.size());
-            
+
             return entities.stream()
                     .map(entity -> {
                         try {
@@ -63,11 +70,11 @@ public class ShortLinkService {
     }
 
     @Transactional
-    public ShortLinkDto create(ShortLinkDto dto, HttpServletRequest request) {
+    public ShortLinkDto create(ShortLinkDto dto) {
         ShortLinkEntity entity = mapper.fromBusinessToEntity(dto);
         entity.setOriginalUrl("https://www.citout.me");
         entity.setShortCode(generateUniqueShortCode());
-        entity.setQrCodeSvg(generateQrCodeSvg(entity.getShortCode(), request));
+        entity.setQrCodeSvg(generateQrCodeSvg(entity.getShortCode()));
 
         // Handle link items
         if (dto.getLinks() != null) {
@@ -154,12 +161,12 @@ public class ShortLinkService {
         existing.setThemeColor(dto.getThemeColor());
         existing.setLinkType(dto.getLinkType());
 
-        if(!dto.getShortCode().equalsIgnoreCase(existing.getShortCode())) {
-            if(repository.existsByShortCodeIgnoreCase(dto.getShortCode())) {
+        if (!dto.getShortCode().equalsIgnoreCase(existing.getShortCode())) {
+            if (repository.existsByShortCodeIgnoreCase(dto.getShortCode())) {
                 throw new ShortLinkException("Short code already exists: " + dto.getShortCode());
             }
-
             existing.setShortCode(dto.getShortCode());
+            existing.setQrCodeSvg(generateQrCodeSvg(existing.getShortCode()));
         }
 
         log.info(" update() method was called for Smartlink ID: {}", dto.getId());
@@ -182,7 +189,7 @@ public class ShortLinkService {
             List<LinkItemEntity> existingLinks = existing.getLinks();
             log.info("📦 Existing links count: {}", existingLinks.size());
             existingLinks.forEach(l -> log.info("→ {} | deleted = {}", l.getTitle(), l.isDeleted()));
-            
+
             int count = Math.min(existingLinks.size(), incomingLinks.size());
             log.info("🔁 Updating {} link items by position", count);
 
@@ -266,9 +273,9 @@ public class ShortLinkService {
         return shortCode.toString();
     }
 
-    public String generateQrCodeSvg(String shortCode, HttpServletRequest request) {
-        String fullUrl = getBaseUrl(request) + "/" + shortCode;
-        QrCode qr = QrCode.encodeText(fullUrl, QrCode.Ecc.LOW);
+    public String generateQrCodeSvg(String shortCode) {
+        String fullUrl = baseUrl + shortCode;
+        QrCode qr = QrCode.encodeText(fullUrl, QrCode.Ecc.MEDIUM);
         return toSvgString(qr);
     }
 
@@ -300,21 +307,6 @@ public class ShortLinkService {
                 + "<rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n"
                 + "<path d=\"" + pathData + "\" stroke=\"black\"/>\n"
                 + "</svg>\n";
-    }
-
-    private String getBaseUrl(HttpServletRequest request) {
-        String scheme = request.getScheme();
-        String serverName = request.getServerName();
-        int serverPort = request.getServerPort();
-
-        StringBuilder baseUrl = new StringBuilder();
-        baseUrl.append(scheme).append("://").append(serverName);
-
-        if ((scheme.equals("http") && serverPort != 80) ||
-                (scheme.equals("https") && serverPort != 443)) {
-            baseUrl.append(":").append(serverPort);
-        }
-        return baseUrl.toString();
     }
 
     private void uploadLogoIfPresent(MultipartFile logoFile, ShortLinkEntity entity) {

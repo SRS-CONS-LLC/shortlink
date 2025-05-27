@@ -585,6 +585,35 @@ createApp({
             return link.isValidUrl;
         }
 
+        function downloadQRCode() {
+            if (!linkInBio.qrCodeSvg) return;
+            const container = document.createElement('div');
+            container.innerHTML = linkInBio.qrCodeSvg;
+            const svgElement = container.querySelector('svg');
+            // Set size limits
+            const MIN_SIZE = 256;
+            const MAX_SIZE = 800;
+            // Get current size
+            const viewBox = svgElement.getAttribute('viewBox');
+            const [, , width] = viewBox.split(' ').map(Number);
+            // Calculate final size within limits
+            const finalSize = Math.min(Math.max(width, MIN_SIZE), MAX_SIZE);
+            // Apply size
+            svgElement.setAttribute('width', finalSize);
+            svgElement.setAttribute('height', finalSize);
+            // Create and trigger download
+            const blob = new Blob([container.innerHTML], { type: 'image/svg+xml' });
+            const url = window.URL.createObjectURL(blob);
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.download = `your-citout-qr-code.svg`;
+            
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            // Cleanup
+            document.body.removeChild(downloadLink);
+            window.URL.revokeObjectURL(url);
+        }
 
         return {
             loggedInUser,
@@ -618,7 +647,8 @@ createApp({
             createNewLink,
             saveChanges,
             handleQRTagImageUpload,
-            undoDelete
+            undoDelete,
+            downloadQRCode
         };
     }
 }).mount('#app');
