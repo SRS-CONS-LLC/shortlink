@@ -225,14 +225,23 @@
 
                                     <!-- Link items are rendered below the dropdown -->
                                     <div class="links-container">
-                                        <div class="link-item d-flex align-items-center" v-for="(link, index) in linkInBio.links" :key="index">
+                                        <div class="link-item d-flex align-items-center"
+                                             v-for="(link, index) in linkInBio.links"
+                                             :key="index"
+                                             draggable="true"
+                                             @dragstart="onDragStart(index)"
+                                             @dragover.prevent="onDragOver(index)"
+                                             @drop="onDrop(index)"
+                                             @dragend="onDragEnd"
+                                             :class="{ 'dragging': draggingIndex === index }"
+                                        >
                                             <div class="drag-handle me-2" style="font-size: 1.5em; color: #b0b8c1;">☰</div>
-                                            <span v-if="link.logoPreview || link.logoUrl" style="position: relative; display: inline-block;">
+                                            <span v-if="link.logoPreview || link.logoUrl" style="position: relative; display: inline-block; width: 32px; height: 32px;">
+                                                <img :src="link.logoPreview || link.logoUrl" class="link-icon me-2" style="width: 32px; height: 32px; object-fit: cover; border-radius: 50%;" />
                                                 <button @click="removeLogo(index)" title="Remove icon"
-                                                        style="position: absolute; top: -8px; left: -8px; width: 20px; height: 20px; background: #ff3b30; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; z-index: 2;">
+                                                        style="position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; background: #ff3b30; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; z-index: 2;">
                                                     <i class="bi bi-x"></i>
                                                 </button>
-                                                <img :src="link.logoPreview || link.logoUrl" class="link-icon me-2" style="width: 32px; height: 32px; object-fit: cover; border-radius: 50%;" />
                                             </span>
                                             <!-- Show upload input if no logoUrl -->
                                             <span v-else style="position: relative; display: inline-block; width: 32px; height: 32px; vertical-align: middle;">
