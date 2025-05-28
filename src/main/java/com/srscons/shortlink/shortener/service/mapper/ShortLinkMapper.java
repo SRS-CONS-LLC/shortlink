@@ -1,7 +1,7 @@
 package com.srscons.shortlink.shortener.service.mapper;
 
-import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.repository.entity.LinkItemEntity;
+import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import org.mapstruct.*;
 
@@ -17,6 +17,7 @@ public interface ShortLinkMapper {
     @Mapping(target = "links", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "shortCode", ignore = true)
+    @Mapping(target = "qrCodeSvg", ignore = true)
     @Mapping(target = "visitMetadata", ignore = true)
     @Mapping(target = "linkType", source = "linkType")
     ShortLinkEntity fromBusinessToEntity(ShortLinkDto dto);
@@ -24,6 +25,7 @@ public interface ShortLinkMapper {
     @Mapping(target = "links", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "shortCode", ignore = true)
+    @Mapping(target = "qrCodeSvg", ignore = true)
     @Mapping(target = "visitMetadata", ignore = true)
     void updateEntityFromDto(ShortLinkDto dto, @MappingTarget ShortLinkEntity entity);
 

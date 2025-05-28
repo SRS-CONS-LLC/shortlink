@@ -1,8 +1,8 @@
 package com.srscons.shortlink.shortener.service.dto;
 
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
-import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
+import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Data
 public class ShortLinkDto {
-    
+
     private Long id;
     private String title;
     private String description;
@@ -21,6 +21,7 @@ public class ShortLinkDto {
     private LinkType linkType;
     private String themeColor;
     private String shortCode;
+    private String qrCodeSvg;
     private String originalUrl;
     private List<LinkItemDto> links;
     private UserDto user;

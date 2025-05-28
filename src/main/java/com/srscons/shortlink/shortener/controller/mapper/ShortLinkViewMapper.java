@@ -6,7 +6,6 @@ import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Value;
 
 @Mapper(componentModel = "spring")
 public interface ShortLinkViewMapper {
@@ -21,6 +20,6 @@ public interface ShortLinkViewMapper {
         if (shortCode == null) {
             return null;
         }
-        return "http://localhost:8080/" + shortCode;
+        return "https://citout.me/" + shortCode;
     }
 } 

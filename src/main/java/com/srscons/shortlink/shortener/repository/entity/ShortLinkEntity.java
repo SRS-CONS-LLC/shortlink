@@ -2,8 +2,8 @@ package com.srscons.shortlink.shortener.repository.entity;
 
 import com.srscons.shortlink.auth.entity.UserEntity;
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
-import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
+import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -33,6 +33,9 @@ public class ShortLinkEntity {
 
     @Column(name = "short_code", unique = true, nullable = false)
     private String shortCode;
+
+    @Column(name = "qr_code_svg", columnDefinition = "TEXT")
+    private String qrCodeSvg;
 
     @Column(name = "original_url", nullable = false)
     private String originalUrl;
