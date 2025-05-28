@@ -14,17 +14,16 @@ import io.nayuki.qrcodegen.QrCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 @Service
 @RequiredArgsConstructor
 public class ShortLinkService {
@@ -34,14 +33,9 @@ public class ShortLinkService {
     private final FileUploadService fileUploadService;
     private final Random random = new SecureRandom();
     private static final Logger log = LoggerFactory.getLogger(ShortLinkService.class);
-    private static final Pattern OS_VERSION_PATTERN = Pattern.compile("OS ([\\d_.]+)");
-    private static final Pattern BROWSER_PATTERN = Pattern.compile("(Chrome|Firefox|Safari|Edge|Opera|MSIE|Trident)[/\\s]([\\d.]+)");
-    private static final Pattern OS_PATTERN = Pattern.compile("(Windows|Mac OS X|Linux|Android|iOS)[/\\s]([\\d._]+)?");
     private static final String ALPHABET = "23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ";
     private static final int SHORT_CODE_LENGTH = 6;
     private static final int MAX_ATTEMPTS = 10;
-    @Value("${app.base-url}")
-    private String baseUrl;
 
     public List<ShortLinkDto> findAll(Long userId) {
         try {
@@ -66,11 +60,11 @@ public class ShortLinkService {
     }
 
     @Transactional
-    public ShortLinkDto create(ShortLinkDto dto) {
+    public ShortLinkDto create(ShortLinkDto dto, String baseUrl) {
         ShortLinkEntity entity = mapper.fromBusinessToEntity(dto);
         entity.setOriginalUrl("https://www.citout.me");
         entity.setShortCode(generateUniqueShortCode());
-        entity.setQrCodeSvg(generateQrCodeSvg(entity.getShortCode()));
+        entity.setQrCodeSvg(generateQrCodeSvg(entity.getShortCode(), baseUrl));
 
         // Handle link items
         if (dto.getLinks() != null) {
@@ -97,9 +91,6 @@ public class ShortLinkService {
             }
         }
 
-        System.out.println("Saving ShortLink with linkType: " + entity.getLinkType());
-        System.out.println("Existing logo: " + entity.getLogoUrl());
-        System.out.println("DTO logo: " + dto.getLogoUrl());
         ShortLinkEntity saved = repository.save(entity);
         return mapper.fromEntityToBusiness(saved);
     }
@@ -143,7 +134,7 @@ public class ShortLinkService {
 
 
     @Transactional
-    public ShortLinkDto update(ShortLinkDto shortLinkDto) {
+    public ShortLinkDto update(ShortLinkDto shortLinkDto, String baseUrl) {
         ShortLinkEntity foundShortLink = repository.findById(shortLinkDto.getId())
                 .orElseThrow(() -> new ShortLinkNotFoundException(shortLinkDto.getId()));
 
@@ -161,7 +152,7 @@ public class ShortLinkService {
                 throw new ShortLinkException("Short code already exists: " + shortLinkDto.getShortCode());
             }
 
-            foundShortLink.setQrCodeSvg(generateQrCodeSvg(foundShortLink.getShortCode()));
+            foundShortLink.setQrCodeSvg(generateQrCodeSvg(foundShortLink.getShortCode(), baseUrl));
             foundShortLink.setShortCode(shortLinkDto.getShortCode());
         }
 
@@ -224,8 +215,8 @@ public class ShortLinkService {
         return shortCode.toString();
     }
 
-    public String generateQrCodeSvg(String shortCode) {
-        String fullUrl = baseUrl + shortCode;
+    public String generateQrCodeSvg(String shortCode, String baseUrl) {
+        String fullUrl = baseUrl +"/"+ shortCode;
         QrCode qr = QrCode.encodeText(fullUrl, QrCode.Ecc.MEDIUM);
         return toSvgString(qr);
     }

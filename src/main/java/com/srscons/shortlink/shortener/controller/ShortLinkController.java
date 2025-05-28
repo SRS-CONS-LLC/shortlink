@@ -38,19 +38,22 @@ public class ShortLinkController {
         UserEntity loggedInUser = (UserEntity) request.getAttribute(CONSTANTS.LOGGED_IN_USER);
         shortLinkDto.setUser(new UserDto(loggedInUser.getId()));
 
-        ShortLinkDto createdDto = shortLinkService.create(shortLinkDto);
+        ShortLinkDto createdDto = shortLinkService.create(shortLinkDto, getBaseUrl(request));
+
         ShortLinkResponseDto responseDto = shortLinkViewMapper.fromBusinessToResponse(createdDto);
+
         return ResponseEntity.ok(responseDto);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ShortLinkResponseDto> updateShortLink(
             @PathVariable("id") Long id,
-            @Valid @ModelAttribute ShortLinkRequestDto request) {
+            @Valid @ModelAttribute ShortLinkRequestDto shortLinkRequestDto,
+            HttpServletRequest request) {
         try {
-            ShortLinkDto shortLinkDto = shortLinkViewMapper.fromRequestToBusiness(request);
+            ShortLinkDto shortLinkDto = shortLinkViewMapper.fromRequestToBusiness(shortLinkRequestDto);
             shortLinkDto.setId(id);
-            ShortLinkDto updatedDto = shortLinkService.update(shortLinkDto);
+            ShortLinkDto updatedDto = shortLinkService.update(shortLinkDto, getBaseUrl(request));
             ShortLinkResponseDto responseDto = shortLinkViewMapper.fromBusinessToResponse(updatedDto);
             return ResponseEntity.ok(responseDto);
         } catch (ShortLinkNotFoundException e) {
@@ -93,6 +96,27 @@ public class ShortLinkController {
         } catch (ShortLinkNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    private static String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme();             // http or https
+        String serverName = request.getServerName();     // domain or IP
+        int serverPort = request.getServerPort();        // 80, 443, etc.
+        String contextPath = request.getContextPath();   // usually ""
+
+        // Build base URL
+        StringBuilder url = new StringBuilder();
+        url.append(scheme).append("://").append(serverName);
+
+        // Only add port if it's not default
+        if ((scheme.equals("http") && serverPort != 80) ||
+                (scheme.equals("https") && serverPort != 443)) {
+            url.append(":").append(serverPort);
+        }
+
+        url.append(contextPath);
+
+        return url.toString(); // e.g., https://example.com or http://localhost:8080/app
     }
 
 } 
