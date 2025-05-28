@@ -36,6 +36,13 @@ public class ShortLinkService {
     private static final String ALPHABET = "23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ";
     private static final int SHORT_CODE_LENGTH = 6;
     private static final int MAX_ATTEMPTS = 10;
+    private static final String SVG_QR_CODE_TEMPLATE = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 %d %d" shape-rendering="crispEdges">
+                    <rect width="100%%" height="100%%" fill="white"/>
+                    <path d="%s" stroke="black"/>
+                </svg>
+                """;
 
     public List<ShortLinkDto> findAll(Long userId) {
         try {
@@ -243,12 +250,8 @@ public class ShortLinkService {
         }
 
         int fullSize = size + border * 2;
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                + "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 "
-                + fullSize + " " + fullSize + "\" shape-rendering=\"crispEdges\">\n"
-                + "<rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n"
-                + "<path d=\"" + pathData + "\" stroke=\"black\"/>\n"
-                + "</svg>\n";
+
+        return SVG_QR_CODE_TEMPLATE.formatted(fullSize, fullSize, pathData);
     }
 
     private void uploadLogoIfPresent(MultipartFile logoFile, ShortLinkEntity entity) {
