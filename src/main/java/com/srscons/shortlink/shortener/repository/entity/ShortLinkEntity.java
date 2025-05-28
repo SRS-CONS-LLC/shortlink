@@ -1,6 +1,5 @@
 package com.srscons.shortlink.shortener.repository.entity;
 
-import com.srscons.shortlink.shortener.analytics.MetaDataEntity;
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
 import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
 import jakarta.persistence.CascadeType;

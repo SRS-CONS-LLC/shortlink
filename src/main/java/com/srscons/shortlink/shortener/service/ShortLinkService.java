@@ -4,7 +4,7 @@ import com.srscons.shortlink.shortener.exception.ShortLinkNotFoundException;
 import com.srscons.shortlink.shortener.repository.ShortLinkRepository;
 import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.repository.entity.LinkItemEntity;
-import com.srscons.shortlink.shortener.analytics.MetaDataEntity;
+import com.srscons.shortlink.shortener.repository.entity.MetaDataEntity;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import com.srscons.shortlink.shortener.service.mapper.ShortLinkMapper;
 import com.srscons.shortlink.shortener.util.FileUploadService;

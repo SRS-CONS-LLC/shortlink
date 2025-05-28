@@ -1,4 +1,4 @@
-package com.srscons.shortlink.shortener.analytics;
+package com.srscons.shortlink.shortener.repository.entity;
 
 import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import jakarta.persistence.*;

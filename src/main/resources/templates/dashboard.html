@@ -98,108 +98,205 @@
 
             </div>
 
-            <!--            <div id="app" class="container py-5">-->
 
-            <div v-if="activeSection === 'analytics'">
-                <h5 class="fw-semibold">General Analytics</h5>
+            <div v-if="activeSection === 'analytics'" class="analytics-container">
+                <!-- Loading and Error States -->
+<!--                <div v-if="loading" class="loading-overlay">-->
+<!--                    <div class="spinner">Loading...</div>-->
+<!--                </div>-->
 
-                <div class="container-fluent">
+<!--                <div v-if="error" class="error-alert">-->
+<!--                    {{ error }}-->
+<!--                </div>-->
 
-                    <div v-if="activeSection === 'analytics'">
-                        <div class="analytics-section">
-                            <div class="analytics-card" v-for="metric in summaryMetrics" :key="metric.title">
-                                <span class="card-info" @click="showInfo(metric.infoText)">ⓘ</span>
-                                <div class="card-header">
-                                    <img src="/api/placeholder/16/16" :alt="metric.icon + ' icon'">
-                                    <span class="card-title">{{ metric.title }}</span>
-                                </div>
-                                <div class="card-value">{{ metric.value }}</div>
+                <!-- Info Modal -->
+                <div v-if="showInfoModal" class="info-modal">
+                    {{ infoText }}
+                </div>
+
+                <div class="analytics-header">
+                    <div class="analytics-title">
+                        <h5 class="fw-semibold">General Analytics</h5>
+                        <div class="analytics-controls">
+                            <button class="btn btn-outline-secondary btn-sm" @click="toggleShowBots">
+                                <i class="bi bi-robot"></i>
+                                {{ showBots ? 'Hide bots' : 'Show bots' }}
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" @click="exportToCSV">
+                                <i class="bi bi-download"></i>
+                                CSV
+                            </button>
+                            <div class="date-range-picker">
+                                <input type="date" v-model="startDate" @change="handleDateChange">
+                                <span>→</span>
+                                <input type="date" v-model="endDate" @change="handleDateChange">
+                                <button class="btn btn-outline-secondary btn-sm" @click="applyDateRange">
+                                    <i class="bi bi-calendar"></i>
+                                </button>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="chart-container">
-                            <span class="card-info"
-                                  @click="showInfo('This chart shows operating system usage over time.')">ⓘ</span>
+                <div class="analytics-content">
+                    <!-- Summary Metrics Cards -->
+                    <div class="analytics-section">
+                        <div class="analytics-card" v-for="metric in summaryMetrics" :key="metric.title">
+                            <span class="card-info" @click="showInfo(metric.infoText)">ⓘ</span>
                             <div class="card-header">
-                                <img src="/api/placeholder/16/16" alt="chart icon">
-                                <span class="card-title">Operating Systems Chart</span>
+                                <i :class="metric.icon"></i>
+                                <span class="card-title">{{ metric.title }}</span>
                             </div>
+                            <div class="card-value">{{ metric.value }}</div>
+                        </div>
+                    </div>
 
-                            <div class="legend">
-                                <div class="legend-item" v-for="os in osLegend" :key="os.name">
-                                    <div class="legend-color" :style="{ backgroundColor: os.color }"></div>
-                                    <span>{{ os.name }}</span>
+                    <!-- Chart Container -->
+                    <div class="chart-container">
+                        <h6 class="chart-title">Operating Systems Chart</h6>
+                        
+                        <!-- OS Legend -->
+                        <div class="os-legend">
+                            <span v-for="os in osLegend" :key="os.name" class="os-legend-item">
+                                <span class="os-dot" :style="{ backgroundColor: os.color }"></span>
+                                {{ os.name }}
+                            </span>
+                        </div>
+                        
+                        <div class="chart-wrapper">
+                            <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 1200 500">
+                                <!-- Background Grid -->
+                                <g class="chart-grid">
+                                    <!-- Y-axis line -->
+                                    <line 
+                                        x1="100" 
+                                        y1="50" 
+                                        x2="100" 
+                                        y2="400"
+                                        class="axis-line" 
+                                    />
+
+                                    <!-- Horizontal grid lines -->
+                                    <template v-for="n in 5" :key="'h'+n">
+                                        <line 
+                                            x1="100" 
+                                            :y1="400 - (n * 87.5)" 
+                                            x2="1100" 
+                                            :y2="400 - (n * 87.5)"
+                                            class="grid-line solid-line"
+                                        />
+                                        <text 
+                                            x="85" 
+                                            :y="400 - (n * 87.5)" 
+                                            class="grid-label"
+                                            text-anchor="end"
+                                            alignment-baseline="middle"
+                                        >{{ n * 2 }}</text>
+                                    </template>
+
+                                    <!-- X-axis line -->
+                                    <line 
+                                        x1="100" 
+                                        y1="400" 
+                                        x2="1100" 
+                                        y2="400"
+                                        class="axis-line" 
+                                    />
+
+                                    <!-- Vertical grid lines and date labels -->
+                                    <template v-for="(data, index) in osChartData" :key="'v'+index">
+                                        <!-- Vertical grid line -->
+                                        <line 
+                                            :x1="100 + (index * ((1000) / (osChartData.length - 1)))"
+                                            y1="50"
+                                            :x2="100 + (index * ((1000) / (osChartData.length - 1)))"
+                                            y2="400"
+                                            class="grid-line solid-line"
+                                        />
+                                        <!-- Date label -->
+                                        <text 
+                                            :x="100 + (index * ((1000) / (osChartData.length - 1)))"
+                                            y="430"
+                                            class="date-label"
+                                            text-anchor="middle"
+                                        >{{ formatDate(data.date) }}</text>
+                                    </template>
+                                </g>
+
+                                <!-- Data Lines -->
+                                <g v-for="os in osLegend" :key="os.name" class="data-lines">
+                                    <path
+                                        :d="getOSPath(os.name)"
+                                        :stroke="os.color"
+                                        fill="none"
+                                        class="data-line"
+                                    />
+                                    <!-- Data Points -->
+                                    <g v-for="(point, index) in getOSPoints(os.name)" :key="index">
+                                        <circle 
+                                            :cx="point.x"
+                                            :cy="point.y"
+                                            r="4"
+                                            fill="white"
+                                            :stroke="os.color"
+                                            stroke-width="1.5"
+                                            class="data-point"
+                                        />
+                                    </g>
+                                </g>
+
+                                <!-- Hover Overlay -->
+                                <rect
+                                    class="chart-overlay"
+                                    x="100"
+                                    y="50"
+                                    width="1000"
+                                    height="350"
+                                    @mousemove="handleChartHover"
+                                    @mouseleave="hideTooltip"
+                                />
+                            </svg>
+
+                            <!-- Tooltip -->
+                            <div class="chart-tooltip" v-if="showTooltipData" :style="tooltipStyle">
+                                <div class="tooltip-date">{{ tooltipData.date }}</div>
+                                <div v-for="(value, os) in tooltipData.values" :key="os" class="tooltip-value-row">
+                                    <span class="os-name" :style="{ color: getOSColor(os) }">{{ os }}</span>
+                                    <span class="os-value">{{ value }}</span>
                                 </div>
-                            </div>
-
-                            <div style="height: 300px; position: relative;">
-                                <div class="chart-watermark">{{ watermarkText }}</div>
-                                <svg width="100%" height="100%" viewBox="0 0 800 350">
-                                    <!-- Grid lines -->
-                                    <line v-for="(line, index) in gridLinesY" :key="'y-'+index"
-                                          :x1="0" :y1="line.y" :x2="800" :y2="line.y"
-                                          stroke="#e0e0e0" stroke-width="1" stroke-dasharray="3,3"/>
-
-                                    <line v-for="(line, index) in gridLinesX" :key="'x-'+index"
-                                          :x1="line.x" :y1="0" :x2="line.x" :y2="300"
-                                          stroke="#e0e0e0" stroke-width="1" stroke-dasharray="3,3"/>
-
-                                    <!-- Y-axis labels -->
-                                    <text v-for="label in yAxisLabels" :key="'label-'+label.value"
-                                          :x="10" :y="label.y" fill="#888" font-size="12">{{ label.value }}
-                                    </text>
-
-                                    <!-- X-axis dates -->
-                                    <text v-for="date in xAxisDates" :key="'date-'+date.value"
-                                          :x="date.x" :y="330" fill="#888" font-size="10"
-                                          :transform="`rotate(-90, ${date.x}, 330)`">{{ date.value }}
-                                    </text>
-
-                                    <!-- Lines for each OS -->
-                                    <path v-for="os in osData" :key="os.name"
-                                          :d="os.path" fill="none" :stroke="os.color" stroke-width="2"/>
-
-                                    <!-- Data points -->
-                                    <circle v-for="point in dataPoints" :key="'point-'+point.id"
-                                            :cx="point.cx" :cy="point.cy" r="4" :fill="point.fill"></circle>
-                                </svg>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="data-grid">
-                            <div class="data-card" v-for="card in dataCards" :key="card.title">
-                                <span class="card-info" @click="showInfo(card.infoText)">ⓘ</span>
-                                <div class="card-header">
-                                    <img src="/api/placeholder/16/16" :alt="card.icon + ' icon'">
-                                    <span class="card-title">{{ card.title }}</span>
-                                </div>
-
-                                <template v-if="card.data.length > 0">
-                                    <div v-for="(row, index) in card.data" :key="index"
-                                         class="data-row" :class="row.class">
-                                        <span class="data-label">{{ row.label }}</span>
-                                        <span class="data-value">{{ row.value }}</span>
+                    <!-- Analytics Data Cards Grid -->
+                    <div class="data-grid">
+                        <div class="data-card" v-for="card in dataCards" :key="card.title" :data-type="card.type">
+                            <div class="card-header">
+                                <i :class="card.icon"></i>
+                                <span class="card-title">{{ card.title }}</span>
+                            </div>
+                            <div class="card-content">
+                                <template v-if="card.data && card.data.length > 0">
+                                    <div class="data-row" v-for="(item, index) in card.data" :key="index" :style="{ '--bar-color': getBarColor(index, card.data.length) }">
+                                        <div class="data-label">
+                                            <span>{{ item.label }}</span>
+                                        </div>
+                                        <div class="data-value">{{ item.value }}</div>
+                                        <div class="data-bar" :style="{ width: calculatePercentage(item.value, card.data) + '%' }"></div>
                                     </div>
                                 </template>
-
-                                <div v-else style="text-align: center; margin-top: 40px;">
-                                    <a href="#" class="pro-link">{{ card.proMessage || 'Visible only in paid plans'
-                                        }}</a>
+                                <div v-else class="no-data">
+                                    No data available
                                 </div>
                             </div>
                         </div>
-
-                        <div class="date-range">
-                            {{ dateRange }}
-                        </div>
                     </div>
 
-                    <div v-if="activeSection !== 'analytics'">
-                        <div class="general-analytics">
-                            <h3>{{ getSectionName(activeSection) }} Section</h3>
-                            <p>This section is not implemented yet. Please check the Analytics tab.</p>
-                        </div>
-                    </div>
+                    <!-- Date Range -->
+<!--                    <div class="date-range" v-if="dateRange">-->
+<!--                        <span class="date-range-label">Date Range:</span>-->
+<!--                        <span class="date-range-value">{{ dateRange }}</span>-->
+<!--                    </div>-->
                 </div>
             </div>
 
@@ -612,10 +709,9 @@
 </div>
 
 <script>
-    const {createApp, ref, reactive, computed, watch, onMounted} = Vue;
+    const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
 
-    createApp({
-
+    let vm = createApp({
         data() {
             return {
                 activeSection: 'analytics',
@@ -625,345 +721,503 @@
                 infoText: null,
                 showInfoModal: false,
 
+                // Summary metrics for the top cards
                 summaryMetrics: [
                     {
                         title: 'Total clicks',
                         value: 0,
-                        icon: 'visits',
+                        icon: 'bi bi-graph-up',
                         infoText: 'Shows the total number of visits to your links.'
                     },
                     {
                         title: 'Total QR code scans',
                         value: 0,
-                        icon: '404',
-                        infoText: 'Shows the number of times users encountered a 404 error.'
+                        icon: 'bi bi-qr-code',
+                        infoText: 'Shows the number of times your QR codes were scanned.'
                     },
                     {
                         title: 'Total Referrals',
                         value: 0,
-                        icon: 'referrals',
+                        icon: 'bi bi-share',
                         infoText: 'Shows the number of visits from referral links.'
                     }
                 ],
+
+                // OS Chart configuration
                 osLegend: [
-                    {name: 'iOS', color: '#ff6384'},
-                    {name: 'Bot/Crawler', color: '#36a2eb'},
-                    {name: 'macOS', color: '#ffcd56'},
-                    {name: 'Windows', color: '#789fff'},
-                    {name: 'Android', color: '#4bc0c0'},
-                    {name: 'Linux', color: '#ff9f40'}
+                    { name: 'iOS', color: '#ff6384' },
+                    { name: 'macOS', color: '#ffcd56' },
+                    { name: 'Windows', color: '#36a2eb' },
+                    { name: 'Android', color: '#4bc0c0' },
+                    { name: 'Linux', color: '#ff9f40' }
                 ],
-                gridLinesY: [
-                    {y: 50}, {y: 100}, {y: 150}, {y: 200}, {y: 250}, {y: 300}
-                ],
-                gridLinesX: [
-                    {x: 100}, {x: 200}, {x: 300}, {x: 400}, {x: 500}, {x: 600}, {x: 700}
-                ],
-                yAxisLabels: [
-                    {value: 8, y: 50},
-                    {value: 6, y: 100},
-                    {value: 4, y: 150},
-                    {value: 2, y: 200},
-                    {value: 0, y: 250}
-                ],
-                xAxisDates: [
-                    {value: '05/05/2025', x: 40},
-                    {value: '06/05/2025', x: 140},
-                    {value: '06/05/2025', x: 240},
-                    {value: '07/05/2025', x: 340},
-                    {value: '08/05/2025', x: 440},
-                    {value: '09/05/2025', x: 540},
-                    {value: '10/05/2025', x: 640},
-                    {value: '11/05/2025', x: 740}
-                ],
-                osData: [
-                    {name: 'iOS', color: '#ff6384', path: 'M40,200 L140,150 L540,80 L640,220 L740,180'},
-                    {name: 'Bot/Crawler', color: '#36a2eb', path: 'M240,250 L340,160 L400,160 L540,200'},
-                    {name: 'macOS', color: '#ffcd56', path: 'M140,150 L640,220'},
-                    {name: 'Windows', color: '#789fff', path: ''},
-                    {name: 'Android', color: '#4bc0c0', path: 'M240,250 L540,130 L600,50'},
-                    {name: 'Linux', color: '#ff9f40', path: 'M540,230 L740,180'}
-                ],
-                dataPoints: [
-                    {id: 1, cx: 40, cy: 200, fill: '#ff6384'}, // iOS start
-                    {id: 2, cx: 140, cy: 150, fill: '#ff6384'}, // iOS point 2
-                    {id: 3, cx: 140, cy: 220, fill: '#888888'}, // Gray point
-                    {id: 4, cx: 240, cy: 250, fill: '#4bc0c0'}, // Android start
-                    {id: 5, cx: 340, cy: 160, fill: '#36a2eb'}, // Bot/Crawler point
-                    {id: 6, cx: 400, cy: 160, fill: '#36a2eb'}, // Bot/Crawler point
-                    {id: 7, cx: 540, cy: 130, fill: '#4bc0c0'}, // Android point
-                    {id: 8, cx: 540, cy: 200, fill: '#36a2eb'}, // Bot/Crawler end
-                    {id: 9, cx: 540, cy: 230, fill: '#ff9f40'}, // Linux point
-                    {id: 10, cx: 600, cy: 50, fill: '#4bc0c0'}, // Android peak
-                    {id: 11, cx: 540, cy: 80, fill: '#ff6384'}, // iOS peak
-                    {id: 12, cx: 640, cy: 220, fill: '#ff6384'}, // iOS dip
-                    {id: 13, cx: 640, cy: 220, fill: '#ffcd56'}, // macOS point
-                    {id: 14, cx: 740, cy: 180, fill: '#ff6384'}, // iOS end
-                    {id: 15, cx: 740, cy: 180, fill: '#ff9f40'}  // Linux end
-                ],
+
+                // Analytics cards data structure
                 dataCards: [
                     {
                         title: 'Devices',
-                        icon: 'devices',
+                        icon: 'bi bi-phone',
+                        type: 'devices',
                         infoText: 'Shows the distribution of devices used to access your links.',
-                        data: [
-                            {label: 'Mobile', value: 0, class: 'mobile-row'},
-                            {label: 'Desktop', value: 0, class: 'desktop-row'},
-                            {label: 'Bot/Crawler', value: 0, class: 'bot-crawler-row'}
-                        ]
+                        data: []
                     },
                     {
                         title: 'Countries',
-                        icon: 'countries',
+                        icon: 'bi bi-globe',
+                        type: 'countries',
                         infoText: 'Shows the geographic distribution of your visitors.',
                         data: []
                     },
                     {
                         title: 'OS',
-                        icon: 'os',
+                        icon: 'bi bi-cpu',
+                        type: 'os',
                         infoText: 'Shows the distribution of operating systems used by your visitors.',
                         data: []
                     },
                     {
-                        title: 'Referrers',
-                        icon: 'referrers',
-                        infoText: 'Shows where your traffic is coming from.',
-                        data: [],
-                        proMessage: 'Visible only in paid plans'
-                    },
-                    {
-                        title: 'Redirects',
-                        icon: 'redirects',
-                        infoText: 'Shows information about redirects.',
-                        data: [],
-                        proMessage: 'Visible only in paid plans'
-                    },
-                    {
-                        title: 'UTM',
-                        icon: 'utm',
-                        infoText: 'Shows UTM parameter tracking information.',
-                        data: [],
-                        proMessage: 'Visible only in paid plans'
-                    },
-                    {
-                        title: 'Channels',
-                        icon: 'channels',
-                        infoText: 'Shows traffic distribution by channel.',
-                        data: [],
-                        proMessage: 'Visible only in paid plans'
-                    },
-                    {
-                        title: 'Timezones',
-                        icon: 'timezones',
-                        infoText: 'Shows visitor distribution by timezone.',
-                        data: [],
-                        proMessage: 'Visible only in paid plans'
+                        title: 'Browsers',
+                        icon: 'bi bi-window',
+                        type: 'browsers',
+                        infoText: 'Shows browser distribution of your visitors.',
+                        data: []
                     },
                     {
                         title: 'Languages',
-                        icon: 'languages',
+                        icon: 'bi bi-translate',
+                        type: 'languages',
                         infoText: 'Shows language preferences of your visitors.',
-                        data: [],
-                        proMessage: 'Visible only in paid plans'
+                        data: []
                     },
                     {
-                        title: 'Browsers',
-                        icon: 'browsers',
-                        infoText: 'Shows browser distribution of your visitors.',
-                        data: [],
-                        proMessage: 'Visible only in paid plans'
+                        title: 'Channels',
+                        icon: 'bi bi-diagram-3',
+                        type: 'channels',
+                        infoText: 'Shows traffic distribution by channel.',
+                        data: []
+                    },
+                    {
+                        title: 'Referrers',
+                        icon: 'bi bi-box-arrow-in-right',
+                        type: 'referrers',
+                        infoText: 'Shows where your traffic is coming from.',
+                        data: []
+                    },
+                    {
+                        title: 'Redirects',
+                        icon: 'bi bi-arrow-return-right',
+                        type: 'redirects',
+                        infoText: 'Shows information about redirects.',
+                        data: []
+                    },
+                    {
+                        title: 'UTM',
+                        icon: 'bi bi-tag',
+                        type: 'utmParameters',
+                        infoText: 'Shows UTM parameter tracking information.',
+                        data: []
+                    },
+                    {
+                        title: 'Timezones',
+                        icon: 'bi bi-clock',
+                        type: 'timezones',
+                        infoText: 'Shows visitor distribution by timezone.',
+                        data: []
                     },
                     {
                         title: 'Smartlink Type',
-                        icon: 'smartlink type',
+                        icon: 'bi bi-link-45deg',
+                        type: 'smartlinkTypes',
                         infoText: 'Shows distribution of smartlink types.',
-                        data: [],
-                        proMessage: 'Visible only in paid plans'
+                        data: []
                     },
                     {
                         title: 'Shortened URLs',
-                        icon: 'shortened',
-                        infoText: 'Shows screen shortened statistics of your visitors.',
-                        data: [],
-                        proMessage: 'Visible only in paid plans'
+                        icon: 'bi bi-link',
+                        type: 'shortenedUrls',
+                        infoText: 'Shows statistics for shortened URLs.',
+                        data: []
                     }
                 ],
+
+                // OS Chart data
+                osChartData: [],
                 dateRange: '',
-                watermarkText: 'relink'
+                tooltipData: {
+                    os: '',
+                    date: '',
+                    value: 0
+                },
+                tooltipStyle: {
+                    left: '0px',
+                    top: '0px'
+                },
+                showTooltipData: false,
+                startDate: '',
+                endDate: '',
+                showBots: true
             };
         },
 
         created() {
-            // selectedLinkId-ni izlə
-            this.$watch('selectedLinkId', (newId) => {
+            // Watch for changes in shortlinkId
+            this.$watch('shortlinkId', (newId) => {
                 if (newId) {
-                    this.shortlinkId = newId;
-                    this.fetchMetaData();
+                    this.fetchAnalytics();
                 }
             });
 
-            // URL-dən ID-ni yoxla
+            // Check URL for ID
             const urlParams = new URLSearchParams(window.location.search);
-            this.shortlinkId = urlParams.get('id');
-            if (this.shortlinkId) {
-                this.fetchMetaData();
+            const idFromUrl = urlParams.get('id');
+            if (idFromUrl) {
+                this.shortlinkId = idFromUrl;
+                this.fetchAnalytics();
             }
         },
-
         methods: {
             showInfo(text) {
                 this.infoText = text;
                 this.showInfoModal = true;
-
-                // 3 saniyə sonra info modalını bağlayaq
                 setTimeout(() => {
                     this.showInfoModal = false;
                 }, 3000);
             },
-            async fetchMetaData() {
-                this.loading = true;
-                this.error = null;
+
+            async fetchAnalytics() {
+                console.log('fetchAnalytics called with shortlinkId:', this.shortlinkId);
 
                 if (!this.shortlinkId) {
-                    this.error = "Shortlink ID tapılmadı.";
-                    this.loading = false;
+                    console.error('No shortlinkId available');
+                    this.error = "Shortlink ID not found.";
                     return;
                 }
 
+                this.loading = true;
+                this.error = null;
+
                 try {
-                    const shortlinkRes = await fetch(`/api/short-links/${this.shortlinkId}`);
-                    if (!shortlinkRes.ok) throw new Error(`Shortlink fetch error: ${shortlinkRes.status}`);
-                    const shortlinkData = await shortlinkRes.json();
-                    console.log("Shortlink:", shortlinkData);
+                    let url = `/api/short-links/${this.shortlinkId}/analytics`;
+                    if (this.startDate && this.endDate) {
+                        url += `?startDate=${this.startDate}&endDate=${this.endDate}`;
+                    }
+                    console.log('Fetching from URL:', url);
 
-                    const metaRes = await fetch(`/api/short-links/${this.shortlinkId}/metadata`);
-                    if (!metaRes.ok) throw new Error(`Metadata fetch error: ${metaRes.status}`);
-                    const metadataData = await metaRes.json();
-                    console.log("Metadata:", metadataData);
+                    const response = await fetch(url);
+                    console.log('Response status:', response.status);
 
-                    this.processMetaData(metadataData);
+                    if (!response.ok) {
+                        throw new Error(`Analytics fetch error: ${response.status}`);
+                    }
+
+                    const analyticsData = await response.json();
+                    console.log('Received analytics data:', analyticsData);
+
+                    this.processAnalyticsData(analyticsData);
                 } catch (error) {
-                    console.error('Fetch error:', error);
-                    this.error = `Xəta baş verdi: ${error.message}`;
+                    console.error('Error in fetchAnalytics:', error);
+                    this.error = `Error occurred: ${error.message}`;
                 } finally {
                     this.loading = false;
                 }
             },
-            processMetaData(metaData) {
-                if (!metaData || !Array.isArray(metaData)) {
-                    this.error = 'Invalid data received from API';
-                    return;
-                }
 
-                const deviceCounts = {
-                    Mobile: 0,
-                    Desktop: 0,
-                    'Bot/Crawler': 0
-                };
+            processAnalyticsData(data) {
+                // Update summary metrics
+                this.summaryMetrics[0].value = data.totalClicks || 0;
+                this.summaryMetrics[1].value = data.totalQRCodeScans || 0;
+                this.summaryMetrics[2].value = data.totalReferrals || 0;
 
-                const osCounts = {};
-                const countryCounts = {};
-
-                let totalClicks = 0;
-                let totalQRScans = 0;
-                let totalReferrals = 0;
-
-                let startDate = null;
-                let endDate = null;
-
-                metaData.forEach(entry => {
-                    totalClicks++;
-
-                    if (entry.deviceType) {
-                        if (entry.deviceType.toLowerCase() === 'mobile' || entry.deviceType.toLowerCase() === 'phone') {
-                            deviceCounts.Mobile++;
-                        } else if (entry.deviceType.toLowerCase() === 'desktop' || entry.deviceType.toLowerCase() === 'pc') {
-                            deviceCounts.Desktop++;
-                        } else if (entry.deviceType.toLowerCase().includes('bot') || entry.deviceType.toLowerCase().includes('crawler')) {
-                            deviceCounts['Bot/Crawler']++;
-                        }
-                    }
-
-                    if (entry.operatingSystem) {
-                        const os = entry.operatingSystem;
-                        osCounts[os] = (osCounts[os] || 0) + 1;
-                    }
-
-                    if (entry.country) {
-                        const country = entry.country;
-                        countryCounts[country] = (countryCounts[country] || 0) + 1;
-                    }
-
-                    if (entry.isQRScan) {
-                        totalQRScans++;
-                    }
-
-                    if (entry.isReferral) {
-                        totalReferrals++;
-                    }
-
-                    if (entry.timestamp) {
-                        const entryDate = new Date(entry.timestamp);
-                        if (!startDate || entryDate < startDate) {
-                            startDate = entryDate;
-                        }
-                        if (!endDate || entryDate > endDate) {
-                            endDate = entryDate;
-                        }
-                    }
-                });
-
-                this.summaryMetrics[0].value = totalClicks;
-                this.summaryMetrics[1].value = totalQRScans;
-                this.summaryMetrics[2].value = totalReferrals;
-
-                this.dataCards[0].data = [
-                    {label: 'Mobile', value: deviceCounts.Mobile, class: 'mobile-row'},
-                    {label: 'Desktop', value: deviceCounts.Desktop, class: 'desktop-row'},
-                    {label: 'Bot/Crawler', value: deviceCounts['Bot/Crawler'], class: 'bot-crawler-row'}
-                ];
-
-                this.dataCards[1].data = Object.entries(countryCounts)
-                    .map(([label, value]) => ({label, value}))
+                // Update devices card with sorting
+                this.dataCards[0].data = Object.entries(data.devices || {})
+                    .map(([label, value]) => ({ label, value }))
                     .sort((a, b) => b.value - a.value);
 
-                this.dataCards[2].data = Object.entries(osCounts)
-                    .map(([label, value]) => ({label, value}))
+                // Update countries card with sorting
+                this.dataCards[1].data = Object.entries(data.countries || {})
+                    .map(([label, value]) => ({ label, value }))
                     .sort((a, b) => b.value - a.value);
 
-                if (startDate && endDate) {
+                // Update OS card with sorting
+                this.dataCards[2].data = Object.entries(data.operatingSystems || {})
+                    .map(([label, value]) => ({ label, value }))
+                    .sort((a, b) => b.value - a.value);
+
+                // Update browsers card with sorting
+                this.dataCards[3].data = Object.entries(data.browsers || {})
+                    .map(([label, value]) => ({ label, value }))
+                    .sort((a, b) => b.value - a.value);
+
+                // Update languages card with sorting
+                this.dataCards[4].data = Object.entries(data.languages || {})
+                    .map(([label, value]) => ({ label, value }))
+                    .sort((a, b) => b.value - a.value);
+
+                // Update channels card with sorting
+                this.dataCards[5].data = Object.entries(data.channels || {})
+                    .map(([label, value]) => ({ label, value }))
+                    .sort((a, b) => b.value - a.value);
+
+                // Update referrers card with sorting
+                this.dataCards[6].data = Object.entries(data.referrers || {})
+                    .map(([label, value]) => ({ label, value }))
+                    .sort((a, b) => b.value - a.value);
+
+                // Update redirects card with sorting
+                this.dataCards[7].data = Object.entries(data.redirects || {})
+                    .map(([label, value]) => ({ label, value }))
+                    .sort((a, b) => b.value - a.value);
+
+                // Update UTM card with sorting
+                this.dataCards[8].data = Object.entries(data.utmParameters || {})
+                    .map(([label, value]) => ({ label, value }))
+                    .sort((a, b) => b.value - a.value);
+
+                // Update timezones card with sorting
+                this.dataCards[9].data = Object.entries(data.timezones || {})
+                    .map(([label, value]) => ({ label, value }))
+                    .sort((a, b) => b.value - a.value);
+
+                // Update smartlink types card with sorting
+                this.dataCards[10].data = Object.entries(data.smartlinkTypes || {})
+                    .map(([label, value]) => ({ label, value }))
+                    .sort((a, b) => b.value - a.value);
+
+                // Update shortened URLs card with sorting
+                this.dataCards[11].data = Object.entries(data.shortenedUrls || {})
+                    .map(([label, value]) => ({ label, value }))
+                    .sort((a, b) => b.value - a.value);
+
+                // Process OS chart data
+                if (data.osChartData && data.osChartData.length > 0) {
+                    this.osChartData = data.osChartData;
+
+                    // Set date range
+                    const dates = data.osChartData.map(item => new Date(item.date));
+                    const startDate = new Date(Math.min(...dates));
+                    const endDate = new Date(Math.max(...dates));
+
                     const formatDate = (date) => {
-                        return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+                        const day = date.getDate().toString().padStart(2, '0');
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        return `${day}.${month}`;
                     };
+
                     this.dateRange = `${formatDate(startDate)} - ${formatDate(endDate)}`;
                 }
             },
+
+            calculatePercentage(value, data) {
+                const max = Math.max(...data.map(item => item.value));
+                return (value / max) * 100;
+            },
+
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                return `${day}.${month}`;
+            },
+
+            formatFullDate(dateString) {
+                const date = new Date(dateString);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}.${month}.${year}`;
+            },
+
+            getOSPath(osName) {
+                if (!this.osChartData.length) return '';
+
+                let path = '';
+                this.osChartData.forEach((data, index) => {
+                    const x = 100 + (index * (1000 / (this.osChartData.length - 1)));
+                    const y = 400 - (data.osData[osName] || 0) * 87.5;
+
+                    if (index === 0) {
+                        path += `M ${x} ${y}`;
+                    } else {
+                        path += ` L ${x} ${y}`;
+                    }
+                });
+                return path;
+            },
+
+            getOSPoints(osName) {
+                return this.osChartData.map((data, index) => ({
+                    x: 100 + (index * (1000 / (this.osChartData.length - 1))),
+                    y: 400 - (data.osData[osName] || 0) * 87.5
+                }));
+            },
+
             selectSection(section) {
                 this.activeSection = section;
+                if (section === 'analytics' && this.shortlinkId) {
+                    console.log('Loading analytics for section change, shortlinkId:', this.shortlinkId);
+                    this.fetchAnalytics();
+                }
             },
-            getSectionName(sectionId) {
-                const section = this.sections.find(s => s.id === sectionId);
-                return section ? section.name : 'Unknown';
+
+            getBarColor(index, total) {
+                // Generate colors from light blue to darker blue based on index
+                const hue = 210; // Blue hue
+                const saturation = 85;
+                const lightness = Math.max(65 - (index * (30 / total)), 35); // Gradually decrease lightness
+                return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
             },
+
+            getOSColor(osName) {
+                const os = this.osLegend.find(o => o.name === osName);
+                return os ? os.color : '#ffffff';
+            },
+
+            handleChartHover(event) {
+                const svgPoint = this.getSVGPoint(event);
+                const chartWrapper = event.target.closest('.chart-wrapper');
+                const rect = chartWrapper.getBoundingClientRect();
+
+                // Calculate which data point we're closest to
+                const xPos = svgPoint.x - 100;
+                const step = 1000 / (this.osChartData.length - 1);
+                const dataIndex = Math.round(xPos / step);
+
+                if (dataIndex >= 0 && dataIndex < this.osChartData.length) {
+                    const data = this.osChartData[dataIndex];
+                    
+                    this.tooltipData = {
+                        date: this.formatFullDate(data.date),
+                        values: data.osData
+                    };
+
+                    const mouseX = event.clientX - rect.left;
+                    const mouseY = event.clientY - rect.top;
+
+                    this.tooltipStyle = {
+                        left: `${mouseX}px`,
+                        top: `${mouseY - 10}px`,
+                        transform: 'translate(-50%, -100%)',
+                        opacity: 1,
+                        visibility: 'visible'
+                    };
+
+                    this.showTooltipData = true;
+                }
+            },
+
+            hideTooltip() {
+                this.showTooltipData = false;
+                this.tooltipStyle = {
+                    ...this.tooltipStyle,
+                    opacity: 0,
+                    visibility: 'hidden'
+                };
+            },
+
+            getSVGPoint(event) {
+                const svg = event.target.ownerSVGElement;
+                const point = svg.createSVGPoint();
+                point.x = event.clientX;
+                point.y = event.clientY;
+                return point.matrixTransform(svg.getScreenCTM().inverse());
+            },
+
+            toggleShowBots() {
+                this.showBots = !this.showBots;
+                this.fetchAnalytics();
+            },
+
+            exportToCSV() {
+                const data = this.prepareCSVData();
+                const csvContent = "data:text/csv;charset=utf-8," + data;
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `analytics_${this.startDate}_${this.endDate}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+
+            prepareCSVData() {
+                // Convert analytics data to CSV format
+                const headers = ["Date", "iOS", "macOS", "Windows", "Android", "Linux"];
+                const rows = [headers];
+
+                this.osChartData.forEach(data => {
+                    const row = [
+                        this.formatFullDate(data.date),
+                        data.osData.iOS || 0,
+                        data.osData.macOS || 0,
+                        data.osData.Windows || 0,
+                        data.osData.Android || 0,
+                        data.osData.Linux || 0
+                    ];
+                    rows.push(row);
+                });
+
+                return rows.map(row => row.join(",")).join("\n");
+            },
+
+            handleDateChange() {
+                // Validate dates
+                if (this.startDate && this.endDate) {
+                    const start = new Date(this.startDate);
+                    const end = new Date(this.endDate);
+                    if (start > end) {
+                        this.error = "Start date cannot be after end date";
+                        return;
+                    }
+                }
+            },
+
+            applyDateRange() {
+                if (this.startDate && this.endDate) {
+                    this.fetchAnalytics();
+                }
+            },
+
             selectLink(linkId) {
-                selectedLinkId.value = linkId;
-                activeTab.value = 'link-in-bio';
-
-                // URL-i yenilə
-                const newUrl = new URL(window.location.href);
-                newUrl.searchParams.set('tab', 'link-in-bio');
-                newUrl.searchParams.set('id', linkId);
-                window.history.pushState({}, '', newUrl);
-
-                // Link məlumatlarını və analytics məlumatlarını yüklə
-                loadLinkDetails(linkId);
+                // Implementation of selectLink method
             },
-            showInfo(message) {
-                alert(message);
+
+            createNewLink() {
+                // Implementation of createNewLink method
             },
-            selectSection(section) {
-                this.activeSection = section;
-            }
+
+            handleLogoUpload(event) {
+                // Implementation of handleLogoUpload method
+            },
+
+            deleteLogo() {
+                // Implementation of deleteLogo method
+            },
+
+            handleLinkLogoUpload(event, index) {
+                // Implementation of handleLinkLogoUpload method
+            },
+
+            deleteLinkLogo(index) {
+                // Implementation of deleteLinkLogo method
+            },
+
+            addLink() {
+                // Implementation of addLink method
+            },
+
+            deleteLink(index) {
+                // Implementation of deleteLink method
+            },
+
+            saveChanges() {
+                // Implementation of saveChanges method
+            },
+
+            handleQRTagImageUpload(event) {
+                // Implementation of handleQRTagImageUpload method
+            },
+
+            // getBarColor
         },
         setup() {
             const baseUrl = computed(() => {
@@ -1066,17 +1320,21 @@
                 }
             }
 
-            function selectLink(linkId) {
+            async function selectLink(linkId) {
                 selectedLinkId.value = linkId;
-                
-                // URL-i yenilə
+                activeTab.value = 'link-in-bio';
+                vm.shortlinkId = linkId;  // Add this line
+
                 const newUrl = new URL(window.location.href);
                 newUrl.searchParams.set('tab', 'link-in-bio');
                 newUrl.searchParams.set('id', linkId);
                 window.history.pushState({}, '', newUrl);
 
-                // Link məlumatlarını və analytics məlumatlarını yüklə
-                loadLinkDetails(linkId);
+                await loadLinkDetails(linkId);
+
+                if (vm.activeSection === 'analytics') {
+                    await vm.fetchAnalytics();
+                }
             }
 
             function addLink() {
@@ -1496,7 +1754,8 @@
                 deleteLink,
                 createNewLink,
                 saveChanges,
-                handleQRTagImageUpload
+                handleQRTagImageUpload,
+                // getBarColor
             };
         }
     }).mount('#app');

@@ -1,5 +1,6 @@
-package com.srscons.shortlink.shortener.analytics;
+package com.srscons.shortlink.analytics;
 
+import com.srscons.shortlink.shortener.repository.entity.MetaDataEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,6 +11,8 @@ import java.util.List;
 
 @Repository
 public interface AnalyticsRepository extends JpaRepository<MetaDataEntity, Long> {
+
+    List<MetaDataEntity> findByShortLinkId(@Param("shortLinkId") Long shortLinkId);
 
     // Total clicks for a specific shortlink
     @Query("SELECT COUNT(m) FROM MetaDataEntity m WHERE m.shortLink.id = :shortLinkId")
@@ -110,4 +113,11 @@ public interface AnalyticsRepository extends JpaRepository<MetaDataEntity, Long>
             "AND m.smartlinkType IS NOT NULL " +
             "GROUP BY m.smartlinkType")
     List<Object[]> getSmartlinkTypesAnalytics(@Param("shortLinkId") Long shortLinkId);
-} 
+
+    // Overall OS distribution
+    @Query("SELECT m.os as os, COUNT(m) as count " +
+            "FROM MetaDataEntity m " +
+            "WHERE m.shortLink.id = :shortLinkId " +
+            "GROUP BY m.os")
+    List<Object[]> getOSDistribution(@Param("shortLinkId") Long shortLinkId);
+}

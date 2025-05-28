@@ -1,10 +1,8 @@
-package com.srscons.shortlink.shortener.analytics;
-
+package com.srscons.shortlink.analytics;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
 import java.util.Map;
 
@@ -27,26 +25,26 @@ public class AnalyticsDTO {
     // OS Distribution
     private Map<String, Long> operatingSystems;
 
-    // Referrers Data
+    // Browser Data
+    private Map<String, Long> browsers;
+
+    // Language Data
+    private Map<String, Long> languages;
+
+    // Channel Data
+    private Map<String, Long> channels;
+
+    // Referrer Data
     private Map<String, Long> referrers;
 
-    // Redirects Data
+    // Redirect Data
     private Map<String, Long> redirects;
 
     // UTM Data
     private Map<String, Long> utmParameters;
 
-    // Channels Data
-    private Map<String, Long> channels;
-
-    // Timezones Data
+    // Timezone Data
     private Map<String, Long> timezones;
-
-    // Languages Data
-    private Map<String, Long> languages;
-
-    // Browsers Data
-    private Map<String, Long> browsers;
 
     // Smartlink Types
     private Map<String, Long> smartlinkTypes;
@@ -54,7 +52,7 @@ public class AnalyticsDTO {
     // Shortened URLs
     private Map<String, Long> shortenedUrls;
 
-    // Operating Systems Chart Data
+    // OS Chart Data
     private List<OSChartData> osChartData;
 
     @Data
