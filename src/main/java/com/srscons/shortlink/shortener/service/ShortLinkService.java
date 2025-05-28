@@ -153,13 +153,13 @@ public class ShortLinkService {
         foundShortLink.setLayoutType(shortLinkDto.getLayoutType());
         foundShortLink.setThemeColor(shortLinkDto.getThemeColor());
         foundShortLink.setLinkType(shortLinkDto.getLinkType());
+        foundShortLink.setQrCodeSvg(generateQrCodeSvg(foundShortLink.getShortCode(), baseUrl));
 
         if(!shortLinkDto.getShortCode().equalsIgnoreCase(foundShortLink.getShortCode())) {
             if(repository.existsByShortCodeIgnoreCase(shortLinkDto.getShortCode())) {
                 throw new ShortLinkException("Short code already exists: " + shortLinkDto.getShortCode());
             }
 
-            foundShortLink.setQrCodeSvg(generateQrCodeSvg(foundShortLink.getShortCode(), baseUrl));
             foundShortLink.setShortCode(shortLinkDto.getShortCode());
         }
 
