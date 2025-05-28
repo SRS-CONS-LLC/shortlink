@@ -95,6 +95,10 @@ createApp({
         const showPresetDropdown = ref(false);
         const selectedPresetObj = ref(null);
 
+        // Drag-and-drop state
+        const draggingIndex = ref(null);
+        let dragOverIndex = null;
+
         // Methods
         async function loadLinks() {
             try {
@@ -578,7 +582,7 @@ createApp({
 
             // Only add https:// for certain types
             const urlTypes = [
-                "url link", "youtube", "github", "linkedin", "twitter", "facebook", "tiktok", "spotify", "reddit", "pinterest", "medium", "behance", "dribbble", "snapchat", "location"
+                "url link", "youtube", "github", "linkedin", "twitter", "facebook", "tiktok", "spotify", "reddit", "pinterest", "medium", "behance", "dribbble", "snapchat"
             ];
             if (urlTypes.includes(type) && !/^https?:\/\//i.test(testUrl)) {
                 testUrl = 'https://' + testUrl;
@@ -640,6 +644,28 @@ createApp({
             link.removeLogo = true;
         }
 
+        function onDragStart(index) {
+            draggingIndex.value = index;
+        }
+
+        function onDragOver(index) {
+            dragOverIndex = index;
+        }
+
+        function onDrop(index) {
+            if (draggingIndex.value === null || draggingIndex.value === index) return;
+            const movedItem = linkInBio.links[draggingIndex.value];
+            linkInBio.links.splice(draggingIndex.value, 1);
+            linkInBio.links.splice(index, 0, movedItem);
+            draggingIndex.value = null;
+            dragOverIndex = null;
+        }
+
+        function onDragEnd() {
+            draggingIndex.value = null;
+            dragOverIndex = null;
+        }
+
         return {
             loggedInUser,
             links,
@@ -659,6 +685,11 @@ createApp({
             selectedPreset,
             showPresetDropdown,
             selectedPresetObj,
+            draggingIndex,
+            onDragStart,
+            onDragOver,
+            onDrop,
+            onDragEnd,
 
             // Methods
             validateUrl,
