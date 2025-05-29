@@ -386,14 +386,18 @@
                                             {{ linkInBio.description || 'CTOUT' }}
                                         </div>
                                         <div class="preview-links" :class="{ 'grid': linkInBio.layoutType === 'grid' }">
-                                            <div class="preview-link" v-for="(link, index) in linkInBio.links"
-                                                 :key="'preview-'+index">
+                                            <a class="preview-link"
+                                               v-for="(link, index) in linkInBio.links"
+                                               :key="'preview-'+index"
+                                               :href="formatUrl(link.url)"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
                                                 <div class="preview-link-icon">
                                                     <img v-if="link.logoPreview" :src="link.logoPreview"
                                                          :alt="link.title">
                                                 </div>
                                                 <span>{{ link.title }}</span>
-                                            </div>
+                                            </a>
                                         </div>
                                         <div class="preview-footer">Powered by CTOUT</div>
                                     </div>
@@ -835,22 +839,23 @@
                     formData.append('themeType', linkInBio.themeType.toUpperCase());
                     formData.append('layoutType', linkInBio.layoutType.toUpperCase());
 
-                    // Collect links
                     linkInBio.links.forEach((link, index) => {
                         if (link.url && link.title) {
                             formData.append(`links[${index}].title`, link.title);
                             formData.append(`links[${index}].url`, link.url);
 
-                            // Handle link logo
+                            // Logo handling
                             if (link.logoFile) {
-                                // New logo file uploaded
                                 formData.append(`links[${index}].logoFile`, link.logoFile);
                             } else if (link.logoUrl && !link.removeLogo) {
-                                // Existing logo kept
                                 formData.append(`links[${index}].logoUrl`, link.logoUrl);
                             } else if (link.removeLogo) {
-                                // Logo was removed
                                 formData.append(`links[${index}].removeLogo`, 'true');
+                            }
+
+
+                            if (link.deleted) {
+                                formData.append(`links[${index}].deleted`, 'true');
                             }
                         }
                     });
@@ -985,6 +990,14 @@
                 window.open(`${url}`, '_blank');
             }
 
+            function formatUrl(url) {
+                if (!url) return '#';
+                if (!/^https?:\/\//i.test(url)) {
+                    return 'https://' + url;
+                }
+                return url;
+            }
+
             // Lifecycle hooks
             onMounted(() => {
                 loadLinks();
@@ -1022,7 +1035,8 @@
                 deleteLink,
                 createNewLink,
                 saveChanges,
-                handleQRTagImageUpload
+                handleQRTagImageUpload,
+                formatUrl
             };
         }
     }).mount('#app');

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CITOUT.ME - Smart URL Shortener & Analytics</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a"><stop offset="0" stop-color="%23ffffff" stop-opacity=".1"/><stop offset="1" stop-color="%23ffffff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"><animate attributeName="cx" values="200;800;200" dur="20s" repeatCount="indefinite"/></circle><circle cx="800" cy="800" r="150" fill="url(%23a)"><animate attributeName="cy" values="800;200;800" dur="25s" repeatCount="indefinite"/></circle></svg>') center/cover;
+            pointer-events: none;
+        }
+
+        .animate-fade-in {
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 1.2s ease forwards;
+        }
+
+        .animate-delay-1 { animation-delay: 0.2s; }
+        .animate-delay-2 { animation-delay: 0.4s; }
+        .animate-delay-3 { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .feature-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+
+        .card {
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .bounce-arrow {
+            animation: bounce 2s infinite;
+        }
+
+        .number-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .number-circle:hover {
+            transform: scale(1.1);
+        }
+
+        .stats-counter {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 1s ease forwards;
+            opacity: 0;
+        }
+
+        .slide-in-right {
+            animation: slideInRight 1s ease forwards;
+            opacity: 0;
+        }
+
+        .fade-enter-active, .fade-leave-active {
+            transition: all 0.5s ease;
+        }
+        .fade-enter-from, .fade-leave-to {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+    </style>
+</head>
+<body>
+<div>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3" href="#">
+                <i class="bi bi-link-45deg"></i> CITOUT.ME
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">How It Works</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pricing">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#faq">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary ms-2 mt-1" href="/oauth2/authorization/google">Get Started Free</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white" style="padding-top: 100px;">
+        <div class="container py-5">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <h1 class="display-3 fw-bold mb-4 animate-fade-in animate-delay-1">
+                        <span style="color:#000000">You're Losing Followers</span> — Just Because Your YouTube Links Don't Open in the App!
+                    </h1>
+                    <h4 class="lead mb-3 animate-fade-in animate-delay-2">
+                        Shorten, Track & Optimize Your Links
+                    </h4>
+                    <p class="lead mb-3 animate-fade-in animate-delay-2">
+                        Create smart short links that direct to link trees, apps, or any URL.
+                        Generate QR codes and track detailed analytics - all in one powerful platform.
+                    </p>
+                    <p class="mb-5 animate-fade-in animate-delay-2">
+                        <small class="opacity-75">
+                            <i class="bi bi-gear"></i> Powered by SRSCONS LLC
+                        </small>
+                    </p>
+
+                    <!-- Demo Section -->
+                    <div class="card glass-effect border-0 shadow-lg mx-auto animate-fade-in animate-delay-3" style="max-width: 600px;">
+                        <div class="card-body p-4">
+                            <h5 class="card-title text-white mb-3">
+                                <i class="bi bi-magic bounce-arrow"></i> Try it now - Enter your URL:
+                            </h5>
+                            <div class="input-group mb-3">
+                                <input
+                                        type="url"
+                                        class="form-control form-control-lg"
+                                        placeholder="https://example.com/my-long-url"
+                                        readonly
+                                >
+                                <a href="/oauth2/authorization/google"
+                                        class="btn btn-success btn-lg"
+                                        type="button"
+                                >
+                                    <i class="bi bi-stars"></i> Generate
+                                </a>
+                            </div>
+
+                            <div class="alert alert-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong><i class="bi bi-check-circle text-success"></i> Your short link:</strong><br>
+                                        <a href="#" class="text-primary fs-5">citout.me/abc123</a>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-clipboard"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-5 bg-light">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h2 class="display-5 fw-bold mb-3">Simple, Transparent Pricing</h2>
+                    <p class="lead text-muted">Choose the plan that fits your needs</p>
+                </div>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <!-- Free Plan -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4 text-center">
+                            <h5 class="card-title">Free</h5>
+                            <div class="display-4 fw-bold text-primary mb-3">$0</div>
+                            <p class="text-muted mb-4">Perfect for personal use</p>
+                            <ul class="list-unstyled mb-4">
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> 100 links per month</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Basic analytics</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> QR code generation</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Link tree support</li>
+                                <li class="mb-2"><i class="bi bi-check-circle text-success"></i> Custom domains</li>
+                            </ul>
+                            <a href="/oauth2/authorization/google" class="btn btn-outline-primary w-100">Get Started Free</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-5 bg-light">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h2 class="display-5 fw-bold mb-3">Frequently Asked Questions</h2>
+                    <p class="lead text-muted">Everything you need to know about CITOUT.ME</p>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    What makes CITOUT.ME different from other URL shorteners?
+                                </button>
+                            </h3>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    CITOUT.ME offers comprehensive link management with advanced analytics, QR code generation, link tree integration, and mobile app deep linking - all in one platform. Our focus on detailed tracking and professional features sets us apart.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Can I use my own custom domain?
+                                </button>
+                            </h3>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes! Pro and Enterprise plans include custom domain support. You can use your own branded domain for all shortened links, maintaining your brand identity across all communications.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    How detailed are the analytics?
+                                </button>
+                            </h3>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Our analytics include click tracking, geographic location, device types, referrer sources, time-based data, and much more. Pro users get advanced filtering and export capabilities for deeper insights.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                    What happens if I exceed my plan limits?
+                                </button>
+                            </h3>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    If you approach your plan limits, we'll notify you in advance. You can either upgrade your plan or purchase additional link credits. Your existing links will always continue to work regardless of plan status.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-0 shadow-sm">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                    Is my data secure and private?
+                                </button>
+                            </h3>
+                            <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Absolutely. We use enterprise-grade security, SSL encryption, and follow strict data privacy standards. We never share your data with third parties and you maintain full ownership of your links and analytics. CITOUT.ME is operated by SRSCONS LLC with industry-leading security practices.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item border-0 shadow-sm">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+                                    Who operates CITOUT.ME?
+                                </button>
+                            </h3>
+                            <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    CITOUT.ME is proudly operated by SRSCONS LLC, a technology company focused on providing reliable web services. For more information about our company, visit <a href="https://srscons.com" target="_blank">srscons.com</a>. You can contact us at support@srscons.com for any inquiries.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <section id="features" class="py-5 bg-light">
+            <div class="container">
+                <div class="row mb-5">
+                    <div class="col-12 text-center">
+                        <h2 class="display-5 fw-bold mb-3">Powerful Features for Every Need</h2>
+                        <p class="lead text-muted">Everything you need to manage and optimize your links</p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Link Tree Integration -->
+                    <div class="col-md-6 col-lg-4 slide-in-left">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="bi bi-diagram-3"></i>
+                                </div>
+                                <h5 class="card-title">Link Tree Integration</h5>
+                                <p class="card-text">Direct visitors to your complete social media hub. Perfect for Instagram bios, business cards, and social profiles.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom URL Redirect -->
+                    <div class="col-md-6 col-lg-4 slide-in-left" style="animation-delay: 0.2s;">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="bi bi-arrow-right-circle"></i>
+                                </div>
+                                <h5 class="card-title">Custom URL Redirect</h5>
+                                <p class="card-text">Redirect to any website, landing page, or online resource. Clean, professional short links for all your marketing needs.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile App Links -->
+                    <div class="col-md-6 col-lg-4 slide-in-left" style="animation-delay: 0.4s;">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="bi bi-phone"></i>
+                                </div>
+                                <h5 class="card-title">Mobile App Links</h5>
+                                <p class="card-text">Smart links that open your iOS or Android app directly. Fallback to app stores if the app isn't installed.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QR Code Generation -->
+                    <div class="col-md-6 col-lg-4 slide-in-right">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="bi bi-qr-code"></i>
+                                </div>
+                                <h5 class="card-title">QR Code Generation</h5>
+                                <p class="card-text">Instantly generate QR codes for your short links. Perfect for print materials, business cards, and offline marketing.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Dashboard -->
+                    <div class="col-md-6 col-lg-4 slide-in-right" style="animation-delay: 0.2s;">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="bi bi-graph-up"></i>
+                                </div>
+                                <h5 class="card-title">Advanced Analytics</h5>
+                                <p class="card-text">Track clicks, locations, devices, and referrers. Detailed insights to optimize your marketing campaigns.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security & Reliability -->
+                    <div class="col-md-6 col-lg-4 slide-in-right" style="animation-delay: 0.4s;">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="feature-icon">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <h5 class="card-title">Secure & Reliable</h5>
+                                <p class="card-text">99.9% uptime guarantee with enterprise-grade security. Your links work when your audience needs them most.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section id="how-it-works" class="py-5">
+            <div class="container">
+                <div class="row mb-5">
+                    <div class="col-12 text-center">
+                        <h2 class="display-5 fw-bold mb-3">How It Works</h2>
+                        <p class="lead text-muted">Get started in three simple steps</p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="text-center slide-in-left">
+                            <div class="number-circle bg-primary text-white">1</div>
+                            <h5><i class="bi bi-clipboard"></i> Paste Your Link</h5>
+                            <p class="text-muted">Enter your long URL, link tree, or app store link</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center slide-in-left" style="animation-delay: 0.2s;">
+                            <div class="number-circle bg-success text-white">2</div>
+                            <h5><i class="bi bi-gear"></i> Customize & Generate</h5>
+                            <p class="text-muted">Create your short link and optional QR code</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center slide-in-left" style="animation-delay: 0.4s;">
+                            <div class="number-circle bg-info text-white">3</div>
+                            <h5><i class="bi bi-share"></i> Share & Track</h5>
+                            <p class="text-muted">Share your link and monitor detailed analytics</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics -->
+        <section class="py-5 bg-primary text-white">
+            <div class="container">
+                <div class="row text-center g-4">
+                    <div class="col-md-3 col-6">
+                        <h3 class="stats-counter">10M+</h3>
+                        <p class="mb-0"><i class="bi bi-link-45deg"></i> Links Created</p>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <h3 class="stats-counter">50K+</h3>
+                        <p class="mb-0"><i class="bi bi-people"></i> Active Users</p>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <h3 class="stats-counter">99.9%</h3>
+                        <p class="mb-0"><i class="bi bi-server"></i> Uptime</p>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <h3 class="stats-counter">24/7</h3>
+                        <p class="mb-0"><i class="bi bi-headset"></i> Support</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section id="get-started" class="py-5 bg-light">
+            <div class="container text-center">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <h2 class="display-5 fw-bold mb-3">Ready to Get Started?</h2>
+                        <p class="lead mb-4">Join thousands of marketers, businesses, and creators who trust CITOUT.ME</p>
+                        <div class="d-grid gap-2 d-md-block">
+                            <a href="/oauth2/authorization/google" class="btn btn-primary btn-lg px-5 me-3">Start For Free</a>
+                            <a href="#pricing" class="btn btn-outline-primary btn-lg px-5">View Pricing</a>
+                        </div>
+                        <p class="small text-muted mt-3">
+                            No credit card required • Free forever plan available<br>
+                            <i class="bi bi-shield-check"></i> Secure service powered by SRSCONS LLC
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-dark text-white py-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="bi bi-link-45deg"></i> CITOUT.ME</h5>
+                        <p class="text-muted">Smart URL shortening and analytics platform</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="mb-2">
+                            <a href="/privacy" class="text-white me-3">Privacy</a>
+                            <a href="/terms" class="text-white me-3">Terms</a>
+                            <a href="/support" class="text-white">Support</a>
+                        </div>
+                        <p class="text-muted small">© 2025 CITOUT.ME. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Simple smooth scrolling for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

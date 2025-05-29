@@ -1,0 +1,54 @@
+
+<div>
+    <div class="p-3">
+        <h5 class="fw-bold ps-2">CITOUT</h5>
+        <div class="section-title">Links</div>
+        <div id="links-container">
+            <a
+                    v-for="link in links"
+                    :key="link.id"
+                    href="#"
+                    class="nav-link"
+                    :class="{ 'active-link': selectedLinkId === link.id }"
+                    @click.prevent="selectLink(link.id)"
+            >
+                <div class="d-flex align-items-center gap-2">
+                    <div class="link-icon"
+                         style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; overflow: hidden; background: #f8f9fa;">
+                        <img v-if="link.logoFileName" :src="link.logoFileName" :alt="link.title"
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                        <i v-else class="bi bi-link" style="font-size: 16px; color: #6c757d;"></i>
+                    </div>
+                    <div class="link-info">
+                        <div class="link-title">{{ link.title }}</div>
+                        <div class="link-description" style="font-size: 12px; color: #6c757d;">
+                            {{ link.description || '' }}
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <a href="#" class="btn btn-outline w-100 mt-2" @click.prevent="createNewLink">+ Create New</a>
+    </div>
+    <div>
+        <a href="/account" class="d-flex align-items-center gap-2 px-3 py-2 rounded-pill text-decoration-none"
+           style="background: #f8fafd; border: 1px solid #dbe1ea;">
+            <img th:src="${loggedInUser.picture}" alt="User" referrerpolicy="no-referrer" class="rounded-circle"
+                 style="width: 32px; height: 32px; object-fit: cover;">
+            <span class="fw-bold text-dark" th:text="${loggedInUser.name+' '+loggedInUser.surname}"></span>
+        </a>
+    </div>
+</div>
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+
+        if (sidebar.classList.contains('visible')) {
+            sidebar.classList.add('invisible');
+            sidebar.classList.remove('visible');
+        } else {
+            sidebar.classList.add('visible');
+            sidebar.classList.remove('invisible');
+        }
+    }
+</script>

@@ -1,17 +1,10 @@
 package com.srscons.shortlink.shortener.repository.entity;
 
+import com.srscons.shortlink.auth.entity.UserEntity;
 import com.srscons.shortlink.shortener.repository.entity.enums.LayoutType;
+import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
 import com.srscons.shortlink.shortener.repository.entity.enums.ThemeType;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -41,6 +34,9 @@ public class ShortLinkEntity {
     @Column(name = "short_code", unique = true, nullable = false)
     private String shortCode;
 
+    @Column(name = "qr_code_svg", columnDefinition = "TEXT")
+    private String qrCodeSvg;
+
     @Column(name = "original_url", nullable = false)
     private String originalUrl;
 
@@ -51,6 +47,10 @@ public class ShortLinkEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "layout_type", columnDefinition = "varchar(10) default 'LIST'")
     private LayoutType layoutType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "link_type", columnDefinition = "varchar(10) default 'REDIRECT'")
+    private LinkType linkType;
 
     @Column(name = "theme_color")
     private String themeColor;
@@ -71,6 +71,16 @@ public class ShortLinkEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
+    @Column(name = "removeMainLogo")
+    private boolean removeMainLogo;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     public ShortLinkEntity() {
         this.links = new ArrayList<>();
@@ -96,4 +106,6 @@ public class ShortLinkEntity {
         links.remove(link);
         link.setShortLink(null);
     }
-} 
+
+
+}

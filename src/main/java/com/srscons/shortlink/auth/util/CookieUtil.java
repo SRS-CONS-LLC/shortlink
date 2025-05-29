@@ -19,10 +19,11 @@ public class CookieUtil {
         return null;
     }
 
-    public static void setCookie(HttpServletResponse response, String name, String value, int interval) {
+    public static void setCookie(HttpServletRequest request, HttpServletResponse response,  String name, String value, int interval) {
         Cookie tokenCookie = new Cookie(name, value);
         tokenCookie.setHttpOnly(true);
         tokenCookie.setSecure(true); // Only over HTTPS
+        tokenCookie.setDomain(request.getServerName()); // with dot to include subdomains
         tokenCookie.setPath("/");
         tokenCookie.setMaxAge(interval); // 1 day
 
@@ -36,6 +37,7 @@ public class CookieUtil {
             for (Cookie cookie : cookies) {
                 Cookie deletedCookie = new Cookie(cookie.getName(), null);
                 deletedCookie.setPath("/"); // make sure path matches original
+                deletedCookie.setDomain(request.getServerName()); // with dot to include subdomains
                 deletedCookie.setMaxAge(0); // deletes the cookie
                 deletedCookie.setHttpOnly(cookie.isHttpOnly());
                 deletedCookie.setSecure(cookie.getSecure());

@@ -73,6 +73,8 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // QR Code Generator
+    implementation 'io.nayuki:qrcodegen:1.8.0'
 }
 
 tasks.named('test') {

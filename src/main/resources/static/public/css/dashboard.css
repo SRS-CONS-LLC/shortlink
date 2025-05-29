@@ -6,12 +6,6 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-body {
-    display: flex;
-    min-height: 100vh;
-    background-color: #f7f8fa;
-}
-
 .layout {
     display: flex;
     width: 100%;
@@ -44,13 +38,88 @@ body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
+.qr-code-box {
+    width: 100%;
+    max-width: 200px;
+    aspect-ratio: 1 / 1;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    padding: 4px;
+    box-sizing: border-box;
+    position: relative;
+    cursor: pointer;
+}
+
+.qr-code-svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    border: none;
+    background-color: white;
+    transition: filter 0.3s ease;
+}
+
+.qr-download-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    color: #666;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.qr-download-info i {
+    font-size: 14px;
+    color: #666;
+}
+
+/* QR Code Hover Effect */
+.qr-code-box:hover .qr-code-svg {
+    filter: blur(2px);
+}
+
+.qr-hover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    border-radius: 8px;
+}
+
+.qr-hover-overlay span {
+    color: white;
+    font-size: clamp(16px, 2.4vw, 24px);
+    font-weight: 600;
+    text-align: center;
+    width: 80%;
+}
+
+.qr-code-box:hover .qr-hover-overlay {
+    opacity: 1;
+}
+
 .form-section-title {
     font-size: 0.8rem;
     color: #6c757d;
     margin-bottom: 0.5rem;
 }
 
-.smartlink-type {
+.link-type {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
@@ -59,17 +128,12 @@ body {
 .input-wrapper {
     display: flex;
     align-items: center;
-    background: #f8fafd;
-    border: 1px solid #dbe1ea;
-    border-radius: 0.5rem;
-    padding: 0.5rem 1rem;
 }
 
 .readonly-input {
     flex: 1;
     border: none;
-    background: transparent;
-    margin: 0 0.5rem;
+    background: #acacac82;
 }
 
 .icon-btn {
@@ -115,18 +179,15 @@ body {
     flex: 1;
     background-color: white;
     border-radius: 8px;
-    padding: 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .preview-section {
-    flex: 1;
-    background-color: white;
+    height: auto;
     border-radius: 8px;
-    padding-top: 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    display: flex;
     justify-content: center;
+    margin-top:10px;
 }
 
 .form-group {
@@ -137,14 +198,6 @@ body {
     display: block;
     font-weight: 500;
     margin-bottom: 8px;
-}
-
-.form-control {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
 }
 
 .upload-btn {
@@ -301,7 +354,6 @@ body {
 /* Preview Styles */
 .preview-container {
     width: 450px;
-    height: 350px;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -356,7 +408,7 @@ body {
 }
 
 .preview-links.grid {
-    display: grid;
+    display: grid !important;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
 }
@@ -413,7 +465,6 @@ body {
 }
 
 .save-btn {
-    width: 100%;
     padding: 12px;
     background-color: #4CAF50;
     color: white;
@@ -597,13 +648,7 @@ body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     }
 
-    body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden; /* Prevent body scrolling */
-        background-color: #f7f8fa;
-        height: 100vh;
-    }
+
 
     .layout {
         display: flex;
@@ -612,23 +657,7 @@ body {
         overflow: hidden; /* Prevent layout scrolling */
     }
 
-    /* Sidebar Styles - Fixed position */
-    .sidebar {
-        width: 280px;
-        height: 100vh;
-        background: #fff;
-        border-right: 1px solid #dbe1ea;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 1.5rem;
-        position: fixed; /* Fixed position */
-        top: 0;
-        left: 0;
-        bottom: 0;
-        overflow-y: auto; /* Allow sidebar to scroll if content is too tall */
-        z-index: 100;
-    }
+
 
     /* Links container in sidebar needs fixed height with scrolling */
     #links-container {
@@ -636,25 +665,6 @@ body {
         max-height: calc(100vh - 300px); /* Adjust based on other sidebar elements */
     }
 
-    .sidebar .nav-link {
-        color: #6c757d;
-        text-decoration: none;
-        padding: 0.5rem;
-        border-radius: 0.5rem;
-        margin-bottom: 0.25rem;
-        transition: all 0.2s ease;
-    }
-
-    .sidebar .nav-link:hover {
-        background: #f8fafd;
-        color: #000;
-    }
-
-    .sidebar .nav-link.active-link {
-        background: #2f2f32;
-        color: #000;
-        font-weight: 500;
-    }
 
     .section-title {
         font-size: 0.8rem;
@@ -673,7 +683,6 @@ body {
     .main-content {
         flex: 1;
         padding: 2rem;
-        margin-left: 280px; /* Equal to sidebar width */
         height: 100vh;
         overflow-y: auto; /* Enable scrolling */
         position: relative;
@@ -687,21 +696,13 @@ body {
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    /* Complete CSS solution for non-scrollable sidebar with scrollable Smartlinks section */
+    /* Complete CSS solution for non-scrollable sidebar with scrollable links section */
 
     * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    }
-
-    body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden; /* Prevent body scrolling */
-        background-color: #f7f8fa;
-        height: 100vh;
     }
 
     .layout {
@@ -711,23 +712,6 @@ body {
         overflow: hidden; /* Prevent layout scrolling */
     }
 
-    /* Sidebar that scrolls as a whole */
-    .sidebar {
-        width: 280px;
-        height: 100vh;
-        background: #fff;
-        border-right: 1px solid #dbe1ea;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 1.5rem;
-        position: fixed; /* Fixed position */
-        top: 0;
-        left: 0;
-        bottom: 0;
-        overflow-y: auto; /* Make entire sidebar scrollable */
-        z-index: 100;
-    }
 
     /* Prevent links container from having its own scrolling */
     #links-container {
@@ -735,26 +719,7 @@ body {
         max-height: none; /* Remove height constraints */
     }
 
-    /* Sidebar styling */
-    .sidebar .nav-link {
-        color: #6c757d;
-        text-decoration: none;
-        padding: 0.5rem;
-        border-radius: 0.5rem;
-        margin-bottom: 0.25rem;
-        transition: all 0.2s ease;
-    }
 
-    .sidebar .nav-link:hover {
-        background: #f8fafd;
-        color: #000;
-    }
-
-    .sidebar .nav-link.active-link {
-        background: #2f2f32;
-        color: #000;
-        font-weight: 500;
-    }
 
     .section-title {
         font-size: 0.8rem;
@@ -773,33 +738,17 @@ body {
     .main-content {
         flex: 1;
         padding: 2rem;
-        margin-left: 280px; /* Equal to sidebar width */
         height: 100vh;
         overflow-y: auto; /* Enable scrolling */
         position: relative;
         width: calc(100% - 280px); /* Calculate remaining width */
     }
 
-    /* Custom scrollbar for the entire sidebar */
-    .sidebar::-webkit-scrollbar {
-        width: 5px;
-    }
 
-    .sidebar::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
 
-    .sidebar::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 10px;
-    }
-
-    .sidebar::-webkit-scrollbar-thumb:hover {
-        background: #a1a1a1;
-    }
 
     /* CSS for the delete button in the top right corner */
-    .delete-smartlink-btn {
+    .delete-link-btn {
         position: absolute;
         top: 20px;
         right: 20px;
@@ -818,12 +767,12 @@ body {
         transition: all 0.2s ease;
     }
 
-    .delete-smartlink-btn:hover {
+    .delete-link-btn:hover {
         background-color: #dc3545;
         color: white;
     }
 
-    .delete-smartlink-btn i {
+    .delete-link-btn i {
         font-size: 16px;
     }
 
@@ -912,4 +861,69 @@ body {
         to {
             transform: rotate(360deg);
         }
+    }
+
+    .invisible {
+        display: none;
+    }
+
+    .visible {
+        display: block;
+    }
+
+    /* Sidebar Styles - Scrollable and Fixed */
+    .sidebar {
+        background: #fff;
+        /*width: 280px;*/
+        /*height: 100vh;*/
+        /*border-right: 1px solid #dbe1ea;*/
+        /*display: flex;*/
+        /*flex-direction: column;*/
+        /*justify-content: space-between;*/
+        /*padding: 1.5rem;*/
+        /*position: fixed;*/
+        /*top: 0;*/
+        /*left: 0;*/
+        /*bottom: 0;*/
+        /*overflow-y: auto;*/
+        /*z-index: 100;*/
+    }
+
+    /* Sidebar Navigation Links */
+    .sidebar .nav-link {
+        color: #6c757d;
+        text-decoration: none;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 0.25rem;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar .nav-link:hover {
+        background: #f8fafd;
+        color: #000;
+    }
+
+    .sidebar .nav-link.active-link {
+        background: #2f2f32;
+        color: #000;
+        font-weight: 500;
+    }
+
+    /* Custom Scrollbar for Sidebar */
+    .sidebar::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 10px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
     }

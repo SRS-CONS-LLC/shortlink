@@ -2,6 +2,7 @@ package com.srscons.shortlink.shortener.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.srscons.shortlink.shortener.config.CloudflareProperties;
+import com.srscons.shortlink.common.exception.ShortLinkException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,17 +33,17 @@ public class FileUploadService {
         String originalFileName = file.getOriginalFilename();
 
         if (originalFileName == null || !originalFileName.contains(".")) {
-            throw new IllegalArgumentException("Invalid file: no extension found.");
+            throw new ShortLinkException("Invalid file: no extension found.");
         }
 
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf(".")).toLowerCase();
 
         if (!ALLOWED_EXTENSIONS.contains(fileExtension)) {
-            throw new IllegalArgumentException("File type not allowed: " + fileExtension);
+            throw new ShortLinkException("File type not allowed: " + fileExtension);
         }
 
         if (file.getSize() > MAX_FILE_SIZE) {
-            throw new IllegalArgumentException("File size exceeds the 5MB limit.");
+            throw new ShortLinkException("File size exceeds the 5MB limit.");
         }
 
         try {
@@ -69,37 +70,13 @@ public class FileUploadService {
                 String imageId = response.getBody().path("result").path("id").asText();
                 return cloudflareProperties.getDeliveryUrl() + "/" + imageId + "/public";
             } else {
-                throw new RuntimeException("Cloudflare image upload failed: " + response);
+                throw new ShortLinkException("Cloudflare image upload failed: " + response);
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Cloudflare CDN upload failed", e);
+            throw new ShortLinkException("Cloudflare CDN upload failed", e);
         }
     }
 
-    public void deleteFileFromCloudflare(String fileUrl) {
-        String deliveryUrl = cloudflareProperties.getDeliveryUrl();
-        String accountId = cloudflareProperties.getAccountId();
-        String apiToken = cloudflareProperties.getApiToken();
 
-        if (fileUrl == null || !fileUrl.startsWith(deliveryUrl)) return;
-
-        // Extract image ID
-        String path = fileUrl.replace(deliveryUrl + "/", "");
-        String imageId = path.split("/")[0];
-        String apiUrl = "https://api.cloudflare.com/client/v4/accounts/" + accountId + "/images/v1/" + imageId;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + apiToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        try {
-            ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.DELETE, entity, String.class);
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                System.err.println("Failed to delete image from Cloudflare: " + response.getBody());
-            }
-        } catch (Exception e) {
-            System.err.println("Exception deleting image from Cloudflare: " + e.getMessage());
-        }
-    }
 }

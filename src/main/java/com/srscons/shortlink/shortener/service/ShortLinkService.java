@@ -1,13 +1,16 @@
 package com.srscons.shortlink.shortener.service;
 
-import com.srscons.shortlink.shortener.exception.ShortLinkNotFoundException;
+import com.srscons.shortlink.common.exception.ShortLinkException;
+import com.srscons.shortlink.common.exception.ShortLinkNotFoundException;
 import com.srscons.shortlink.shortener.repository.ShortLinkRepository;
 import com.srscons.shortlink.shortener.repository.entity.ShortLinkEntity;
 import com.srscons.shortlink.shortener.repository.entity.LinkItemEntity;
 import com.srscons.shortlink.shortener.repository.entity.MetaDataEntity;
+import com.srscons.shortlink.shortener.repository.entity.enums.LinkType;
 import com.srscons.shortlink.shortener.service.dto.ShortLinkDto;
 import com.srscons.shortlink.shortener.service.mapper.ShortLinkMapper;
 import com.srscons.shortlink.shortener.util.FileUploadService;
+import io.nayuki.qrcodegen.QrCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
@@ -28,51 +32,97 @@ public class ShortLinkService {
     private final ShortLinkMapper mapper;
     private final FileUploadService fileUploadService;
     private final Random random = new SecureRandom();
-
-    private static final Pattern OS_VERSION_PATTERN = Pattern.compile("OS ([\\d_.]+)");
-    private static final Pattern BROWSER_PATTERN = Pattern.compile("(Chrome|Firefox|Safari|Edge|Opera|MSIE|Trident)[/\\s]([\\d.]+)");
-    private static final Pattern OS_PATTERN = Pattern.compile("(Windows|Mac OS X|Linux|Android|iOS)[/\\s]([\\d._]+)?");
+    private static final Logger log = LoggerFactory.getLogger(ShortLinkService.class);
     private static final String ALPHABET = "23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ";
     private static final int SHORT_CODE_LENGTH = 6;
     private static final int MAX_ATTEMPTS = 10;
+    private static final String SVG_QR_CODE_TEMPLATE = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 %d %d" shape-rendering="crispEdges">
+                    <rect width="100%%" height="100%%" fill="white"/>
+                    <path d="%s" stroke="black"/>
+                </svg>
+                """;
 
-    public List<ShortLinkDto> findAll() {
-        return repository.findAll().stream()
-                .map(mapper::fromEntityToBusiness)
-                .collect(Collectors.toList());
+    public List<ShortLinkDto> findAll(Long userId) {
+        try {
+            List<ShortLinkEntity> entities = repository.findAllByDeletedFalseAndUserId(userId);
+            log.info("Found {} non-deleted short links", entities.size());
+            
+            return entities.stream()
+                    .map(entity -> {
+                        try {
+                            return mapper.fromEntityToBusiness(entity);
+                        } catch (Exception e) {
+                            log.error("Error mapping entity to DTO: {}", e.getMessage(), e);
+                            return null;
+                        }
+                    })
+                    .filter(dto -> dto != null)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error in findAll: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Transactional
-    public ShortLinkDto create(ShortLinkDto dto) {
+    public ShortLinkDto create(ShortLinkDto dto, String baseUrl) {
         ShortLinkEntity entity = mapper.fromBusinessToEntity(dto);
-        entity.setOriginalUrl("https://www.ctout.com");
+        entity.setOriginalUrl("https://www.citout.me");
         entity.setShortCode(generateUniqueShortCode());
+        entity.setQrCodeSvg(generateQrCodeSvg(entity.getShortCode(), baseUrl));
+
+        // Handle link items
+        if (dto.getLinks() != null) {
+            List<ShortLinkDto.LinkItemDto> incomingLinks = dto.getLinks();
+            log.info("📦 Creating new Smartlink with {} link items", incomingLinks.size());
+
+            for (ShortLinkDto.LinkItemDto itemDto : incomingLinks) {
+                if (itemDto.getUrl() != null && !itemDto.getUrl().trim().isEmpty()) {
+                    LinkItemEntity item = new LinkItemEntity();
+                    item.setTitle(itemDto.getTitle());
+                    item.setUrl(itemDto.getUrl());
+                    item.setShortLink(entity);
+                    item.setDeleted(false);
+
+                    if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
+                        uploadLogoIfPresent(itemDto.getLogoFile(), item);
+                    } else if (itemDto.getLogoUrl() != null && !itemDto.getLogoUrl().trim().isEmpty()) {
+                        item.setLogoUrl(itemDto.getLogoUrl());
+                    }
+
+                    entity.getLinks().add(item);
+                    log.info("→ Added link item: {} | url={}", itemDto.getTitle(), itemDto.getUrl());
+                }
+            }
+        }
 
         ShortLinkEntity saved = repository.save(entity);
         return mapper.fromEntityToBusiness(saved);
     }
 
     public ShortLinkDto findById(Long id) {
-        return repository.findById(id)
-                .map(mapper::fromEntityToBusiness)
+        ShortLinkEntity entity = repository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ShortLinkNotFoundException(id));
+
+        return mapper.fromEntityToBusiness(entity);
     }
 
     @Transactional
-    public String getOriginalUrl(String shortCode) {
-        return repository.findByShortCode(shortCode)
-                .map(ShortLinkEntity::getOriginalUrl)
+    public ShortLinkDto getShortLinkByCode(String shortCode) {
+        return repository.findByShortCodeIgnoreCase(shortCode)
+                .map(mapper::fromEntityToBusiness)
                 .orElse(null);
     }
 
     @Transactional
     public void saveVisitMetadata(String shortCode, HttpServletRequest request) {
-        ShortLinkEntity shortLink = repository.findByShortCode(shortCode)
+        ShortLinkEntity shortLink = repository.findByShortCodeIgnoreCase(shortCode)
                 .orElseThrow(() -> new ShortLinkNotFoundException(shortCode));
 
         String userAgent = request.getHeader("User-Agent");
         String referer = request.getHeader("Referer");
-        String queryString = request.getQueryString();
 
         MetaDataEntity metadata = new MetaDataEntity();
         metadata.setShortLink(shortLink);
@@ -85,105 +135,82 @@ public class ShortLinkService {
         metadata.setProxy(detectProxy(request));
         metadata.setVpn(detectVPN(request));
 
-        // Parse user agent manually
-        if (userAgent != null) {
-            // Detect browser
-            java.util.regex.Matcher browserMatcher = BROWSER_PATTERN.matcher(userAgent);
-            if (browserMatcher.find()) {
-                metadata.setBrowser(browserMatcher.group(1));
-            }
-
-            // Detect OS
-            java.util.regex.Matcher osMatcher = OS_PATTERN.matcher(userAgent);
-            if (osMatcher.find()) {
-                String os = osMatcher.group(1);
-                metadata.setOs(os);
-                metadata.setOsVersion(osMatcher.group(2));
-            }
-
-            // Detect device type
-            String userAgentLower = userAgent.toLowerCase();
-            metadata.setIsMobile(userAgentLower.contains("mobile") || userAgentLower.contains("android") || userAgentLower.contains("iphone"));
-            metadata.setIsTablet(userAgentLower.contains("tablet") || userAgentLower.contains("ipad"));
-            metadata.setIsDesktop(!metadata.getIsMobile() && !metadata.getIsTablet());
-        }
-
-        // Parse UTM parameters
-        if (queryString != null) {
-            Map<String, String> params = parseQueryString(queryString);
-            metadata.setUtmSource(params.get("utm_source"));
-            metadata.setUtmMedium(params.get("utm_medium"));
-            metadata.setUtmCampaign(params.get("utm_campaign"));
-            metadata.setUtmTerm(params.get("utm_term"));
-            metadata.setUtmContent(params.get("utm_content"));
-        }
-
-        shortLink.getVisitMetadata().add(metadata);
+        shortLink.addVisitMetadata(metadata);
         repository.save(shortLink);
     }
 
+
     @Transactional
-    public ShortLinkDto update(ShortLinkDto dto) {
-        ShortLinkEntity existing = repository.findById(dto.getId())
-                .orElseThrow(() -> new ShortLinkNotFoundException(dto.getId()));
+    public ShortLinkDto update(ShortLinkDto shortLinkDto, String baseUrl) {
+        ShortLinkEntity foundShortLink = repository.findById(shortLinkDto.getId())
+                .orElseThrow(() -> new ShortLinkNotFoundException(shortLinkDto.getId()));
 
-        existing.setTitle(dto.getTitle());
-        existing.setOriginalUrl(dto.getOriginalUrl());
-        existing.setDescription(dto.getDescription());
-        existing.setThemeType(dto.getThemeType());
-        existing.setLayoutType(dto.getLayoutType());
-        existing.setThemeColor(dto.getThemeColor());
+        // Update main fields
+        foundShortLink.setTitle(shortLinkDto.getTitle());
+        foundShortLink.setOriginalUrl(shortLinkDto.getOriginalUrl());
+        foundShortLink.setDescription(shortLinkDto.getDescription());
+        foundShortLink.setThemeType(shortLinkDto.getThemeType());
+        foundShortLink.setLayoutType(shortLinkDto.getLayoutType());
+        foundShortLink.setThemeColor(shortLinkDto.getThemeColor());
+        foundShortLink.setLinkType(shortLinkDto.getLinkType());
+        foundShortLink.setQrCodeSvg(generateQrCodeSvg(foundShortLink.getShortCode(), baseUrl));
 
-        // Handle main logo
-        if (dto.getLogoFile() != null && !dto.getLogoFile().isEmpty()) {
-            // New logo file uploaded
-            uploadLogoIfPresent(dto.getLogoFile(), existing);
-        } else if (dto.getLogoUrl() != null) {
-            // Preserve existing logo URL
-            existing.setLogoUrl(dto.getLogoUrl());
-        } else {
-            // Remove logo
-            existing.setLogoUrl(null);
-        }
-
-        // Remove old links and re-add new ones
-        existing.getLinks().clear();
-
-        if (dto.getLinks() != null) {
-            for (ShortLinkDto.LinkItemDto itemDto : dto.getLinks()) {
-                LinkItemEntity item = new LinkItemEntity();
-                item.setTitle(itemDto.getTitle());
-                item.setUrl(itemDto.getUrl());
-                item.setShortLink(existing);
-
-                // Handle link logo
-                if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
-                    // New logo file uploaded
-                    uploadLogoIfPresent(itemDto.getLogoFile(), item);
-                } else if (itemDto.getLogoUrl() != null) {
-                    // Preserve existing logo URL
-                    item.setLogoUrl(itemDto.getLogoUrl());
-                } else {
-                    // Remove logo
-                    item.setLogoUrl(null);
-                }
-
-                existing.getLinks().add(item);
+        if(!shortLinkDto.getShortCode().equalsIgnoreCase(foundShortLink.getShortCode())) {
+            if(repository.existsByShortCodeIgnoreCase(shortLinkDto.getShortCode())) {
+                throw new ShortLinkException("Short code already exists: " + shortLinkDto.getShortCode());
             }
+
+            foundShortLink.setShortCode(shortLinkDto.getShortCode());
         }
 
-        ShortLinkEntity updated = repository.save(existing);
+        // Main logo logic
+        if (shortLinkDto.getLogoFile() != null && !shortLinkDto.getLogoFile().isEmpty()) {
+            uploadLogoIfPresent(shortLinkDto.getLogoFile(), foundShortLink);
+        } else if (shortLinkDto.isRemoveMainLogo()) {
+            foundShortLink.setLogoUrl(null);
+        } else if (shortLinkDto.getLogoUrl() != null && !shortLinkDto.getLogoUrl().equals(foundShortLink.getLogoUrl())) {
+            foundShortLink.setLogoUrl(shortLinkDto.getLogoUrl());
+        }
+
+        List<LinkItemEntity> existingLinks = foundShortLink.getLinks();
+        existingLinks.clear();
+        // Update link items based on index (position)
+        if (shortLinkDto.getLinks() != null && shortLinkDto.getLinkType() == LinkType.BIO) {
+            for (int i = 0; i < shortLinkDto.getLinks().size(); i++) {
+                ShortLinkDto.LinkItemDto itemDto = shortLinkDto.getLinks().get(i);
+                if (itemDto.getUrl() != null && !itemDto.getUrl().isBlank()) {
+                    LinkItemEntity linkEntity = new LinkItemEntity();
+                    linkEntity.setTitle(itemDto.getTitle());
+                    linkEntity.setUrl(itemDto.getUrl());
+                    linkEntity.setShortLink(foundShortLink);
+                    linkEntity.setDeleted(false);
+
+                    if (itemDto.getLogoFile() != null && !itemDto.getLogoFile().isEmpty()) {
+                        uploadLogoIfPresent(itemDto.getLogoFile(), linkEntity);
+                    } else if (itemDto.getLogoUrl() != null && !itemDto.getLogoUrl().isBlank()) {
+                        linkEntity.setLogoUrl(itemDto.getLogoUrl());
+                    }
+
+                    existingLinks.add(linkEntity);
+                }
+            }
+
+            foundShortLink.setLinks(existingLinks);
+        }
+
+        ShortLinkEntity updated = repository.save(foundShortLink);
+
         return mapper.fromEntityToBusiness(updated);
     }
 
     private String generateUniqueShortCode() {
         for (int attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
             String shortCode = generateRandomShortCode();
-            if (!repository.existsByShortCode(shortCode)) {
+            if (!repository.existsByShortCodeIgnoreCase(shortCode)) {
                 return shortCode;
             }
         }
-        throw new IllegalStateException("Could not generate unique short code after " + MAX_ATTEMPTS + " attempts");
+        throw new ShortLinkException("Could not generate unique short code after " + MAX_ATTEMPTS + " attempts");
     }
 
     private String generateRandomShortCode() {
@@ -193,6 +220,38 @@ public class ShortLinkService {
             shortCode.append(ALPHABET.charAt(index));
         }
         return shortCode.toString();
+    }
+
+    public String generateQrCodeSvg(String shortCode, String baseUrl) {
+        String fullUrl = baseUrl +"/"+ shortCode;
+        QrCode qr = QrCode.encodeText(fullUrl, QrCode.Ecc.MEDIUM);
+        return toSvgString(qr);
+    }
+
+    private String toSvgString(QrCode qr) {
+        int border = 1;
+        int size = qr.size;
+
+        StringBuilder pathData = new StringBuilder();
+        for (int y = 0; y < size; y++) {
+            boolean inLine = false;
+            for (int x = 0; x < size; x++) {
+                if (qr.getModule(x, y)) {
+                    if (!inLine) {
+                        pathData.append("M").append(x + border).append(",").append(y + border).append("h1");
+                        inLine = true;
+                    } else {
+                        pathData.append("h1");
+                    }
+                } else {
+                    inLine = false;
+                }
+            }
+        }
+
+        int fullSize = size + border * 2;
+
+        return SVG_QR_CODE_TEMPLATE.formatted(fullSize, fullSize, pathData);
     }
 
     private void uploadLogoIfPresent(MultipartFile logoFile, ShortLinkEntity entity) {
@@ -295,6 +354,20 @@ public class ShortLinkService {
         }
 
         return null;
+    }
+
+    @Transactional
+    public void softDeleteShortlink(Long shortlinkId) {
+        ShortLinkEntity shortlink = repository.findById(shortlinkId)
+                .orElseThrow(() -> new ShortLinkNotFoundException("Shortlink not found"));
+
+        shortlink.setDeleted(true);
+
+        for (LinkItemEntity item : shortlink.getLinks()) {
+            item.setDeleted(true);
+        }
+
+        repository.save(shortlink);
     }
 
 } 
