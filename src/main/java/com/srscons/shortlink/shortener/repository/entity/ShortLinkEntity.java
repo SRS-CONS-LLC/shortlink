@@ -87,16 +87,15 @@ public class ShortLinkEntity {
         this.visitMetadata = new ArrayList<>();
     }
 
-    public void addVisitMetadata(MetaDataEntity metadata) {
-        visitMetadata.add(metadata);
-        metadata.setShortLink(this);
-    }
-
-    public void removeVisitMetadata(MetaDataEntity metadata) {
-        visitMetadata.remove(metadata);
-        metadata.setShortLink(null);
-    }
-
+   // public void addVisitMetadata(MetaDataEntity metadata) {
+   //        visitMetadata.add(metadata);
+   //        metadata.setShortLink(this);
+   //    }
+   //
+   //    public void removeVisitMetadata(MetaDataEntity metadata) {
+   //        visitMetadata.remove(metadata);
+   //        metadata.setShortLink(null);
+   //    }
     public void addLink(LinkItemEntity link) {
         links.add(link);
         link.setShortLink(this);

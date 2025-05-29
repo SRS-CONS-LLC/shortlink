@@ -118,25 +118,25 @@ public class ShortLinkService {
 
     @Transactional
     public void saveVisitMetadata(String shortCode, HttpServletRequest request) {
-        ShortLinkEntity shortLink = repository.findByShortCodeIgnoreCase(shortCode)
-                .orElseThrow(() -> new ShortLinkNotFoundException(shortCode));
-
-        String userAgent = request.getHeader("User-Agent");
-        String referer = request.getHeader("Referer");
-
-        MetaDataEntity metadata = new MetaDataEntity();
-        metadata.setShortLink(shortLink);
-        metadata.setClickTime(LocalDateTime.now());
-        metadata.setIpAddress(getClientIp(request));
-        metadata.setUserAgent(userAgent);
-        metadata.setReferer(referer);
-        metadata.setChannel(detectChannel(referer));
-        metadata.setSmartlinkType(detectSmartlinkType(shortLink.getOriginalUrl()));
-        metadata.setProxy(detectProxy(request));
-        metadata.setVpn(detectVPN(request));
-
-        shortLink.addVisitMetadata(metadata);
-        repository.save(shortLink);
+       // ShortLinkEntity shortLink = repository.findByShortCodeIgnoreCase(shortCode)
+        //                .orElseThrow(() -> new ShortLinkNotFoundException(shortCode));
+        //
+        //        String userAgent = request.getHeader("User-Agent");
+        //        String referer = request.getHeader("Referer");
+        //
+        //        MetaDataEntity metadata = new MetaDataEntity();
+        //        metadata.setShortLink(shortLink);
+        //        metadata.setClickTime(LocalDateTime.now());
+        //        metadata.setIpAddress(getClientIp(request));
+        //        metadata.setUserAgent(userAgent);
+        //        metadata.setReferer(referer);
+        //        metadata.setChannel(detectChannel(referer));
+        //        metadata.setSmartlinkType(detectSmartlinkType(shortLink.getOriginalUrl()));
+        //        metadata.setProxy(detectProxy(request));
+        //        metadata.setVpn(detectVPN(request));
+        //
+        //        shortLink.addVisitMetadata(metadata);
+        //        repository.save(shortLink);
     }
 
 
