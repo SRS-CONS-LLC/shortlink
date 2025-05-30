@@ -120,34 +120,48 @@ public class IndexController {
         String fallbackUrl = originalUrl;
         String videoId = null;
         String channelHandle = null;
+        String appId = null;
+        String packageName = null;
 
         try {
             URI uri = new URI(originalUrl);
             String host = uri.getHost();
             String path = uri.getPath();
 
-            if (host == null || !(host.contains("youtube.com") || host.contains("youtu.be"))) {
-                // Not a YouTube domain — don't try to deep link
-                return fallbackUrl;
+            // Handle App Store links
+            if (host != null && host.contains("apps.apple.com")) {
+                int idIndex = path.indexOf("/id");
+                if (idIndex != -1) {
+                    String idPart = path.substring(idIndex + 3);
+                    int endIndex = idPart.indexOf("?");
+                    appId = endIndex != -1 ? idPart.substring(0, endIndex) : idPart;
+                }
             }
-
-            // Check if it's a video URL
-            if (originalUrl.contains("watch?v=")) {
-                videoId = getQueryParam(originalUrl, "v");
-
-            } else if (host != null && host.contains("youtu.be")) {
-                videoId = path.substring(1); // /d2P8sVU5ydM -> d2P8sVU5ydM
-
-            } else if (path.equals("/watch") && originalUrl.contains("v=")) {
-                videoId = getQueryParam(originalUrl, "v");
-
-            } else if (path.matches("^/@[\\w\\-]+$") ||
-                    path.startsWith("/c/") ||
-                    path.startsWith("/user/") ||
-                    path.startsWith("/channel/")) {
-                channelHandle = path.substring(1); // remove leading /
+            // Handle Play Store links
+            else if (host != null && host.contains("play.google.com")) {
+                String query = uri.getQuery();
+                if (query != null && query.contains("id=")) {
+                    int idIndex = query.indexOf("id=");
+                    String packagePart = query.substring(idIndex + 3);
+                    int endIndex = packagePart.indexOf("&");
+                    packageName = endIndex != -1 ? packagePart.substring(0, endIndex) : packagePart;
+                }
             }
-
+            // Handle YouTube links
+            else if (host != null && (host.contains("youtube.com") || host.contains("youtu.be"))) {
+                if (originalUrl.contains("watch?v=")) {
+                    videoId = getQueryParam(originalUrl, "v");
+                } else if (host.contains("youtu.be")) {
+                    videoId = path.substring(1);
+                } else if (path.equals("/watch") && originalUrl.contains("v=")) {
+                    videoId = getQueryParam(originalUrl, "v");
+                } else if (path.matches("^/@[\\w\\-]+$") ||
+                        path.startsWith("/c/") ||
+                        path.startsWith("/user/") ||
+                        path.startsWith("/channel/")) {
+                    channelHandle = path.substring(1);
+                }
+            }
         } catch (Exception e) {
             return fallbackUrl;
         }
@@ -155,7 +169,20 @@ public class IndexController {
         boolean isIOS = userAgent.contains("iPhone") || userAgent.contains("iPad") || userAgent.contains("iOS");
         boolean isAndroid = userAgent.contains("Android");
 
-        if (videoId != null) {
+        // Handle App Store links
+        if (appId != null) {
+            String iosUrl = "itms-apps://itunes.apple.com/app/id" + appId;
+            String webUrl = "https://apps.apple.com/app/id" + appId;
+            return isIOS ? iosUrl : webUrl;
+        }
+        // Handle Play Store links
+        else if (packageName != null) {
+            String androidUrl = "market://details?id=" + packageName;
+            String webUrl = "https://play.google.com/store/apps/details?id=" + packageName;
+            return isAndroid ? androidUrl : webUrl;
+        }
+        // Handle YouTube links
+        else if (videoId != null) {
             String iosUrl = "youtube://watch?v=" + videoId;
             String androidUrl = "intent://scan/#Intent;" +
                     "scheme=vnd.youtube://watch?v=" + videoId + ";" +
@@ -163,14 +190,13 @@ public class IndexController {
                     "S.browser_fallback_url=" + fallbackUrl + ";" +
                     "end;";
             return isIOS ? iosUrl : isAndroid ? androidUrl : fallbackUrl;
-
         } else if (channelHandle != null) {
             String iosUrl = "youtube://youtube.com/" + channelHandle;
             String androidUrl = "vnd.youtube://" + channelHandle;
             return isIOS ? iosUrl : isAndroid ? androidUrl : fallbackUrl;
         }
 
-        return fallbackUrl; // fallback if format not matched
+        return fallbackUrl;
     }
 
     private static String getQueryParam(String url, String key) {
