@@ -32,6 +32,9 @@ public class ShortLinkEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private Boolean deleted = false;
+
     @Column(name = "title", nullable = false)
     private String title;
 

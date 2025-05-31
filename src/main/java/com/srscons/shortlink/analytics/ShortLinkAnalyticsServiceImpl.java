@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +22,27 @@ public class ShortLinkAnalyticsServiceImpl implements ShortLinkAnalyticsService 
 
     @Override
     @Transactional(readOnly = true)
-    public AnalyticsDTO getAnalytics(Long shortLinkId) {
-        List<MetaDataEntity> metaDataList = analyticsRepository.findByShortLinkId(shortLinkId);
-        return analyticsMapper.toAnalytics(metaDataList);
+    public AnalyticsDTO getAnalytics(Long shortLinkId, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
+        LocalDateTime endDateTime = endDate != null ? endDate.atTime(LocalTime.MAX) : null;
+        
+        List<MetaDataEntity> metaDataList;
+        if (startDateTime != null && endDateTime != null) {
+            metaDataList = analyticsRepository.findByShortLinkIdAndClickTimeBetween(
+                shortLinkId, startDateTime, endDateTime);
+        } else {
+            metaDataList = analyticsRepository.findByShortLinkId(shortLinkId);
+        }
+        
+        AnalyticsDTO analyticsDTO = analyticsMapper.toAnalytics(metaDataList);
+        
+        // Add OS chart data with date range
+        if (startDateTime != null && endDateTime != null) {
+            List<AnalyticsDTO.OSChartData> osChartData = getOSChartData(shortLinkId, startDateTime, endDateTime);
+            analyticsDTO.setOsChartData(osChartData);
+        }
+        
+        return analyticsDTO;
     }
 
     private List<AnalyticsDTO.OSChartData> getOSChartData(Long shortLinkId, LocalDateTime startDate, LocalDateTime endDate) {

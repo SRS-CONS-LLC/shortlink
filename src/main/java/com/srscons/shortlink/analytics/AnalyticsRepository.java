@@ -14,6 +14,11 @@ public interface AnalyticsRepository extends JpaRepository<MetaDataEntity, Long>
 
     List<MetaDataEntity> findByShortLinkId(@Param("shortLinkId") Long shortLinkId);
 
+    List<MetaDataEntity> findByShortLinkIdAndClickTimeBetween(
+            @Param("shortLinkId") Long shortLinkId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
+
     // Total clicks for a specific shortlink
     @Query("SELECT COUNT(m) FROM MetaDataEntity m WHERE m.shortLink.id = :shortLinkId")
     Long countClicksByShortLinkId(@Param("shortLinkId") Long shortLinkId);
@@ -32,7 +37,7 @@ public interface AnalyticsRepository extends JpaRepository<MetaDataEntity, Long>
             "WHERE m.shortLink.id = :shortLinkId " +
             "AND m.clickTime BETWEEN :startDate AND :endDate " +
             "GROUP BY DATE(m.clickTime), m.os " +
-            "ORDER BY clickDate")
+            "ORDER BY clickDate ASC")
     List<Object[]> getOSDistributionByDateRange(
             @Param("shortLinkId") Long shortLinkId,
             @Param("startDate") LocalDateTime startDate,

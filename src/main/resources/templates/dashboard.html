@@ -101,13 +101,13 @@
 
             <div v-if="activeSection === 'analytics'" class="analytics-container">
                 <!-- Loading and Error States -->
-<!--                <div v-if="loading" class="loading-overlay">-->
-<!--                    <div class="spinner">Loading...</div>-->
-<!--                </div>-->
+                <div v-if="loading" class="loading-overlay">
+                    <div class="spinner">Loading...</div>
+                </div>
 
-<!--                <div v-if="error" class="error-alert">-->
-<!--                    {{ error }}-->
-<!--                </div>-->
+                <div v-if="error" class="error-alert">
+                    {{ error }}
+                </div>
 
                 <!-- Info Modal -->
                 <div v-if="showInfoModal" class="info-modal">
@@ -127,11 +127,31 @@
                                 CSV
                             </button>
                             <div class="date-range-picker">
-                                <input type="date" v-model="startDate" @change="handleDateChange">
+                                <div class="date-input-container">
+                                    <input type="date" 
+                                           ref="startDateInput"
+                                           v-model="startDate"
+                                           :max="endDate || undefined"
+                                           @change="handleDateChange"
+                                           class="date-input">
+                                    <div class="date-display" @click="openDatePicker('start')">
+                                        {{ startDate ? formatFullDate(startDate) : 'DD/MM/YYYY' }}
+                                    </div>
+                                </div>
                                 <span>→</span>
-                                <input type="date" v-model="endDate" @change="handleDateChange">
-                                <button class="btn btn-outline-secondary btn-sm" @click="applyDateRange">
-                                    <i class="bi bi-calendar"></i>
+                                <div class="date-input-container">
+                                    <input type="date" 
+                                           ref="endDateInput"
+                                           v-model="endDate"
+                                           :min="startDate || undefined"
+                                           @change="handleDateChange"
+                                           class="date-input">
+                                    <div class="date-display" @click="openDatePicker('end')">
+                                        {{ endDate ? formatFullDate(endDate) : 'DD/MM/YYYY' }}
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-secondary btn-sm" @click="resetDateRange">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
                                 </button>
                             </div>
                         </div>
@@ -164,14 +184,14 @@
                         </div>
                         
                         <div class="chart-wrapper">
-                            <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 1200 500">
-                                <!-- Background Grid -->
+                            <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 2000 500">
+                                <!-- Chart Grid -->
                                 <g class="chart-grid">
                                     <!-- Y-axis line -->
                                     <line 
-                                        x1="100" 
+                                        x1="120" 
                                         y1="50" 
-                                        x2="100" 
+                                        x2="120" 
                                         y2="400"
                                         class="axis-line" 
                                     />
@@ -179,14 +199,14 @@
                                     <!-- Horizontal grid lines -->
                                     <template v-for="n in 5" :key="'h'+n">
                                         <line 
-                                            x1="100" 
+                                            x1="120" 
                                             :y1="400 - (n * 87.5)" 
-                                            x2="1100" 
+                                            x2="1880" 
                                             :y2="400 - (n * 87.5)"
                                             class="grid-line solid-line"
                                         />
                                         <text 
-                                            x="85" 
+                                            x="100" 
                                             :y="400 - (n * 87.5)" 
                                             class="grid-label"
                                             text-anchor="end"
@@ -196,61 +216,59 @@
 
                                     <!-- X-axis line -->
                                     <line 
-                                        x1="100" 
+                                        x1="120" 
                                         y1="400" 
-                                        x2="1100" 
+                                        x2="1880" 
                                         y2="400"
                                         class="axis-line" 
                                     />
 
-                                    <!-- Vertical grid lines and date labels -->
-                                    <template v-for="(data, index) in osChartData" :key="'v'+index">
-                                        <!-- Vertical grid line -->
+                                    <!-- Dynamic vertical grid lines and dates -->
+                                    <template v-for="(data, index) in filteredChartData" :key="'v'+index">
                                         <line 
-                                            :x1="100 + (index * ((1000) / (osChartData.length - 1)))"
+                                            :x1="getXPosition(index, filteredChartData.length)"
                                             y1="50"
-                                            :x2="100 + (index * ((1000) / (osChartData.length - 1)))"
+                                            :x2="getXPosition(index, filteredChartData.length)"
                                             y2="400"
-                                            class="grid-line solid-line"
+                                            class="grid-line"
                                         />
-                                        <!-- Date label -->
                                         <text 
-                                            :x="100 + (index * ((1000) / (osChartData.length - 1)))"
-                                            y="430"
+                                            :x="getXPosition(index, filteredChartData.length)"
+                                            y="420"
                                             class="date-label"
                                             text-anchor="middle"
-                                        >{{ formatDate(data.date) }}</text>
+                                        >{{ formatDynamicDate(data.date) }}</text>
                                     </template>
                                 </g>
 
                                 <!-- Data Lines -->
-                                <g v-for="os in osLegend" :key="os.name" class="data-lines">
+                                <g v-for="os in osLegend" :key="os.name">
                                     <path
                                         :d="getOSPath(os.name)"
                                         :stroke="os.color"
-                                        fill="none"
                                         class="data-line"
+                                        fill="none"
                                     />
-                                    <!-- Data Points -->
-                                    <g v-for="(point, index) in getOSPoints(os.name)" :key="index">
-                                        <circle 
-                                            :cx="point.x"
-                                            :cy="point.y"
-                                            r="4"
-                                            fill="white"
-                                            :stroke="os.color"
-                                            stroke-width="1.5"
+                                </g>
+
+                                <!-- Data Points -->
+                                <g v-for="os in osLegend" :key="'points-'+os.name">
+                                    <template v-for="(data, index) in filteredChartData" :key="'point-'+index">
+                                        <circle
+                                            :cx="getXPosition(index, filteredChartData.length)"
+                                            :cy="400 - (data.osData[os.name] || 0) * 87.5"
+                                            :fill="os.color"
                                             class="data-point"
                                         />
-                                    </g>
+                                    </template>
                                 </g>
 
                                 <!-- Hover Overlay -->
                                 <rect
                                     class="chart-overlay"
-                                    x="100"
+                                    x="120"
                                     y="50"
-                                    width="1000"
+                                    width="1760"
                                     height="350"
                                     @mousemove="handleChartHover"
                                     @mouseleave="hideTooltip"
@@ -277,11 +295,26 @@
                             </div>
                             <div class="card-content">
                                 <template v-if="card.data && card.data.length > 0">
-                                    <div class="data-row" v-for="(item, index) in card.data" :key="index" :style="{ '--bar-color': getBarColor(index, card.data.length) }">
+                                    <div class="data-row" 
+                                         v-for="(item, index) in card.data" 
+                                         :key="index" 
+                                         :style="{ '--bar-color': getBarColor(index, card.data.length) }"
+                                         @mousemove="$event => { 
+                                             const tooltip = $event.currentTarget.querySelector('.data-tooltip');
+                                             if (tooltip) {
+                                                 tooltip.style.left = ($event.clientX - $event.currentTarget.getBoundingClientRect().left + 10) + 'px';
+                                                 tooltip.style.top = ($event.clientY - $event.currentTarget.getBoundingClientRect().top - 40) + 'px';
+                                                 tooltip.style.transform = 'none';
+                                             }
+                                         }">
                                         <div class="data-label">
                                             <span>{{ item.label }}</span>
                                         </div>
                                         <div class="data-value">{{ item.value }}</div>
+                                        <div class="data-tooltip">
+                                            <div>{{ item.label }}</div>
+                                            <div>Value: {{ item.value }}</div>
+                                        </div>
                                         <div class="data-bar" :style="{ width: calculatePercentage(item.value, card.data) + '%' }"></div>
                                     </div>
                                 </template>
@@ -316,7 +349,7 @@
                                     <div class="col-md-6">
                                         <div class="form-section-title">Smartlink Name <i
                                                 class="bi bi-question-circle"></i>
-                                        </div>
+                                        </div>  
                                         <div class="input-wrapper">
                                             <i class="bi bi-bookmark"></i>
                                             <input type="text" class="readonly-input" value="Draft Smartlink"
@@ -720,6 +753,10 @@
                 error: null,
                 infoText: null,
                 showInfoModal: false,
+                tooltipPosition: {
+                    top: '0px',
+                    left: '0px' 
+                },
 
                 // Summary metrics for the top cards
                 summaryMetrics: [
@@ -874,6 +911,14 @@
                 this.shortlinkId = idFromUrl;
                 this.fetchAnalytics();
             }
+
+            // Set initial date range to last 30 days when component is created
+            const end = new Date();
+            const start = new Date();
+            start.setDate(start.getDate() - 30);
+            
+            this.endDate = end.toISOString().split('T')[0];
+            this.startDate = start.toISOString().split('T')[0];
         },
         methods: {
             showInfo(text) {
@@ -885,8 +930,6 @@
             },
 
             async fetchAnalytics() {
-                console.log('fetchAnalytics called with shortlinkId:', this.shortlinkId);
-
                 if (!this.shortlinkId) {
                     console.error('No shortlinkId available');
                     this.error = "Shortlink ID not found.";
@@ -898,21 +941,19 @@
 
                 try {
                     let url = `/api/short-links/${this.shortlinkId}/analytics`;
+                    
                     if (this.startDate && this.endDate) {
                         url += `?startDate=${this.startDate}&endDate=${this.endDate}`;
                     }
+                    
                     console.log('Fetching from URL:', url);
 
                     const response = await fetch(url);
-                    console.log('Response status:', response.status);
-
                     if (!response.ok) {
                         throw new Error(`Analytics fetch error: ${response.status}`);
                     }
 
                     const analyticsData = await response.json();
-                    console.log('Received analytics data:', analyticsData);
-
                     this.processAnalyticsData(analyticsData);
                 } catch (error) {
                     console.error('Error in fetchAnalytics:', error);
@@ -928,7 +969,14 @@
                 this.summaryMetrics[1].value = data.totalQRCodeScans || 0;
                 this.summaryMetrics[2].value = data.totalReferrals || 0;
 
-                // Update devices card with sorting
+                // Process OS chart data and ensure it's sorted
+                if (data.osChartData && data.osChartData.length > 0) {
+                    this.osChartData = data.osChartData.sort((a, b) => {
+                        return new Date(a.date) - new Date(b.date);
+                    });
+                }
+
+                // Update other cards with sorting
                 this.dataCards[0].data = Object.entries(data.devices || {})
                     .map(([label, value]) => ({ label, value }))
                     .sort((a, b) => b.value - a.value);
@@ -1012,43 +1060,142 @@
                 return (value / max) * 100;
             },
 
-            formatDate(dateString) {
-                const date = new Date(dateString);
-                const day = date.getDate().toString().padStart(2, '0');
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                return `${day}.${month}`;
-            },
-
-            formatFullDate(dateString) {
-                const date = new Date(dateString);
+            formatDateForDisplay(dateStr) {
+                if (!dateStr) return '';
+                const date = new Date(dateStr);
                 const day = date.getDate().toString().padStart(2, '0');
                 const month = (date.getMonth() + 1).toString().padStart(2, '0');
                 const year = date.getFullYear();
-                return `${day}.${month}.${year}`;
+                return `${day}/${month}/${year}`;
+            },
+
+            formatFullDate(dateStr) {
+                if (!dateStr) return '';
+                const date = new Date(dateStr);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            },
+
+            getDateForIndex(index) {
+                if (!this.startDate || !this.endDate) return '';
+                
+                const start = new Date(this.startDate);
+                const end = new Date(this.endDate);
+                const totalDays = (end - start) / (1000 * 60 * 60 * 24);
+                const daysToAdd = Math.floor((totalDays / 9) * index);
+                
+                const date = new Date(start);
+                date.setDate(date.getDate() + daysToAdd);
+                
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
             },
 
             getOSPath(osName) {
-                if (!this.osChartData.length) return '';
+                if (!this.filteredChartData || !this.filteredChartData.length) return '';
 
                 let path = '';
-                this.osChartData.forEach((data, index) => {
-                    const x = 100 + (index * (1000 / (this.osChartData.length - 1)));
-                    const y = 400 - (data.osData[osName] || 0) * 87.5;
+                const data = this.filteredChartData;
+                const totalPoints = data.length;
 
-                    if (index === 0) {
+                // If only one point, draw a dot
+                if (totalPoints === 1) {
+                    const x = 1000; // Center point
+                    const y = 400 - (data[0].osData[osName] || 0) * 87.5;
+                    return `M ${x-1} ${y} L ${x+1} ${y}`;
+                }
+
+                // Draw line through all points
+                data.forEach((point, i) => {
+                    const x = this.getXPosition(i, totalPoints);
+                    const y = 400 - (point.osData[osName] || 0) * 87.5;
+                    
+                    if (i === 0) {
                         path += `M ${x} ${y}`;
                     } else {
                         path += ` L ${x} ${y}`;
                     }
                 });
+
                 return path;
             },
 
-            getOSPoints(osName) {
-                return this.osChartData.map((data, index) => ({
-                    x: 100 + (index * (1000 / (this.osChartData.length - 1))),
-                    y: 400 - (data.osData[osName] || 0) * 87.5
-                }));
+            getXPosition(index, totalPoints) {
+                if (totalPoints <= 1) {
+                    return 1000; // Center point for single data
+                }
+                // Calculate position based on total width and number of points
+                const availableWidth = 1760; // Total width minus margins
+                const spacing = availableWidth / (totalPoints - 1);
+                return 120 + (index * spacing); // Start from x=120 (left margin)
+            },
+
+            filteredChartData() {
+                if (!this.osChartData || !this.osChartData.length) return [];
+                
+                // Filter data between start and end dates
+                const filteredByDate = this.osChartData.filter(data => {
+                    const date = new Date(data.date);
+                    const start = this.startDate ? new Date(this.startDate) : null;
+                    const end = this.endDate ? new Date(this.endDate) : null;
+                    
+                    if (start && end) {
+                        return date >= start && date <= end;
+                    } else if (start) {
+                        return date >= start;
+                    } else if (end) {
+                        return date <= end;
+                    }
+                    return true;
+                }).sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
+
+                if (!filteredByDate.length) return [];
+                
+                // If only one data point exists, return it
+                if (filteredByDate.length === 1) {
+                    return filteredByDate;
+                }
+                
+                // If 10 or fewer points, return all
+                if (filteredByDate.length <= 10) {
+                    return filteredByDate;
+                }
+                
+                // For more than 10 points, select evenly spaced points
+                const result = [];
+                const step = (filteredByDate.length - 1) / 9;
+                
+                // Always include first and last points
+                result.push(filteredByDate[0]);
+                
+                // Add 8 evenly spaced points in between
+                for (let i = 1; i < 9; i++) {
+                    const index = Math.round(i * step);
+                    result.push(filteredByDate[index]);
+                }
+                
+                // Add last point
+                result.push(filteredByDate[filteredByDate.length - 1]);
+                
+                return result;
+            },
+
+            handleDateChange() {
+                if (this.startDate && this.endDate) {
+                    const start = new Date(this.startDate);
+                    const end = new Date(this.endDate);
+                    
+                    if (start > end) {
+                        this.error = "Start date cannot be after end date";
+                        return;
+                    }
+
+                    this.fetchAnalytics();
+                }
             },
 
             selectSection(section) {
@@ -1078,15 +1225,15 @@
                 const rect = chartWrapper.getBoundingClientRect();
 
                 // Calculate which data point we're closest to
-                const xPos = svgPoint.x - 100;
-                const step = 1000 / (this.osChartData.length - 1);
+                const xPos = svgPoint.x - 120;
+                const step = 1760 / (this.osChartData.length - 1);
                 const dataIndex = Math.round(xPos / step);
 
                 if (dataIndex >= 0 && dataIndex < this.osChartData.length) {
                     const data = this.osChartData[dataIndex];
-                    
+
                     this.tooltipData = {
-                        date: this.formatFullDate(data.date),
+                        date: this.formatDateForDisplay(data.date),
                         values: data.osData
                     };
 
@@ -1146,7 +1293,7 @@
 
                 this.osChartData.forEach(data => {
                     const row = [
-                        this.formatFullDate(data.date),
+                        this.formatDateForDisplay(data.date),
                         data.osData.iOS || 0,
                         data.osData.macOS || 0,
                         data.osData.Windows || 0,
@@ -1157,24 +1304,6 @@
                 });
 
                 return rows.map(row => row.join(",")).join("\n");
-            },
-
-            handleDateChange() {
-                // Validate dates
-                if (this.startDate && this.endDate) {
-                    const start = new Date(this.startDate);
-                    const end = new Date(this.endDate);
-                    if (start > end) {
-                        this.error = "Start date cannot be after end date";
-                        return;
-                    }
-                }
-            },
-
-            applyDateRange() {
-                if (this.startDate && this.endDate) {
-                    this.fetchAnalytics();
-                }
             },
 
             selectLink(linkId) {
@@ -1217,7 +1346,33 @@
                 // Implementation of handleQRTagImageUpload method
             },
 
-            // getBarColor
+            resetDateRange() {
+                // Set default date range to last 30 days
+                const end = new Date();
+                const start = new Date();
+                start.setDate(start.getDate() - 30);
+                
+                this.endDate = end.toISOString().split('T')[0];
+                this.startDate = start.toISOString().split('T')[0];
+                this.fetchAnalytics();
+            },
+
+            openDatePicker(type) {
+                if (type === 'start') {
+                    this.$refs.startDateInput.showPicker();
+                } else {
+                    this.$refs.endDateInput.showPicker();
+                }
+            },
+
+            formatDynamicDate(dateStr) {
+                if (!dateStr) return '';
+                const date = new Date(dateStr);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            },
         },
         setup() {
             const baseUrl = computed(() => {
@@ -1755,7 +1910,6 @@
                 createNewLink,
                 saveChanges,
                 handleQRTagImageUpload,
-                // getBarColor
             };
         }
     }).mount('#app');
